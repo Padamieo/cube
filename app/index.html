@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
+
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -12,16 +13,17 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
+
   </head>
-  <body>
+  <body onload="myFunction()">
+
     <ul id="messages"></ul>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+    <input id="m" autocomplete="off" /><button>Send</button>
     </form>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="index.js"></script>
-  <script>
-    var socket = io();
-  </script>
+
+    <script src="index.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script><!-- would like to referance out localyhosted version -->
+
   </body>
 </html>

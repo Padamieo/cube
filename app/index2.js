@@ -20,5 +20,5 @@ var polo = require('polo');
 var apps = polo();
 
 apps.once('up', function(name, service) {                   // up fires everytime some service joins
-    console.log(apps.get(name));                        // should print out the joining service, e.g. hello-world
+  console.log(apps.get(name));                        // should print out the joining service, e.g. hello-world
 });
