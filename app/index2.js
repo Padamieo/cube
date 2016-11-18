@@ -22,3 +22,12 @@ var apps = polo();
 apps.once('up', function(name, service) {                   // up fires everytime some service joins
   console.log(apps.get(name));                        // should print out the joining service, e.g. hello-world
 });
+
+
+// var name = "hello-world";
+//
+// apps.once('up', function(name, service) {
+//   console.log(service);
+//   console.log(apps);
+//   //var socket = io.connect('http://10.50.74.5:'+http.address().port);
+// });
