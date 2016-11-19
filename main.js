@@ -6,6 +6,8 @@ const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
+const ipcMain = electron.ipcMain;
+
 const path = require('path')
 const url = require('url')
 
@@ -37,6 +39,33 @@ function createWindow () {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
+
+  ipcMain.on('show-prop1', function(event) {
+    console.log("test");
+
+    var polo = require('polo');
+    var apps = polo();
+
+    var apps = polo({
+      multicast: true,     // disables network multicast,
+      monitor: true        // fork a monitor for faster failure detection
+    });
+
+    apps.put({
+      name:'hello-world',
+      port: 3000
+    });
+
+  });
+
+  ipcMain.on('show-prop2', function(event, tt) {
+    console.log(tt);
+    var polo = require('polo');
+    var apps = polo();
+    apps.once('up', function(name, service) {                   // up fires everytime some service joins
+      console.log(apps.get(name));                        // should print out the joining service, e.g. hello-world
+    });
+  });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
