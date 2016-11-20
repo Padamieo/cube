@@ -23,26 +23,19 @@ http.listen(0, ip_address, function(){
 
 
 function myFunction(){
-  var polo = require('polo');
-  var apps = polo();
 
-  // var apps = polo({
-  //     multicast: true,     // disables network multicast,
-  //     monitor: true        // fork a monitor for faster failure detection
-  // });
 
   document.getElementById("host").onclick = function(){
     console.log("hosting");
 
     var ipcRenderer = require('electron').ipcRenderer;
-    ipcRenderer.send('show-prop1');
+    var service = {
+      ip: ip_address,
+      port: http.address().port
+    }
+    ipcRenderer.send('advertise', service);
 
-    // apps.put({
-    //   name:'hello-world',
-    //   port: 3000
-    // });
-
-    //var socket = io.connect('http://10.50.74.5:'+http.address().port);
+    var socket = io.connect('http://'+ip_address+':'+http.address().port);
 
   };
 
@@ -50,15 +43,14 @@ function myFunction(){
     console.log("joining");
 
     var ipcRenderer = require('electron').ipcRenderer;
-    ipcRenderer.send('show-prop2', 'bv232');
+    ipcRenderer.send('find', http.address().port);
 
-    // var name = "hello-world";
-    // apps.once('up', function(name, service) {
-    //   console.log("test");
-    //   console.log(service);
-    //   console.log(apps);
-    //   var socket = io.connect('http://'+ip_address+':'+http.address().port);
-    // });
+    ipcRenderer.on('asynchronous-reply', (event, arg) => {
+      console.log(arg);
+      var socket = io.connect('http://'+arg.ip+':'+arg.port);
+    });
+
+
 
   };
 

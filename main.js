@@ -40,31 +40,63 @@ function createWindow () {
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 
-  ipcMain.on('show-prop1', function(event) {
-    console.log("test");
+  ipcMain.on('advertise', function(event, service) {
 
-    var polo = require('polo');
-    var apps = polo();
+    // /*polo*/
+    // var polo = require('polo');
+    // var apps = polo();
+    // var apps = polo({
+    //   multicast: true,     // disables network multicast,
+    //   monitor: true        // fork a monitor for faster failure detection
+    // });
+    // apps.put({
+    //   name:'hello-world',
+    //   port: service.port
+    // });
 
-    var apps = polo({
-      multicast: true,     // disables network multicast,
-      monitor: true        // fork a monitor for faster failure detection
+    var Discover = require('node-discover');
+    var d = Discover();
+
+    d.advertise({ something : "something" });
+
+    d.on('added', function(obj) {
+      console.log('A new node has been added. d');
+
+      var success = d.send("service-details", { details : service });
+
+      if (!success) {
+        //could not send on that channel; probably because it is reserved
+        console.log("d");
+      }
     });
 
-    apps.put({
-      name:'hello-world',
-      port: 3000
-    });
 
   });
 
-  ipcMain.on('show-prop2', function(event, tt) {
-    console.log(tt);
-    var polo = require('polo');
-    var apps = polo();
-    apps.once('up', function(name, service) {                   // up fires everytime some service joins
-      console.log(apps.get(name));                        // should print out the joining service, e.g. hello-world
+  ipcMain.on('find', function(event, port) {
+
+    // /*polo*/
+    // var polo = require('polo');
+    // var apps = polo();
+    // apps.once('up', function(name, service) {
+    //   console.log(apps.get(name));
+    //   event.sender.send('asynchronous-reply', apps.get(name));
+    // });
+
+    var Discover = require('node-discover');
+    var d = Discover();
+
+    var success = d.join("service-details", function (data) {
+      console.log("something join");
+        if (data.details) {
+            //connect to the new redis master
+            console.log(data.details);
+            event.sender.send('asynchronous-reply', data.details);
+        }
     });
+
+    console.log(success);
+
   });
 
   // Emitted when the window is closed.
