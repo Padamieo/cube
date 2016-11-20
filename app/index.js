@@ -2,6 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var t = require('./test.js');
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -16,7 +17,8 @@ io.on('connection', function(socket){
 
 });
 
-var ip_address = '192.168.0.10';//'10.50.74.5';
+var ip_address = t.getAddress(); //'192.168.0.3';//'10.50.74.5';
+
 http.listen(0, ip_address, function(){
   console.log('listening on *:' + http.address().port );
 });
@@ -36,6 +38,8 @@ function myFunction(){
     ipcRenderer.send('advertise', service);
 
     var socket = io.connect('http://'+ip_address+':'+http.address().port);
+
+    t.someFunction();
 
   };
 
