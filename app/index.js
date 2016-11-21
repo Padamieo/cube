@@ -1,9 +1,13 @@
 /*cube-hide-and-seek V0.0.1 made on 2016-11-21*/function myFunction() {
     function common(socket) {
         three = THREE.Bootstrap(), socket.on("createPlayer", function(data) {
-            console.log("boops"), t.createPlayer(data);
+            t.createPlayer(data);
         }), socket.on("connect", function() {
-            t.loadWorld();
+            t.loadWorld(), socket.emit("requestOldPlayers", {});
+        }), socket.on("addOtherPlayer", function(data) {
+            t.addOtherPlayer(data);
+        }), socket.on("removeOtherPlayer", function(data) {
+            t.removeOtherPlayer(data);
         });
     }
     document.getElementById("host").onclick = function() {
@@ -16075,7 +16079,12 @@ app.get("/", function(req, res) {
 }), io.on("connection", function(socket) {
     console.log("a user connected");
     var id = socket.id;
-    player = host.addPlayer(id), console.log(player), socket.emit("createPlayer", player);
+    player = host.addPlayer(id), console.log(player), socket.emit("createPlayer", player), 
+    socket.broadcast.emit("addOtherPlayer", player), socket.on("requestOldPlayers", function() {
+        for (var i = 0; i < players.length; i++) players[i].playerId != id && socket.emit("addOtherPlayer", players[i]);
+    }), socket.on("disconnect", function() {
+        console.log("user disconnected"), socket.emit("removeOtherPlayer", player), host.removePlayer(player);
+    });
 });
 
 var ip_address = t.getAddress();

@@ -60,10 +60,19 @@ var test = {
 
   },
 
-  updateCameraPosition: function(){
-    three.camera.position.x = player.position.x + 2* Math.sin( player.rotation.y );
-    three.camera.position.y = player.position.y + 2;
-    three.camera.position.z = player.position.z + 2.5 * Math.cos( player.rotation.y );
+  getObject: function(playerId){
+    for(var i = 0; i < objects.length; i++){
+      if(objects[i].rel == playerId){
+        return objects[i];
+      }
+    }
+  },
+
+  updateCameraPosition: function(playerId){
+    var obj = this.getObject(playerId);
+    three.camera.position.x = obj.position.x + 2* Math.sin( obj.rotation.y );
+    three.camera.position.y = obj.position.y + 2;
+    three.camera.position.z = obj.position.z + 2.5 * Math.cos( obj.rotation.y );
   },
 
   create_cube: function(data){
@@ -81,36 +90,59 @@ var test = {
     //this needs to be array to hold all cube_geometry or we end up with one cube with material
     cube_geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
     cube_material = new THREE.MeshLambertMaterial({color: 0x7f1d1d});
+    var temp = new THREE.Mesh(cube_geometry, cube_material);
 
-    return new THREE.Mesh(cube_geometry, cube_material);
+    return temp;
   },
 
   createPlayer: function(data){
 
-    //playerData = data;
-
     // no idea why this does not work
     // player = create_cube(data);
-    // console.log(player);
 
-    player = new THREE.Mesh(
+    //think i need to change player to avatar or something
+    var obj = new THREE.Mesh(
       new THREE.CubeGeometry(data.sizeX, data.sizeX, data.sizeX),
       new THREE.MeshLambertMaterial({color: 0x7777ff, transparent:true, opacity:0.8, side: THREE.DoubleSide})
     );
 
-    player.rotation.set(0,0,0);
-    player.position.x = data.x;
-    player.position.y = data.y;
-    player.position.z = data.z;
+    obj.rel = data.playerId;
 
-    playerId = data.playerId;
-    moveSpeed = data.speed;
-    turnSpeed = data.turnSpeed;
-    this.updateCameraPosition();
-    objects.push( player );
-    three.scene.add( player );
-    three.camera.lookAt( player.position );
+    obj.rotation.set(0,0,0);
+    obj.position.x = data.x;
+    obj.position.y = data.y;
+    obj.position.z = data.z;
 
+    objects.push( obj );
+    three.scene.add( obj );
+
+    //camera look at the player
+    this.updateCameraPosition(data.playerId);
+    three.camera.lookAt( obj.position );
+
+  },
+
+  addOtherPlayer: function(data){
+
+    cube_geometry3 = new THREE.BoxGeometry(data.sizeX, data.sizeX, data.sizeX);
+    cube_material3 = new THREE.MeshLambertMaterial({color: 0x7777ff});
+    otherPlayer = new THREE.Mesh(cube_geometry3, cube_material3);
+
+    otherPlayer.rel = data.playerId;
+    otherPlayer.rotation.set(0,0,0);
+    otherPlayer.position.x = data.x;
+    otherPlayer.position.y = data.y;
+    otherPlayer.position.z = data.z;
+
+    objects.push( otherPlayer );
+    three.scene.add( otherPlayer );
+
+  },
+
+  removeOtherPlayer: function(data){
+    var obj = this.getObject(data.playerId);
+    //var selectedObject = scene.getObjectByName(obj.name);
+    three.scene.remove( obj );
   }
 
 };

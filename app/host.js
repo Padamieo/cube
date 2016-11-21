@@ -23,15 +23,25 @@ var host = {
     return player;
   },
 
-  playerForId: function( id ){
-    var index;
-    for (var i = 0; i < otherPlayersId.length; i++){
-      if (otherPlayersId[i] == id){
-        index = i;
-        break;
-      }
+  // playerForId: function( id ){
+  //   var index;
+  //   for (var i = 0; i < otherPlayersId.length; i++){
+  //     if (otherPlayersId[i] == id){
+  //       index = i;
+  //       break;
+  //     }
+  //   }
+  //   return otherPlayers[index];
+  // },
+
+  removePlayer: function(player){
+    console.log("remove player");
+
+    var index = players.indexOf(player);
+    if (index > -1) {
+      players.splice(index, 1);
     }
-    return otherPlayers[index];
+
   }
 
 };
