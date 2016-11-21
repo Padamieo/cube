@@ -83,6 +83,34 @@ var test = {
     cube_material = new THREE.MeshLambertMaterial({color: 0x7f1d1d});
 
     return new THREE.Mesh(cube_geometry, cube_material);
+  },
+
+  createPlayer: function(data){
+
+    //playerData = data;
+
+    // no idea why this does not work
+    // player = create_cube(data);
+    // console.log(player);
+
+    player = new THREE.Mesh(
+      new THREE.CubeGeometry(data.sizeX, data.sizeX, data.sizeX),
+      new THREE.MeshLambertMaterial({color: 0x7777ff, transparent:true, opacity:0.8, side: THREE.DoubleSide})
+    );
+
+    player.rotation.set(0,0,0);
+    player.position.x = data.x;
+    player.position.y = data.y;
+    player.position.z = data.z;
+
+    playerId = data.playerId;
+    moveSpeed = data.speed;
+    turnSpeed = data.turnSpeed;
+    this.updateCameraPosition();
+    objects.push( player );
+    three.scene.add( player );
+    three.camera.lookAt( player.position );
+
   }
 
 };

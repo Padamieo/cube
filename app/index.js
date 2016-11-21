@@ -1,4 +1,11 @@
 /*cube-hide-and-seek V0.0.1 made on 2016-11-21*/function myFunction() {
+    function common(socket) {
+        three = THREE.Bootstrap(), socket.on("createPlayer", function(data) {
+            console.log("boops"), t.createPlayer(data);
+        }), socket.on("connect", function() {
+            t.loadWorld();
+        });
+    }
     document.getElementById("host").onclick = function() {
         console.log("hosting");
         var ipcRenderer = require("electron").ipcRenderer, service = {
@@ -6,14 +13,15 @@
             port: http.address().port
         };
         ipcRenderer.send("advertise", service);
-        io.connect("http://" + ip_address + ":" + http.address().port);
-        three = THREE.Bootstrap(), t.loadWorld();
+        var socket = io.connect("http://" + ip_address + ":" + http.address().port);
+        common(socket);
     }, document.getElementById("join").onclick = function() {
         console.log("joining");
         var ipcRenderer = require("electron").ipcRenderer;
-        ipcRenderer.send("find", http.address().port), ipcRenderer.on("asynchronous-reply", function(event) {
+        ipcRenderer.send("find", http.address().port), ipcRenderer.on("asynchronous-reply", function(event, arg) {
             console.log(arg);
-            io.connect("http://" + arg.ip + ":" + arg.port);
+            var socket = io.connect("http://" + arg.ip + ":" + arg.port);
+            common(socket);
         });
     };
 }
@@ -16058,7 +16066,7 @@ THREE.VRControls = function(object, domElement) {
     }
 });
 
-var app = require("express")(), http = require("http").Server(app), io = require("socket.io")(http), t = require("./test.js"), host = require("./host.js"), three, player, players = [];
+var app = require("express")(), http = require("http").Server(app), io = require("socket.io")(http), t = require("./test.js"), host = require("./host.js"), three, player, socketio, players = [], objects = [], keyState = {};
 
 app.get("/", function(req, res) {
     res.sendFile(__dirname + "/index.html");
@@ -16067,7 +16075,7 @@ app.get("/", function(req, res) {
 }), io.on("connection", function(socket) {
     console.log("a user connected");
     var id = socket.id;
-    player = host.addPlayer(id), console.log(player);
+    player = host.addPlayer(id), console.log(player), socket.emit("createPlayer", player);
 });
 
 var ip_address = t.getAddress();

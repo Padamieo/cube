@@ -2,11 +2,13 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+
 var t = require('./test.js');
 var host = require('./host.js');
 
-var three, player;
-var players = [];
+var three, player, socketio;
+var players = [], objects = [];
+var keyState = {};
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -25,11 +27,12 @@ io.on('connection', function(socket){
   console.log(player);
 
   //var player = host.playerForId(id);
-  //socket.emit('createPlayer', '');
+  socket.emit('createPlayer', player);
 
 
 
 });
+
 
 var ip_address = t.getAddress(); //'192.168.0.3';//'10.50.74.5';
 
@@ -52,12 +55,24 @@ function myFunction(){
     ipcRenderer.send('advertise', service);
 
     var socket = io.connect('http://'+ip_address+':'+http.address().port);
-
-    three = THREE.Bootstrap();
-
-    t.loadWorld();
+    common(socket);
 
   };
+
+  function common(socket){
+    /* common */
+    three = THREE.Bootstrap();
+
+    socket.on('createPlayer', function(data){
+      console.log("boops");
+      t.createPlayer(data);
+    });
+
+    socket.on('connect', function(){
+      t.loadWorld();
+      //socket.emit('requestOldPlayers', {});
+    });
+  }
 
   document.getElementById("join").onclick = function(){
     console.log("joining");
@@ -65,9 +80,11 @@ function myFunction(){
     var ipcRenderer = require('electron').ipcRenderer;
     ipcRenderer.send('find', http.address().port);
 
-    ipcRenderer.on('asynchronous-reply', function(event){
+    ipcRenderer.on('asynchronous-reply', function(event, arg){
       console.log(arg);
       var socket = io.connect('http://' + arg.ip+':'+arg.port);
+      common(socket);
+
     });
 
     // ipcRenderer.on('asynchronous-reply', (event, arg) => {
