@@ -38,9 +38,10 @@ io.on('connection', function(socket){
   });
 
   socket.on('updatePosition', function(data){
-    console.log('test'+data);
+    console.log('updatePosition');
+    console.log(data);
     // var newData = world.updatePlayerData(data);
-    // socket.broadcast.emit('updatePosition', newData);
+    socket.broadcast.emit('updatePosition', 5);
   });
 
   socket.on('disconnect', function(){
@@ -110,7 +111,8 @@ function myFunction(){
 
     socket.on('updatePosition', function(data){
       //updatePlayerPosition(data);
-      console.log('updatePosition'+data);
+      console.log('updatePosition');
+      console.log(data);
     });
 
     socket.on('removeOtherPlayer', function(data){

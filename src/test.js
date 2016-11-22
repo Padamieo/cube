@@ -100,13 +100,37 @@ var test = {
       //objects[0].rotation.x += player.turnSpeed;
       var obj = this.getObject(playerD.playerId);
       obj.rotation.x += playerD.turnSpeed;
-      //updatePlayerData();
+
+      var pass = {
+        playerId: playerD.playerId,
+        r_x: obj.rotation.x,
+        r_y: obj.rotation.y,
+        r_z: obj.rotation.z
+      }
+
       if(socket){
-        socket.emit('updatePosition', 1);
+        this.updatePlayerData(pass);
+        socket.emit('updatePosition', pass);
       }
 
     }
 
+  },
+
+  updatePlayerData: function(pass){
+    console.log('updatePlayerData');
+
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == pass.playerId){
+        // players[i].x = 1;
+        // players[i].y = 1;
+        // players[i].z = 1;
+        players[i].r_x = pass.r_x; //obj.rotation.x;
+        players[i].r_y = pass.r_y; //obj.rotation.y;
+        players[i].r_z = pass.r_z; //obj.rotation.z;
+        //console.log(players[i]);
+      }
+    }
   },
 
   getObject: function(playerId){

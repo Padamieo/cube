@@ -37,6 +37,7 @@ var host = {
   updatePlayerData: function(data){
     console.log('updatePlayerData');
     console.log(data);
+
     // var player = playerForId(data.playerId);
     // player.x = data.x;
     // player.y = data.y;
