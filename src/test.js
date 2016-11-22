@@ -1,5 +1,5 @@
 var os = require('os');
-
+var socket;
 var test = {
 
   someFunction: function(){
@@ -31,7 +31,7 @@ var test = {
     return addresses;
   },
 
-  loadWorld: function(){
+  loadWorld: function(socket){
 
     var random_cube = this.create_cube();
     three.scene.add( random_cube );
@@ -45,18 +45,67 @@ var test = {
     directionalLight.position.set( 2, 1.2, 10 ).normalize();
     three.scene.add( directionalLight );
 
+    this.registerEvents();
+
     three.camera.position.set(1, 1, 0.5);
+
     var v = this;
+
     three.on('update', function () {
       if ( player ){
         //console.log(this);
-        //v.updateCameraPosition();
-        //checkKeyStates();
+        //v.updateCameraPosition(player.playerId);
+        v.checkKeyStates(player, socket);
+
         //three.camera.lookAt( player.position );
+
+        v.updateCameraPosition( player.playerId );
+
       }
     });
 
     three.init();
+
+  },
+
+  registerEvents: function(){
+    // document.addEventListener('click', onMouseClick, false );
+    // document.addEventListener('mousedown', onMouseDown, false);
+    // document.addEventListener('mouseup', onMouseUp, false);
+    // document.addEventListener('mousemove', onMouseMove, false);
+    // document.addEventListener('mouseout', onMouseOut, false);
+    document.addEventListener('keydown', this.onKeyDown, false );
+    document.addEventListener('keyup', this.onKeyUp, false );
+    //window.addEventListener( 'resize', onWindowResize, false );
+  },
+
+  onKeyDown: function( event ){
+    //event = event || window.event;
+    keyState[event.keyCode || event.which] = true;
+  },
+
+  onKeyUp: function( event ){
+    //event = event || window.event;
+    keyState[event.keyCode || event.which] = false;
+  },
+
+  checkKeyStates: function( playerD , socket){
+
+    if (keyState[38] || keyState[87]) {
+      // up arrow or 'w' - move forward
+      //player.position.x -= moveSpeed * Math.sin(player.rotation.y);
+      //player.position.z -= moveSpeed * Math.cos(player.rotation.y);
+
+      console.log("request to move w");
+      //objects[0].rotation.x += player.turnSpeed;
+      var obj = this.getObject(playerD.playerId);
+      obj.rotation.x += playerD.turnSpeed;
+      //updatePlayerData();
+      if(socket){
+        socket.emit('updatePosition', 1);
+      }
+
+    }
 
   },
 
@@ -117,7 +166,7 @@ var test = {
     three.scene.add( obj );
 
     //camera look at the player
-    this.updateCameraPosition(data.playerId);
+    this.updateCameraPosition( data.playerId );
     three.camera.lookAt( obj.position );
 
   },

@@ -6,7 +6,7 @@ var io = require('socket.io')(http);
 var t = require('./test.js');
 var host = require('./host.js');
 
-var three, player, socketio;
+var three, player, socket;
 var players = [], objects = [];
 var keyState = {};
 
@@ -22,12 +22,10 @@ io.on('connection', function(socket){
   console.log('a user connected');
 
   var id = socket.id;
-  player = host.addPlayer(id);
-
-  console.log(player);
+  //player = host.addPlayer(id);
 
   //var player = host.playerForId(id);
-  socket.emit('createPlayer', player);
+  socket.emit('createPlayer', socket.id);//player);
 
   socket.broadcast.emit('addOtherPlayer', player);
 
@@ -39,10 +37,11 @@ io.on('connection', function(socket){
     }
   });
 
-  // socket.on('updatePosition', function(data){
-  //   var newData = world.updatePlayerData(data);
-  //   socket.broadcast.emit('updatePosition', newData);
-  // });
+  socket.on('updatePosition', function(data){
+    console.log('test'+data);
+    // var newData = world.updatePlayerData(data);
+    // socket.broadcast.emit('updatePosition', newData);
+  });
 
   socket.on('disconnect', function(){
     console.log('user disconnected');
@@ -62,7 +61,6 @@ http.listen(0, ip_address, function(){
 
 function myFunction(){
 
-
   document.getElementById("host").onclick = function(){
     console.log("hosting");
 
@@ -78,33 +76,6 @@ function myFunction(){
 
   };
 
-  function common(socket){
-    /* common */
-    three = THREE.Bootstrap();
-
-    socket.on('createPlayer', function(data){
-      t.createPlayer(data);
-    });
-
-    socket.on('connect', function(){
-      t.loadWorld();
-      socket.emit('requestOldPlayers', {});
-    });
-
-    socket.on('addOtherPlayer', function(data){
-      t.addOtherPlayer(data);
-    });
-
-    // socket.on('updatePosition', function(data){
-    //     updatePlayerPosition(data);
-    // });
-
-    socket.on('removeOtherPlayer', function(data){
-      t.removeOtherPlayer(data);
-    });
-
-  }
-
   document.getElementById("join").onclick = function(){
     console.log("joining");
 
@@ -112,19 +83,40 @@ function myFunction(){
     ipcRenderer.send('find', http.address().port);
 
     ipcRenderer.on('asynchronous-reply', function(event, arg){
-      console.log(arg);
+      //console.log(arg);
       var socket = io.connect('http://' + arg.ip+':'+arg.port);
       common(socket);
-
     });
 
-    // ipcRenderer.on('asynchronous-reply', (event, arg) => {
-    //   console.log(arg);
-    //   var socket = io.connect('http://' + arg.ip+':'+arg.port);
-    // });
-
-
-
   };
+
+  function common(socket){
+    /* common */
+    three = THREE.Bootstrap();
+
+    socket.on('createPlayer', function(data){
+      player = host.addPlayer(data);
+      t.createPlayer(player);
+    });
+
+    socket.on('connect', function(){
+      t.loadWorld(socket);
+      socket.emit('requestOldPlayers', {});
+    });
+
+    socket.on('addOtherPlayer', function(data){
+      t.addOtherPlayer(data);
+    });
+
+    socket.on('updatePosition', function(data){
+      //updatePlayerPosition(data);
+      console.log('updatePosition'+data);
+    });
+
+    socket.on('removeOtherPlayer', function(data){
+      t.removeOtherPlayer(data);
+    });
+
+  }
 
 }

@@ -1,11 +1,13 @@
-/*cube-hide-and-seek V0.0.1 made on 2016-11-21*/function myFunction() {
+/*cube-hide-and-seek V0.0.1 made on 2016-11-22*/function myFunction() {
     function common(socket) {
         three = THREE.Bootstrap(), socket.on("createPlayer", function(data) {
-            t.createPlayer(data);
+            player = host.addPlayer(data), t.createPlayer(player);
         }), socket.on("connect", function() {
-            t.loadWorld(), socket.emit("requestOldPlayers", {});
+            t.loadWorld(socket), socket.emit("requestOldPlayers", {});
         }), socket.on("addOtherPlayer", function(data) {
             t.addOtherPlayer(data);
+        }), socket.on("updatePosition", function(data) {
+            console.log("updatePosition" + data);
         }), socket.on("removeOtherPlayer", function(data) {
             t.removeOtherPlayer(data);
         });
@@ -23,7 +25,6 @@
         console.log("joining");
         var ipcRenderer = require("electron").ipcRenderer;
         ipcRenderer.send("find", http.address().port), ipcRenderer.on("asynchronous-reply", function(event, arg) {
-            console.log(arg);
             var socket = io.connect("http://" + arg.ip + ":" + arg.port);
             common(socket);
         });
@@ -16070,7 +16071,7 @@ THREE.VRControls = function(object, domElement) {
     }
 });
 
-var app = require("express")(), http = require("http").Server(app), io = require("socket.io")(http), t = require("./test.js"), host = require("./host.js"), three, player, socketio, players = [], objects = [], keyState = {};
+var app = require("express")(), http = require("http").Server(app), io = require("socket.io")(http), t = require("./test.js"), host = require("./host.js"), three, player, socket, players = [], objects = [], keyState = {};
 
 app.get("/", function(req, res) {
     res.sendFile(__dirname + "/index.html");
@@ -16079,9 +16080,11 @@ app.get("/", function(req, res) {
 }), io.on("connection", function(socket) {
     console.log("a user connected");
     var id = socket.id;
-    player = host.addPlayer(id), console.log(player), socket.emit("createPlayer", player), 
-    socket.broadcast.emit("addOtherPlayer", player), socket.on("requestOldPlayers", function() {
+    socket.emit("createPlayer", socket.id), socket.broadcast.emit("addOtherPlayer", player), 
+    socket.on("requestOldPlayers", function() {
         for (var i = 0; i < players.length; i++) players[i].playerId != id && socket.emit("addOtherPlayer", players[i]);
+    }), socket.on("updatePosition", function(data) {
+        console.log("test" + data);
     }), socket.on("disconnect", function() {
         console.log("user disconnected"), socket.emit("removeOtherPlayer", player), host.removePlayer(player);
     });

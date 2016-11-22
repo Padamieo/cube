@@ -34,6 +34,20 @@ var host = {
   //   return otherPlayers[index];
   // },
 
+  updatePlayerData: function(data){
+    console.log('updatePlayerData');
+    console.log(data);
+    // var player = playerForId(data.playerId);
+    // player.x = data.x;
+    // player.y = data.y;
+    // player.z = data.z;
+    // player.r_x = data.r_x;
+    // player.r_y = data.r_y;
+    // player.r_z = data.r_z;
+    //
+    // return player;
+  },
+
   removePlayer: function(player){
     console.log("remove player");
 
