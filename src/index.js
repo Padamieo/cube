@@ -22,6 +22,23 @@ io.on('connection', function(socket){
   console.log('a user connected');
   console.log(socket.id);
 
+  socket.on('createPlayer', function(data){
+    console.log("server side create player");
+
+    //if playser is 0 create all cubes
+
+    var player = host.addPlayer(data);
+    
+    // have player replace cubes
+
+    socket.emit('createPlayer', player);
+
+    socket.emit('addOtherPlayer', player);
+
+  });
+
+
+/*
   // var id = socket.id;
   // player = host.addPlayer(id);
 
@@ -61,7 +78,7 @@ io.on('connection', function(socket){
     socket.emit('removeOtherPlayer', player);
     host.removePlayer( player );
   });
-
+*/
 });
 
 
@@ -107,6 +124,30 @@ function myFunction(){
     /* common */
     three = THREE.Bootstrap();
 
+    socket.on('connect', function(){
+      console.log("connected");
+      socket.emit('createPlayer', socket.id);
+      t.loadWorld(socket);
+      //socket.emit('requestOldPlayers', socket.id);
+      //socket.emit('addOtherPlayer', player);
+    });
+
+    socket.on('createPlayer', function(data){
+      console.log("client side create player");
+      t.createPlayer(data);
+    });
+
+    socket.on('addOtherPlayer', function(data){
+      console.log('addOtherPlayer');
+      console.log(data);
+      if(socket.id != data.playerId){
+
+        t.addOtherPlayer(data);
+      }
+    });
+
+
+/*
     socket.on('createPlayer', function(data){
       console.log("create player");
       player = host.addPlayer(data);
@@ -137,7 +178,7 @@ function myFunction(){
     socket.on('removeOtherPlayer', function(data){
       t.removeOtherPlayer(data);
     });
-
+*/
   }
 
 }

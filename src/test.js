@@ -52,9 +52,11 @@ var test = {
     var v = this;
 
     three.on('update', function () {
-      if ( player ){
+      if ( players.length <= 1 ){
 
-        v.checkKeyStates(player, socket);
+        console.log();
+
+        //v.checkKeyStates(player, socket);
 
         //three.camera.lookAt( player.position );
 
@@ -237,8 +239,6 @@ var test = {
   },
 
   addOtherPlayer: function(data){
-
-    players.push( data );
 
     cube_geometry3 = new THREE.BoxGeometry(data.sizeX, data.sizeX, data.sizeX);
     cube_material3 = new THREE.MeshLambertMaterial({color: 0x777777});

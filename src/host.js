@@ -1,11 +1,11 @@
 
 var host = {
 
-  player: function(){
-    this.playerId = players.length;
-    this.x = Math.random()*2;
-    this.y = Math.random()*2;
-    this.z = Math.random()*2;
+  player: function(id){
+    this.playerId = id;
+    this.x = 0; //Math.random()*2;
+    this.y = 0; //Math.random()*2;
+    this.z = 0; //Math.random()*2;
     this.r_x = 0;
     this.r_y = 0;
     this.r_z = 0;
@@ -17,8 +17,7 @@ var host = {
   },
 
   addPlayer: function( id ){
-    player = new this.player();
-    player.playerId = id;
+    player = new this.player(id);
     players.push( player );
     return player;
   },
