@@ -20,28 +20,40 @@ app.get('/index.js', function(req, res){
 
 io.on('connection', function(socket){
   console.log('a user connected');
+  console.log(socket.id);
 
-  var id = socket.id;
-  //player = host.addPlayer(id);
+  // var id = socket.id;
+  // player = host.addPlayer(id);
 
   //var player = host.playerForId(id);
   socket.emit('createPlayer', socket.id);//player);
 
-  socket.broadcast.emit('addOtherPlayer', player);
+  //socket.broadcast.emit('addOtherPlayer', player);
 
-  socket.on('requestOldPlayers', function(){
+  socket.on('requestOldPlayers', function(id){
+    //console.log(id);
+    //console.log("add player");
     for (var i = 0; i < players.length; i++){
       if (players[i].playerId != id){
         socket.emit('addOtherPlayer', players[i]);
       }
     }
+
+  });
+
+  socket.on('addOtherPlayer', function(data){
+    //if(data.playerId != socket.id){
+      t.addOtherPlayer(data);
+    //}
   });
 
   socket.on('updatePosition', function(data){
-    console.log('updatePosition');
-    console.log(data);
+    // console.log('updatePosition');
+    // console.log(data);
     // var newData = world.updatePlayerData(data);
-    socket.broadcast.emit('updatePosition', 5);
+    t.updatePlayerData(data);
+    t.updateObject(data);
+    socket.broadcast.emit('updatePosition', data);
   });
 
   socket.on('disconnect', function(){
@@ -96,23 +108,30 @@ function myFunction(){
     three = THREE.Bootstrap();
 
     socket.on('createPlayer', function(data){
+      console.log("create player");
       player = host.addPlayer(data);
       t.createPlayer(player);
+      //socket.emit('addOtherPlayer', player);
     });
 
     socket.on('connect', function(){
       t.loadWorld(socket);
-      socket.emit('requestOldPlayers', {});
+      socket.emit('requestOldPlayers', socket.id);
+      //socket.emit('addOtherPlayer', player);
     });
 
     socket.on('addOtherPlayer', function(data){
+      console.log('addOtherPlayer122333');
+      console.log(data);
       t.addOtherPlayer(data);
     });
 
     socket.on('updatePosition', function(data){
-      //updatePlayerPosition(data);
-      console.log('updatePosition');
-      console.log(data);
+      console.log("update everyone");
+      t.updatePlayerData(data);
+      t.updateObject(data);
+      // console.log('updatePosition');
+      // console.log(data);
     });
 
     socket.on('removeOtherPlayer', function(data){

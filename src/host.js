@@ -3,9 +3,9 @@ var host = {
 
   player: function(){
     this.playerId = players.length;
-    this.x = 1;
-    this.y = 0;
-    this.z = 1;
+    this.x = Math.random()*2;
+    this.y = Math.random()*2;
+    this.z = Math.random()*2;
     this.r_x = 0;
     this.r_y = 0;
     this.r_z = 0;
@@ -21,32 +21,6 @@ var host = {
     player.playerId = id;
     players.push( player );
     return player;
-  },
-
-  // playerForId: function( id ){
-  //   var index;
-  //   for (var i = 0; i < otherPlayersId.length; i++){
-  //     if (otherPlayersId[i] == id){
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-  //   return otherPlayers[index];
-  // },
-
-  updatePlayerData: function(data){
-    console.log('updatePlayerData');
-    console.log(data);
-
-    // var player = playerForId(data.playerId);
-    // player.x = data.x;
-    // player.y = data.y;
-    // player.z = data.z;
-    // player.r_x = data.r_x;
-    // player.r_y = data.r_y;
-    // player.r_z = data.r_z;
-    //
-    // return player;
   },
 
   removePlayer: function(player){

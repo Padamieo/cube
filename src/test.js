@@ -32,9 +32,9 @@ var test = {
   },
 
   loadWorld: function(socket){
-
-    var random_cube = this.create_cube();
-    three.scene.add( random_cube );
+  console.log(socket);
+    // var random_cube = this.create_cube();
+    // three.scene.add( random_cube );
 
     //add an ambient light
     var ambient = new THREE.AmbientLight( 0x050505 );
@@ -53,13 +53,12 @@ var test = {
 
     three.on('update', function () {
       if ( player ){
-        //console.log(this);
-        //v.updateCameraPosition(player.playerId);
+
         v.checkKeyStates(player, socket);
 
         //three.camera.lookAt( player.position );
 
-        v.updateCameraPosition( player.playerId );
+        //v.updateCameraPosition( player.playerId );
 
       }
     });
@@ -91,18 +90,45 @@ var test = {
 
   checkKeyStates: function( playerD , socket){
 
+    var change = false;
+    var obj = this.getObject(playerD.playerId);
+
     if (keyState[38] || keyState[87]) {
-      // up arrow or 'w' - move forward
-      //player.position.x -= moveSpeed * Math.sin(player.rotation.y);
-      //player.position.z -= moveSpeed * Math.cos(player.rotation.y);
-
-      console.log("request to move w");
-      //objects[0].rotation.x += player.turnSpeed;
-      var obj = this.getObject(playerD.playerId);
       obj.rotation.x += playerD.turnSpeed;
+      change = true;
+    }
 
+    if (keyState[40] || keyState[83]) {
+      obj.rotation.x -= playerD.turnSpeed;
+      change = true;
+    }
+
+    if (keyState[37] || keyState[65]) {
+      obj.rotation.y += playerD.turnSpeed;
+      change = true;
+    }
+
+    if (keyState[39] || keyState[68]) {
+      obj.rotation.y -= playerD.turnSpeed;
+      change = true;
+    }
+
+    if (keyState[81]) {
+      console.log("test");
+      obj.position.x -= playerD.moveSpeed + obj.position.x; //* Math.cos(playerD.r_y);
+      // obj.position.z += playerD.moveSpeed * Math.sin(player.rotation.y);
+    }
+
+    if (keyState[69]) {
+
+    }
+
+    if( change == true ){
       var pass = {
         playerId: playerD.playerId,
+        x: obj.position.x,
+        y: obj.position.y,
+        z: obj.position.z,
         r_x: obj.rotation.x,
         r_y: obj.rotation.y,
         r_z: obj.rotation.z
@@ -112,25 +138,40 @@ var test = {
         this.updatePlayerData(pass);
         socket.emit('updatePosition', pass);
       }
-
     }
 
   },
 
   updatePlayerData: function(pass){
-    console.log('updatePlayerData');
 
     for(var i = 0; i < players.length; i++){
       if(players[i].playerId == pass.playerId){
-        // players[i].x = 1;
-        // players[i].y = 1;
-        // players[i].z = 1;
+        players[i].x = pass.x; //1;
+        players[i].y = pass.y; //1;
+        players[i].z = pass.z; //1;
         players[i].r_x = pass.r_x; //obj.rotation.x;
         players[i].r_y = pass.r_y; //obj.rotation.y;
         players[i].r_z = pass.r_z; //obj.rotation.z;
         //console.log(players[i]);
       }
     }
+
+  },
+
+  updateObject: function(data){
+
+    //var obj = this.getObject(data.playerId);
+    for(var i = 0; i < objects.length; i++){
+      if(objects[i].rel == data.playerId){
+        objects[i].position.x = data.x;
+        objects[i].position.y = data.y;
+        objects[i].position.z = data.z;
+        objects[i].rotation.x = data.r_x;
+        objects[i].rotation.y = data.r_y;
+        objects[i].rotation.z = data.r_z;
+      }
+    }
+
   },
 
   getObject: function(playerId){
@@ -197,11 +238,14 @@ var test = {
 
   addOtherPlayer: function(data){
 
+    players.push( data );
+
     cube_geometry3 = new THREE.BoxGeometry(data.sizeX, data.sizeX, data.sizeX);
-    cube_material3 = new THREE.MeshLambertMaterial({color: 0x7777ff});
+    cube_material3 = new THREE.MeshLambertMaterial({color: 0x777777});
     otherPlayer = new THREE.Mesh(cube_geometry3, cube_material3);
 
     otherPlayer.rel = data.playerId;
+
     otherPlayer.rotation.set(0,0,0);
     otherPlayer.position.x = data.x;
     otherPlayer.position.y = data.y;
@@ -209,6 +253,8 @@ var test = {
 
     objects.push( otherPlayer );
     three.scene.add( otherPlayer );
+
+    //return otherPlayer;
 
   },
 
