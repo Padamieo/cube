@@ -25,15 +25,23 @@ io.on('connection', function(socket){
   socket.on('createPlayer', function(data){
     console.log("server side create player");
 
-    //if playser is 0 create all cubes
+    //if playsers is 0 create all cubes
 
     var player = host.addPlayer(data);
-    
+
     // have player replace cubes
 
     socket.emit('createPlayer', player);
 
-    socket.emit('addOtherPlayer', player);
+    socket.broadcast.emit('addPlayer', player);
+
+    socket.on('requestOldPlayers', function(id){
+      for (var i = 0; i < players.length; i++){
+        if (players[i].playerId != id){
+          socket.emit('addPlayer', players[i]);
+        }
+      }
+    });
 
   });
 
@@ -128,7 +136,7 @@ function myFunction(){
       console.log("connected");
       socket.emit('createPlayer', socket.id);
       t.loadWorld(socket);
-      //socket.emit('requestOldPlayers', socket.id);
+      socket.emit('requestOldPlayers', socket.id);
       //socket.emit('addOtherPlayer', player);
     });
 
@@ -137,11 +145,18 @@ function myFunction(){
       t.createPlayer(data);
     });
 
-    socket.on('addOtherPlayer', function(data){
-      console.log('addOtherPlayer');
-      console.log(data);
-      if(socket.id != data.playerId){
+    // socket.on('addOtherPlayer', function(data){
+    //   console.log('addOtherPlayer');
+    //   console.log(data);
+    //   if(socket.id != data.playerId){
+    //
+    //     t.addOtherPlayer(data);
+    //   }
+    // });
 
+    socket.on('addPlayer', function(data){
+      console.log('addPlayer:'+data);
+      if(socket.id != data.playerId){
         t.addOtherPlayer(data);
       }
     });
