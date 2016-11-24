@@ -3,9 +3,9 @@ var host = {
 
   player: function(id){
     this.playerId = id;
-    this.x = Math.random()*4;
-    this.y = Math.random()*4;
-    this.z = Math.random()*4;
+    this.x = Math.random()*3;
+    this.y = Math.random()*1;
+    this.z = Math.random()*3;
     this.r_x = 0;
     this.r_y = 0;
     this.r_z = 0;

@@ -6,7 +6,7 @@ var io = require('socket.io')(http);
 var t = require('./test.js');
 var host = require('./host.js');
 
-var three, player, socket;
+var three, player, socket, thisPlayer;
 var players = [], objects = [];
 var keyState = {};
 
@@ -35,13 +35,22 @@ io.on('connection', function(socket){
 
     socket.broadcast.emit('addPlayer', player);
 
-    socket.on('requestOldPlayers', function(id){
+    socket.on('requestPlayers', function(id){
       for (var i = 0; i < players.length; i++){
         if (players[i].playerId != id){
           socket.emit('addPlayer', players[i]);
         }
       }
     });
+
+    socket.on('updatePlayer', function(data){
+      t.updatePlayerData(data);
+      socket.broadcast.emit('updatePlayers', data);
+    });
+
+
+
+
 
   });
 
@@ -136,8 +145,7 @@ function myFunction(){
       console.log("connected");
       socket.emit('createPlayer', socket.id);
       t.loadWorld(socket);
-      socket.emit('requestOldPlayers', socket.id);
-      //socket.emit('addOtherPlayer', player);
+      socket.emit('requestPlayers', socket.id);
     });
 
     socket.on('createPlayer', function(data){
@@ -145,20 +153,14 @@ function myFunction(){
       t.createPlayer(data);
     });
 
-    // socket.on('addOtherPlayer', function(data){
-    //   console.log('addOtherPlayer');
-    //   console.log(data);
-    //   if(socket.id != data.playerId){
-    //
-    //     t.addOtherPlayer(data);
-    //   }
-    // });
-
     socket.on('addPlayer', function(data){
-      console.log('addPlayer:'+data);
       if(socket.id != data.playerId){
         t.addOtherPlayer(data);
       }
+    });
+
+    socket.on('updatePlayers', function(data){
+      t.updateObject(data);
     });
 
 
