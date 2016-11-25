@@ -2,11 +2,10 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-
 var t = require('./test.js');
 var host = require('./host.js');
 
-var three, player, socket, thisPlayer;
+var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [];
 var keyState = {};
 
@@ -23,13 +22,12 @@ io.on('connection', function(socket){
   console.log(socket.id);
 
   socket.on('createPlayer', function(data){
-    console.log("server side create player");
 
     //if playsers is 0 create all cubes
 
     var player = host.addPlayer(data);
 
-    // have player replace cubes
+    // have player replace cube
 
     socket.emit('createPlayer', player);
 
@@ -48,54 +46,13 @@ io.on('connection', function(socket){
       socket.broadcast.emit('updatePlayers', data);
     });
 
-
-
-
-
-  });
-
-
-/*
-  // var id = socket.id;
-  // player = host.addPlayer(id);
-
-  //var player = host.playerForId(id);
-  socket.emit('createPlayer', socket.id);//player);
-
-  //socket.broadcast.emit('addOtherPlayer', player);
-
-  socket.on('requestOldPlayers', function(id){
-    //console.log(id);
-    //console.log("add player");
-    for (var i = 0; i < players.length; i++){
-      if (players[i].playerId != id){
-        socket.emit('addOtherPlayer', players[i]);
-      }
-    }
+    socket.on('disconnect', function(){
+      host.removePlayer( socket.id );
+      socket.broadcast.emit('removePlayer', socket.id );
+    });
 
   });
 
-  socket.on('addOtherPlayer', function(data){
-    //if(data.playerId != socket.id){
-      t.addOtherPlayer(data);
-    //}
-  });
-
-  socket.on('updatePosition', function(data){
-    // console.log('updatePosition');
-    // console.log(data);
-    // var newData = world.updatePlayerData(data);
-    t.updatePlayerData(data);
-    t.updateObject(data);
-    socket.broadcast.emit('updatePosition', data);
-  });
-
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-    socket.emit('removeOtherPlayer', player);
-    host.removePlayer( player );
-  });
-*/
 });
 
 
@@ -130,7 +87,7 @@ function myFunction(){
     ipcRenderer.send('find', http.address().port);
 
     ipcRenderer.on('asynchronous-reply', function(event, arg){
-      //console.log(arg);
+
       var socket = io.connect('http://' + arg.ip+':'+arg.port);
       common(socket);
     });
@@ -142,14 +99,12 @@ function myFunction(){
     three = THREE.Bootstrap();
 
     socket.on('connect', function(){
-      console.log("connected");
       socket.emit('createPlayer', socket.id);
       t.loadWorld(socket);
       socket.emit('requestPlayers', socket.id);
     });
 
     socket.on('createPlayer', function(data){
-      console.log("client side create player");
       t.createPlayer(data);
     });
 
@@ -163,39 +118,10 @@ function myFunction(){
       t.updateObject(data);
     });
 
-
-/*
-    socket.on('createPlayer', function(data){
-      console.log("create player");
-      player = host.addPlayer(data);
-      t.createPlayer(player);
-      //socket.emit('addOtherPlayer', player);
-    });
-
-    socket.on('connect', function(){
-      t.loadWorld(socket);
-      socket.emit('requestOldPlayers', socket.id);
-      //socket.emit('addOtherPlayer', player);
-    });
-
-    socket.on('addOtherPlayer', function(data){
-      console.log('addOtherPlayer122333');
-      console.log(data);
-      t.addOtherPlayer(data);
-    });
-
-    socket.on('updatePosition', function(data){
-      console.log("update everyone");
-      t.updatePlayerData(data);
-      t.updateObject(data);
-      // console.log('updatePosition');
-      // console.log(data);
-    });
-
-    socket.on('removeOtherPlayer', function(data){
+    socket.on('removePlayer', function(data){
       t.removeOtherPlayer(data);
     });
-*/
+
   }
 
 }

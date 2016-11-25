@@ -42,18 +42,6 @@ function createWindow () {
 
   ipcMain.on('advertise', function(event, service) {
 
-    // /*polo*/
-    // var polo = require('polo');
-    // var apps = polo();
-    // var apps = polo({
-    //   multicast: true,     // disables network multicast,
-    //   monitor: true        // fork a monitor for faster failure detection
-    // });
-    // apps.put({
-    //   name:'hello-world',
-    //   port: service.port
-    // });
-
     var Discover = require('node-discover');
     var d = Discover();
 
@@ -74,14 +62,6 @@ function createWindow () {
   });
 
   ipcMain.on('find', function(event, port) {
-
-    // /*polo*/
-    // var polo = require('polo');
-    // var apps = polo();
-    // apps.once('up', function(name, service) {
-    //   console.log(apps.get(name));
-    //   event.sender.send('asynchronous-reply', apps.get(name));
-    // });
 
     var Discover = require('node-discover');
     var d = Discover();

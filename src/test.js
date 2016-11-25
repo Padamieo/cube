@@ -1,10 +1,6 @@
 var os = require('os');
-var socket;
-var test = {
 
-  someFunction: function(){
-    console.log("test somefunction");
-  },
+var test = {
 
   getAddress: function(idx) {
     var addresses = [],
@@ -33,8 +29,7 @@ var test = {
 
   loadWorld: function(socket){
 
-    // var random_cube = this.create_cube();
-    // three.scene.add( random_cube );
+    // add all the generated cubes, or do they come in later
 
     //add an ambient light
     var ambient = new THREE.AmbientLight( 0x050505 );
@@ -46,11 +41,6 @@ var test = {
     three.scene.add( directionalLight );
 
     this.registerEvents();
-
-    if ( thisPlayer ){
-      console.log( thisPlayer );
-      three.camera.position.set(1, 1, 0.5);
-    }
 
     var v = this;
 
@@ -127,7 +117,7 @@ var test = {
     }
 
     if( change == true ){
-      console.log(thisPlayer.playerId+ " ==== " + socket.id);
+
       var pass = {
         playerId: thisPlayer.playerId,
         x: obj.position.x,
@@ -142,6 +132,7 @@ var test = {
         this.updatePlayerData(pass);
         socket.emit('updatePlayer', pass);
       }
+
     }
 
   },
@@ -164,7 +155,7 @@ var test = {
   updateObject: function(data){
 
     for(var i = 0; i < objects.length; i++){
-      if(objects[i].rel == data.playerId){
+      if(objects[i].playerId == data.playerId){
         objects[i].position.x = data.x;
         objects[i].position.y = data.y;
         objects[i].position.z = data.z;
@@ -178,7 +169,7 @@ var test = {
 
   getObject: function(playerId){
     for(var i = 0; i < objects.length; i++){
-      if(objects[i].rel == playerId){
+      if(objects[i].playerId == playerId){
         return objects[i];
       }
     }
@@ -191,24 +182,12 @@ var test = {
     three.camera.position.z = obj.position.z + 2.5 * Math.cos( obj.rotation.y );
   },
 
-  create_cube: function(data){
-
-    if(data != undefined){
-      var sizeX = data.sizeX;
-      var sizeY = data.sizeY;
-      var sizeZ = data.sizez;
-    }else{
-      var sizeX = 1;
-      var sizeY = 1;
-      var sizeZ = 1;
-    }
-
-    //this needs to be array to hold all cube_geometry or we end up with one cube with material
-    cube_geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
-    cube_material = new THREE.MeshLambertMaterial({color: 0x7f1d1d});
-    var temp = new THREE.Mesh(cube_geometry, cube_material);
-
-    return temp;
+  create_cube: function(data, color, opacity){
+    var obj = new THREE.Mesh(
+      new THREE.CubeGeometry(data.size, data.size, data.size),
+      new THREE.MeshLambertMaterial({color: color, transparent:true, opacity:opacity, side: THREE.DoubleSide})
+    );
+    return obj;
   },
 
   createPlayer: function(data){
@@ -217,15 +196,9 @@ var test = {
     thisPlayer = data;
 
     // no idea why this does not work
-    // this = create_cube(data);
+    var obj = this.create_cube(data, 0x7777ff, 0.8);
 
-    //think i need to change player to avatar or something
-    var obj = new THREE.Mesh(
-      new THREE.CubeGeometry(data.sizeX, data.sizeX, data.sizeX),
-      new THREE.MeshLambertMaterial({color: 0x7777ff, transparent:true, opacity:0.8, side: THREE.DoubleSide})
-    );
-
-    obj.rel = data.playerId;
+    obj.playerId = data.playerId;
 
     obj.rotation.set(0,0,0);
     obj.position.x = data.x;
@@ -236,33 +209,49 @@ var test = {
     three.scene.add( obj );
 
     //camera look at the player
-    this.updateCameraPosition( data.playerId );
+    //this.updateCameraPosition( data.playerId );
+    //three.camera.lookAt( obj.position );
+
+    three.camera.position.set( 3, 1, 0 );
     three.camera.lookAt( obj.position );
+    obj.add( three.camera );
+
+    // camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+    // three.scene.add( camera );
 
   },
 
   addOtherPlayer: function(data){
 
-    cube_geometry3 = new THREE.BoxGeometry(data.sizeX, data.sizeX, data.sizeX);
-    cube_material3 = new THREE.MeshLambertMaterial({color: 0x777777});
-    otherPlayer = new THREE.Mesh(cube_geometry3, cube_material3);
+    var obj = this.create_cube(data, 0x777777, 0.9);
 
-    otherPlayer.rel = data.playerId;
+    obj.playerId = data.playerId;
 
-    otherPlayer.rotation.set(0,0,0);
-    otherPlayer.position.x = data.x;
-    otherPlayer.position.y = data.y;
-    otherPlayer.position.z = data.z;
+    obj.rotation.set(0,0,0);
+    obj.position.x = data.x;
+    obj.position.y = data.y;
+    obj.position.z = data.z;
 
-    objects.push( otherPlayer );
-    three.scene.add( otherPlayer );
+    objects.push( obj );
+    three.scene.add( obj );
 
   },
 
-  removeOtherPlayer: function(data){
-    var obj = this.getObject(data.playerId);
-    //var selectedObject = scene.getObjectByName(obj.name);
-    three.scene.remove( obj );
+  removeOtherPlayer: function(socket_id){
+
+    //remove the objects
+    for(var i = 0; i < objects.length; i++){
+      if(objects[i].playerId == socket_id){
+        three.scene.remove( objects[i] );
+      }
+    }
+
+    //remove listing in objects array incase
+    var index = objects.findIndex(function(obj){
+      return obj.playerId === socket_id;
+    })
+    objects.splice(index, 1);
+
   }
 
 };
