@@ -62,7 +62,7 @@ var test = {
 		// three.scene.add( sky.mesh );
 
     //add an ambient light
-    var ambient = new THREE.AmbientLight( 0x050505 );
+    var ambient = new THREE.AmbientLight( 0x333333 );
     three.scene.add( ambient );
 
     //add a directional light
@@ -117,35 +117,36 @@ var test = {
     var obj = this.getObject(thisPlayer.playerId);
 
     if (keyState[38] || keyState[87]) {
-      obj.rotation.x += thisPlayer.turnSpeed;
+      //obj.rotation.x += thisPlayer.turnSpeed;
+      obj.rotateZ (thisPlayer.turnSpeed);
       change = true;
     }
 
     if (keyState[40] || keyState[83]) {
-      obj.rotation.x -= thisPlayer.turnSpeed;
+      //obj.rotation.x -= thisPlayer.turnSpeed;
+      obj.rotateZ (-thisPlayer.turnSpeed);
       change = true;
     }
 
     if (keyState[37] || keyState[65]) {
-      obj.rotation.y += thisPlayer.turnSpeed;
-      // var a += thisPlayer.turnSpeed;
-      // obj.rotateOnAxis( obj.position, a );
+      //obj.rotation.y += thisPlayer.turnSpeed;
+      obj.rotateY (thisPlayer.turnSpeed);
       change = true;
     }
 
     if (keyState[39] || keyState[68]) {
-      obj.rotation.y -= thisPlayer.turnSpeed;
+      obj.rotateY (-thisPlayer.turnSpeed);
       change = true;
     }
 
     if (keyState[81]) {
-      console.log("test");
-      obj.position.x -= thisPlayer.moveSpeed + obj.position.x; //* Math.cos(playerD.r_y);
-      // obj.position.z += playerD.moveSpeed * Math.sin(player.rotation.y);
+      obj.rotateX (thisPlayer.turnSpeed);
+      change = true
     }
 
     if (keyState[69]) {
-
+      obj.rotateX (-thisPlayer.turnSpeed);
+      change = true
     }
 
     if( change == true ){
@@ -161,8 +162,8 @@ var test = {
       }
 
       if(socket){
-        // this.updatePlayerData(pass);
-        // socket.emit('updatePlayer', pass);
+        this.updatePlayerData(pass);
+        socket.emit('updatePlayer', pass);
       }
 
     }
