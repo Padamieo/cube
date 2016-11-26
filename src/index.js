@@ -6,8 +6,9 @@ var t = require('./test.js');
 var host = require('./host.js');
 
 var three, player, socket, thisPlayer, camera, scene;
-var players = [], objects = [];
+var players = [], objects = [], tempObjects = [];
 var keyState = {};
+
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');

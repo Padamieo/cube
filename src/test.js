@@ -27,9 +27,39 @@ var test = {
     return addresses;
   },
 
+  temp: function(){
+    var dis = 3;
+    var tempObject = [
+      ["rgb(255, 0, 0)", dis, dis],
+      ["rgb(0, 0, 255)", -dis, -dis],
+      ["rgb(255, 255, 0)", -dis, dis],
+      ["rgb(0, 255, 0)", dis, -dis]
+    ];
+
+    var temp = {
+      size: 1
+    };
+
+    for (var i = 0; i < tempObject.length; i++) {
+      var color = new THREE.Color( tempObject[i][0] );
+      var obj1 = this.create_cube(temp, color, 0.8);
+      obj1.rotation.set(0,0,0);
+      obj1.position.x = tempObject[i][1];
+      obj1.position.y = 0;
+      obj1.position.z = tempObject[i][2];
+      three.scene.add( obj1 );
+      tempObjects.push( obj1 );
+    }
+  },
+
   loadWorld: function(socket){
 
     // add all the generated cubes, or do they come in later
+    //temp version
+    this.temp();
+
+    // sky = new THREE.Sky();
+		// three.scene.add( sky.mesh );
 
     //add an ambient light
     var ambient = new THREE.AmbientLight( 0x050505 );
@@ -98,6 +128,8 @@ var test = {
 
     if (keyState[37] || keyState[65]) {
       obj.rotation.y += thisPlayer.turnSpeed;
+      // var a += thisPlayer.turnSpeed;
+      // obj.rotateOnAxis( obj.position, a );
       change = true;
     }
 
@@ -129,8 +161,8 @@ var test = {
       }
 
       if(socket){
-        this.updatePlayerData(pass);
-        socket.emit('updatePlayer', pass);
+        // this.updatePlayerData(pass);
+        // socket.emit('updatePlayer', pass);
       }
 
     }
@@ -201,9 +233,9 @@ var test = {
     obj.playerId = data.playerId;
 
     obj.rotation.set(0,0,0);
-    obj.position.x = data.x;
+    obj.position.x = 0;
     obj.position.y = data.y;
-    obj.position.z = data.z;
+    obj.position.z = 0;
 
     objects.push( obj );
     three.scene.add( obj );
@@ -214,6 +246,11 @@ var test = {
 
     three.camera.position.set( 3, 1, 0 );
     three.camera.lookAt( obj.position );
+
+    obj.position.x = data.x;
+    obj.position.y = data.y;
+    obj.position.z = data.z;
+
     obj.add( three.camera );
 
     // camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );

@@ -17,6 +17,7 @@ module.exports = function(grunt){
             //'node_modules/socket.io/socket.io.js',
             //'node_modules/socket.io-client/socket.io.js',
             'node_modules/three/build/three.js',
+						'node_modules/three/examples/js/SkyShader.js',
             'node_modules/threestrap/build/threestrap.js',
             'src/index.js'
           ]
