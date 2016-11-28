@@ -125,18 +125,40 @@ function myFunction(){
 
     socket.on('createPlayer', function(data){
       //console.log(socket.id+" = "+data.playerId);
-      if( ! thisPlayer ){
+      if( !thisPlayer ){
         t.createPlayer(data);
         socket.emit('requestPlayers', thisPlayer.playerId);
         socket.emit('add', data);
       }
 
-
     });
 
     socket.on('addPlayer', function(data){
-      //if(thisPlayer.playerId != data.playerId){
+      console.log('addPlayer');
+
+      // var a = [];
+      // for(var i = 0; i < objects.length; i++){
+      //   a.push(objects[i].playerId);
+      // }
+      // console.log(a);
+      //
+      // if (objects.filter(function(e){ e.playerId == data.playerId }).length > 0) {
+      //   console.log("F:"+data.playerId);
+      // }
+
+      var d = objects.find( function( p ) {
+        return p.playerId === data.playerId;
+      } );
+
+      if( !d ) {
+        console.log("player:"+data.playerId+" not present will create");
         t.addOtherPlayer(data);
+      }else{
+        console.log("player:"+data.playerId+" present");
+      }
+
+      //if(thisPlayer.playerId != data.playerId){
+      // t.addOtherPlayer(data);
       //}
     });
 

@@ -87,11 +87,23 @@ function createWindow () {
         });
 
         socket.on('requestPlayers', function(id){
+        
           for (var i = 0; i < players.length; i++){
             if (players[i].playerId != id){
               socket.emit('addPlayer', players[i]);
             }
           }
+
+        //   var data = players.find( function( p ) {
+        //     return p.playerId === id;
+        //   } );
+         //
+        //   if( !data ) {
+        //    console.log("player:"+id+" not present will create");
+        //  }else{
+        //    console.log("player:"+id+" present");
+        //  }
+
         });
 
         socket.on('updatePlayer', function(data){
