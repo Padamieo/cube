@@ -149,7 +149,7 @@ var test = {
       change = true
     }
 
-    if( change == true ){
+    if( change ){
 
       //console.log("PASS: "+thisPlayer.playerId+" = "+socket.id);
 

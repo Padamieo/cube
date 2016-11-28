@@ -127,10 +127,10 @@ function myFunction(){
       //console.log(socket.id+" = "+data.playerId);
       if( ! thisPlayer ){
         t.createPlayer(data);
-
+        socket.emit('requestPlayers', thisPlayer.playerId);
         socket.emit('add', data);
       }
-      socket.emit('requestPlayers', thisPlayer.playerId);
+
 
     });
 
