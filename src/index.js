@@ -1,9 +1,9 @@
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+//var io = require('socket.io')(http);
 
 var t = require('./test.js');
-var host = require('./host.js');
+// var host = require('./host.js');
 
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], tempObjects = [];
@@ -18,21 +18,24 @@ app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
 
+/*
 io.on('connection', function(socket){
   console.log('a user connected');
   console.log(socket.id);
 
-  socket.on('createPlayer', function(data){
+  socket.on('createPlayer', function(){
 
-    //if playsers is 0 create all cubes
-
-    var player = host.addPlayer(data);
+    //if players is 0 create all cubes
+    //console.log(players.length+1);
+    var player = host.addPlayer();
 
     // have player replace cube
 
     socket.emit('createPlayer', player);
 
-    socket.broadcast.emit('addPlayer', player);
+    socket.on('add', function(data){
+      socket.broadcast.emit('addPlayer', data);
+    });
 
     socket.on('requestPlayers', function(id){
       for (var i = 0; i < players.length; i++){
@@ -55,6 +58,7 @@ io.on('connection', function(socket){
   });
 
 });
+*/
 
 
 var ip_address = t.getAddress();
@@ -70,14 +74,26 @@ function myFunction(){
     console.log("hosting");
 
     var ipcRenderer = require('electron').ipcRenderer;
-    var service = {
-      ip: ip_address,
-      port: http.address().port
-    }
-    ipcRenderer.send('advertise', service);
 
-    var socket = io.connect('http://'+ip_address+':'+http.address().port);
-    common(socket);
+    ipcRenderer.send('server', ip_address);
+
+    ipcRenderer.on('reply', function(event, service){
+
+      ipcRenderer.send('advertise', service);
+
+      var socket = io.connect('http://'+service.ip+':'+service.port);
+      common(socket);
+
+    });
+
+    // var service = {
+    //   ip: ip_address,
+    //   port: http.address().port
+    // }
+    // ipcRenderer.send('advertise', service);
+    //
+    // var socket = io.connect('http://'+ip_address+':'+http.address().port);
+    // common(socket);
 
   };
 
@@ -87,10 +103,11 @@ function myFunction(){
     var ipcRenderer = require('electron').ipcRenderer;
     ipcRenderer.send('find', http.address().port);
 
-    ipcRenderer.on('asynchronous-reply', function(event, arg){
+    ipcRenderer.on('asynchronous-reply', function(event, service){
 
-      var socket = io.connect('http://' + arg.ip+':'+arg.port);
+      var socket = io.connect('http://' + service.ip+':'+service.port);
       common(socket);
+
     });
 
   };
@@ -100,22 +117,28 @@ function myFunction(){
     three = THREE.Bootstrap();
 
     socket.on('connect', function(){
-      socket.emit('createPlayer', socket.id);
+      console.log(socket);
+      socket.emit('createPlayer', 0);
       t.loadWorld(socket);
-      socket.emit('requestPlayers', socket.id);
+
     });
 
     socket.on('createPlayer', function(data){
+      //console.log(socket.id+" = "+data.playerId);
       t.createPlayer(data);
+      socket.emit('requestPlayers', thisPlayer.playerId);
+      socket.emit('add', data);
+
     });
 
     socket.on('addPlayer', function(data){
-      if(socket.id != data.playerId){
+      //if(thisPlayer.playerId != data.playerId){
         t.addOtherPlayer(data);
-      }
+      //}
     });
 
     socket.on('updatePlayers', function(data){
+      console.log(socket.id+" = "+data.playerId);
       t.updateObject(data);
     });
 

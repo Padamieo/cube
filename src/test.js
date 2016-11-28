@@ -151,6 +151,8 @@ var test = {
 
     if( change == true ){
 
+      //console.log("PASS: "+thisPlayer.playerId+" = "+socket.id);
+
       var pass = {
         playerId: thisPlayer.playerId,
         x: obj.position.x,
@@ -162,25 +164,10 @@ var test = {
       }
 
       if(socket){
-        this.updatePlayerData(pass);
+        //this.updatePlayerData(pass);
         socket.emit('updatePlayer', pass);
       }
 
-    }
-
-  },
-
-  updatePlayerData: function(data){
-
-    for(var i = 0; i < players.length; i++){
-      if(players[i].playerId == data.playerId){
-        players[i].x = data.x;
-        players[i].y = data.y;
-        players[i].z = data.z;
-        players[i].r_x = data.r_x;
-        players[i].r_y = data.r_y;
-        players[i].r_z = data.r_z;
-      }
     }
 
   },

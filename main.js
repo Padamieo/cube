@@ -11,6 +11,9 @@ const ipcMain = electron.ipcMain;
 const path = require('path')
 const url = require('url')
 
+var players = [];
+var host = require('./app/host.js');
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -40,6 +43,74 @@ function createWindow () {
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 
+
+  ipcMain.on('server', function(event, ip) {
+
+    var app = require('express')();
+    var http = require('http').Server(app);
+    var io = require('socket.io')(http);
+
+    app.get('/', function(req, res){
+      res.sendfile('app/index2.html');
+    });
+
+    http.listen(0, function(){
+
+      console.log('listening on *:' + http.address().port );
+
+      var service = {
+        ip: ip,
+        port: http.address().port
+      }
+
+      event.sender.send('reply', service );
+
+    });
+
+    io.on('connection', function(socket){
+      console.log('a user connected');
+      console.log(socket.id);
+
+      socket.on('createPlayer', function(){
+
+        //if players is 0 create all cubes
+
+        //console.log(players.length+1);
+        var player = host.addPlayer(players);
+
+        // have player replace cube
+
+        socket.emit('createPlayer', player);
+
+        socket.on('add', function(data){
+          socket.broadcast.emit('addPlayer', data);
+        });
+
+        socket.on('requestPlayers', function(id){
+          for (var i = 0; i < players.length; i++){
+            if (players[i].playerId != id){
+              socket.emit('addPlayer', players[i]);
+            }
+          }
+        });
+
+        socket.on('updatePlayer', function(data){
+          host.updatePlayerData(players, data);
+          socket.broadcast.emit('updatePlayers', data);
+        });
+
+        socket.on('disconnect', function(){
+          host.removePlayer( socket.id );
+          socket.broadcast.emit('removePlayer', socket.id );
+        });
+
+      });
+
+    });
+
+  });
+
+
   ipcMain.on('advertise', function(event, service) {
 
     var Discover = require('node-discover');
@@ -62,6 +133,7 @@ function createWindow () {
   });
 
   ipcMain.on('find', function(event, port) {
+    console.log('find');
 
     var Discover = require('node-discover');
     var d = Discover();
