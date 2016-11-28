@@ -125,9 +125,12 @@ function myFunction(){
 
     socket.on('createPlayer', function(data){
       //console.log(socket.id+" = "+data.playerId);
-      t.createPlayer(data);
+      if( ! thisPlayer ){
+        t.createPlayer(data);
+
+        socket.emit('add', data);
+      }
       socket.emit('requestPlayers', thisPlayer.playerId);
-      socket.emit('add', data);
 
     });
 
