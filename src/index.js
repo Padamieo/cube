@@ -7,6 +7,9 @@ var t = require('./test.js');
 
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], tempObjects = [];
+
+var otherPlayers = [], otherPlayersId = [];
+
 var keyState = {};
 
 
@@ -17,49 +20,6 @@ app.get('/', function(req, res){
 app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
-
-/*
-io.on('connection', function(socket){
-  console.log('a user connected');
-  console.log(socket.id);
-
-  socket.on('createPlayer', function(){
-
-    //if players is 0 create all cubes
-    //console.log(players.length+1);
-    var player = host.addPlayer();
-
-    // have player replace cube
-
-    socket.emit('createPlayer', player);
-
-    socket.on('add', function(data){
-      socket.broadcast.emit('addPlayer', data);
-    });
-
-    socket.on('requestPlayers', function(id){
-      for (var i = 0; i < players.length; i++){
-        if (players[i].playerId != id){
-          socket.emit('addPlayer', players[i]);
-        }
-      }
-    });
-
-    socket.on('updatePlayer', function(data){
-      t.updatePlayerData(data);
-      socket.broadcast.emit('updatePlayers', data);
-    });
-
-    socket.on('disconnect', function(){
-      host.removePlayer( socket.id );
-      socket.broadcast.emit('removePlayer', socket.id );
-    });
-
-  });
-
-});
-*/
-
 
 var ip_address = t.getAddress();
 
@@ -116,21 +76,32 @@ function myFunction(){
     /* common */
     three = THREE.Bootstrap();
 
+    //var socket = io();
+
     socket.on('connect', function(){
       console.log(socket);
-      socket.emit('createPlayer', 0);
+      //socket.emit('createPlayer', 0);
       t.loadWorld(socket);
+      socket.emit('requestOldPlayers', 0);
 
     });
 
     socket.on('createPlayer', function(data){
+      console.log(socket);
       //console.log(socket.id+" = "+data.playerId);
-      if( !thisPlayer ){
-        t.createPlayer(data);
-        socket.emit('requestPlayers', thisPlayer.playerId);
-        socket.emit('add', data);
-      }
+      // if( !thisPlayer ){
+      //   t.createPlayer(data);
+      //   socket.emit('requestPlayers', thisPlayer.playerId);
+      //   socket.emit('add', data);
+      // }
+      t.createPlayer(data);
 
+    });
+
+    socket.on('addOtherPlayer', function(data){
+      console.log(socket);
+      console.log("addOtherPlayer");
+      t.addOtherPlayer(data);
     });
 
     socket.on('addPlayer', function(data){

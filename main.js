@@ -71,52 +71,62 @@ function createWindow () {
       console.log('a user connected');
       console.log(socket.id);
 
-      socket.on('createPlayer', function(){
 
-        //if players is 0 create all cubes
+      //if players is 0 create all cubes
 
-        //console.log(players.length+1);
-        var player = host.addPlayer(players);
+      //console.log(players.length+1);
+      var id = socket.id;
+      var player = host.addPlayer(players, id);
 
-        // have player replace cube
+      // have player replace cube
 
-        socket.emit('createPlayer', player);
+      socket.emit('createPlayer', player);
 
-        socket.on('add', function(data){
-          socket.broadcast.emit('addPlayer', data);
-        });
+      //socket.broadcast.emit('addOtherPlayer', player);
 
-        socket.on('requestPlayers', function(id){
-        
-          for (var i = 0; i < players.length; i++){
-            if (players[i].playerId != id){
-              socket.emit('addPlayer', players[i]);
-            }
+      // socket.on('add', function(data){
+      //   socket.broadcast.emit('addPlayer', data);
+      // });
+
+      socket.on('requestOldPlayers', function(){
+        for (var i = 0; i < players.length; i++){
+          if (players[i].playerId != id){
+            socket.emit('addOtherPlayer', players[i]);
           }
+        }
+      });
 
-        //   var data = players.find( function( p ) {
-        //     return p.playerId === id;
-        //   } );
-         //
-        //   if( !data ) {
-        //    console.log("player:"+id+" not present will create");
-        //  }else{
-        //    console.log("player:"+id+" present");
-        //  }
+      /*
+      socket.on('requestPlayers', function(id){
 
-        });
+        for (var i = 0; i < players.length; i++){
+          if (players[i].playerId != id){
+            socket.emit('addPlayer', players[i]);
+          }
+        }
 
-        socket.on('updatePlayer', function(data){
-          host.updatePlayerData(players, data);
-          socket.broadcast.emit('updatePlayers', data);
-        });
-
-        socket.on('disconnect', function(){
-          host.removePlayer( socket.id );
-          socket.broadcast.emit('removePlayer', socket.id );
-        });
+      //   var data = players.find( function( p ) {
+      //     return p.playerId === id;
+      //   } );
+       //
+      //   if( !data ) {
+      //    console.log("player:"+id+" not present will create");
+      //  }else{
+      //    console.log("player:"+id+" present");
+      //  }
 
       });
+      */
+
+      // socket.on('updatePlayer', function(data){
+      //   host.updatePlayerData(players, data);
+      //   socket.broadcast.emit('updatePlayers', data);
+      // });
+      //
+      // socket.on('disconnect', function(){
+      //   host.removePlayer( socket.id );
+      //   socket.broadcast.emit('removePlayer', socket.id );
+      // });
 
     });
 
@@ -153,9 +163,9 @@ function createWindow () {
     var success = d.join("service-details", function (data) {
       console.log("something join");
         if (data.details) {
-            //connect to the new redis master
-            console.log(data.details);
-            event.sender.send('asynchronous-reply', data.details);
+          //connect to the new redis master
+          console.log(data.details);
+          event.sender.send('asynchronous-reply', data.details);
         }
     });
 

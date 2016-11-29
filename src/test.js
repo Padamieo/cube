@@ -216,7 +216,11 @@ var test = {
     thisPlayer = data;
 
     // no idea why this does not work
-    var obj = this.create_cube(data, 0x7777ff, 0.8);
+    //var obj = this.create_cube(data, 0x7777ff, 0.8);
+
+    var cube_geometry = new THREE.BoxGeometry(data.size, data.size, data.size);
+    var cube_material = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: false});
+    obj = new THREE.Mesh(cube_geometry, cube_material);
 
     obj.playerId = data.playerId;
 
@@ -248,7 +252,10 @@ var test = {
 
   addOtherPlayer: function(data){
 
-    var obj = this.create_cube(data, 0x777777, 0.9);
+    //var obj = this.create_cube(data, 0x777777, 0.9);
+    var cube_geometry = new THREE.BoxGeometry(data.size, data.size, data.size);
+    var cube_material = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: false});
+    var obj = new THREE.Mesh(cube_geometry, cube_material);
 
     obj.playerId = data.playerId;
 
@@ -257,6 +264,8 @@ var test = {
     obj.position.y = data.y;
     obj.position.z = data.z;
 
+    otherPlayersId.push( data.playerId );
+    otherPlayers.push( obj );
     objects.push( obj );
     three.scene.add( obj );
 

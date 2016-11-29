@@ -5,8 +5,8 @@ var host = {
     console.log("boop");
   },
 
-  player: function( ){
-    this.playerId = 0;
+  player: function( id ){
+    this.playerId = id;
     this.x = Math.random()*3;
     this.y = 0; //Math.random()*1;
     this.z = Math.random()*3;
@@ -18,10 +18,10 @@ var host = {
     this.turnSpeed = 0.03;
   },
 
-  addPlayer: function( players ){
-    player = new this.player();
+  addPlayer: function( players, id ){
+    player = new this.player(id);
     console.log("BPP"+players.length);
-    player.playerId = players.length+1;
+    //player.playerId = players.length+1;
 
     players.push( player );
     return player;
