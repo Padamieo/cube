@@ -20,10 +20,8 @@ var host = {
 
   addPlayer: function( players, id ){
     player = new this.player(id);
-    console.log("BPP"+players.length);
-    //player.playerId = players.length+1;
-
     players.push( player );
+    console.log(players);
     return player;
   },
 
@@ -43,10 +41,15 @@ var host = {
   },
 
   removePlayer: function( id ){
+    var index = this.contains( players, id );
+    players.splice(index, 1);
+  },
+
+  contains: function( players, id ) {
     var index = players.findIndex(function(pd){
       return pd.playerId === id;
-    })
-    players.splice(index, 1);
+    });
+    return index;
   }
 
 };

@@ -9,7 +9,10 @@ const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain;
 
 const path = require('path')
+
 const url = require('url')
+
+const Discover = require('node-discover');
 
 var players = [];
 var host = require('./app/host.js');
@@ -44,15 +47,15 @@ function createWindow () {
   mainWindow.webContents.openDevTools()
 
 
-  ipcMain.on('server', function(event, ip) {
+  ipcMain.on('setup', function(event, ip) {
 
     var app = require('express')();
     var http = require('http').Server(app);
     var io = require('socket.io')(http);
 
-    app.get('/', function(req, res){
-      res.sendfile('app/index2.html');
-    });
+    // app.get('/', function(req, res){
+    //   res.sendfile('app/index2.html');
+    // });
 
     http.listen(0, function(){
 
@@ -63,70 +66,53 @@ function createWindow () {
         port: http.address().port
       }
 
-      event.sender.send('reply', service );
+      event.sender.send('hosting', service );
 
     });
 
     io.on('connection', function(socket){
-      console.log('a user connected');
+      console.log('new connection');
       console.log(socket.id);
 
+      socket.on('newPlayer', function(id){
+        if(host.contains( players, id ) == -1){
+          //if players is 0 create all cubes
 
-      //if players is 0 create all cubes
+          //console.log(players.length+1);
+          //var id = socket.id;
+          var player = host.addPlayer(players, id);
 
-      //console.log(players.length+1);
-      var id = socket.id;
-      var player = host.addPlayer(players, id);
+          // have player replace cube
 
-      // have player replace cube
+          socket.emit('createPlayer', player);
 
-      socket.emit('createPlayer', player);
+          socket.broadcast.emit('addPlayer', player);
 
-      //socket.broadcast.emit('addOtherPlayer', player);
-
-      // socket.on('add', function(data){
-      //   socket.broadcast.emit('addPlayer', data);
-      // });
-
-      socket.on('requestOldPlayers', function(){
-        for (var i = 0; i < players.length; i++){
-          if (players[i].playerId != id){
-            socket.emit('addOtherPlayer', players[i]);
-          }
+        }else{
+          console.log("duplicate connection");
         }
+
       });
 
-      /*
       socket.on('requestPlayers', function(id){
-
         for (var i = 0; i < players.length; i++){
           if (players[i].playerId != id){
             socket.emit('addPlayer', players[i]);
           }
         }
-
-      //   var data = players.find( function( p ) {
-      //     return p.playerId === id;
-      //   } );
-       //
-      //   if( !data ) {
-      //    console.log("player:"+id+" not present will create");
-      //  }else{
-      //    console.log("player:"+id+" present");
-      //  }
-
       });
-      */
 
-      // socket.on('updatePlayer', function(data){
-      //   host.updatePlayerData(players, data);
-      //   socket.broadcast.emit('updatePlayers', data);
-      // });
-      //
-      // socket.on('disconnect', function(){
-      //   host.removePlayer( socket.id );
-      //   socket.broadcast.emit('removePlayer', socket.id );
-      // });
+      socket.on('updatePlayer', function(data){
+        host.updatePlayerData(players, data);
+        socket.broadcast.emit('updatePlayers', data);
+      });
+
+      socket.on('disconnect', function(d){
+        console.log("need uuid to remove now");
+        console.log(d);
+        // host.removePlayer( socket.id );
+        // socket.broadcast.emit('removePlayer', socket.id );
+      });
 
     });
 
@@ -134,30 +120,28 @@ function createWindow () {
 
 
   ipcMain.on('advertise', function(event, service) {
+    console.log('advertise');
 
-    var Discover = require('node-discover');
     var d = Discover();
 
     d.advertise({ something : "something" });
 
     d.on('added', function(obj) {
-      console.log('A new node has been added. d');
 
       var success = d.send("service-details", { details : service });
 
       if (!success) {
         //could not send on that channel; probably because it is reserved
-        console.log("d");
+        console.log("issue sending service details");
       }
     });
 
 
   });
 
-  ipcMain.on('find', function(event, port) {
-    console.log('find');
+  ipcMain.on('find', function(event, scope) {
+    console.log('find '+scope);
 
-    var Discover = require('node-discover');
     var d = Discover();
 
     var success = d.join("service-details", function (data) {
@@ -165,7 +149,7 @@ function createWindow () {
         if (data.details) {
           //connect to the new redis master
           console.log(data.details);
-          event.sender.send('asynchronous-reply', data.details);
+          event.sender.send('found', data.details);
         }
     });
 

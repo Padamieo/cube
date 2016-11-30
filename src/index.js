@@ -1,9 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
-//var io = require('socket.io')(http);
 
 var t = require('./test.js');
-// var host = require('./host.js');
 
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], tempObjects = [];
@@ -11,6 +9,10 @@ var players = [], objects = [], tempObjects = [];
 var otherPlayers = [], otherPlayersId = [];
 
 var keyState = {};
+
+const uuid = t.genUUID();
+
+const ipcRenderer = require('electron').ipcRenderer;
 
 
 app.get('/', function(req, res){
@@ -33,108 +35,61 @@ function myFunction(){
   document.getElementById("host").onclick = function(){
     console.log("hosting");
 
-    var ipcRenderer = require('electron').ipcRenderer;
+    //var ipcRenderer = require('electron').ipcRenderer;
 
-    ipcRenderer.send('server', ip_address);
+    ipcRenderer.send('setup', ip_address);
 
-    ipcRenderer.on('reply', function(event, service){
-
+    ipcRenderer.on('hosting', function(event, service){
       ipcRenderer.send('advertise', service);
-
-      var socket = io.connect('http://'+service.ip+':'+service.port);
-      common(socket);
-
+      common(service);
     });
-
-    // var service = {
-    //   ip: ip_address,
-    //   port: http.address().port
-    // }
-    // ipcRenderer.send('advertise', service);
-    //
-    // var socket = io.connect('http://'+ip_address+':'+http.address().port);
-    // common(socket);
 
   };
 
   document.getElementById("join").onclick = function(){
     console.log("joining");
 
-    var ipcRenderer = require('electron').ipcRenderer;
-    ipcRenderer.send('find', http.address().port);
+    //var ipcRenderer = require('electron').ipcRenderer;
 
-    ipcRenderer.on('asynchronous-reply', function(event, service){
+    ipcRenderer.send('find', 'local');
 
-      var socket = io.connect('http://' + service.ip+':'+service.port);
-      common(socket);
-
+    ipcRenderer.on('found', function(event, service){
+      //list found services
+      common(service);
     });
 
   };
 
-  function common(socket){
+  function common(service){
+
+    io = require('socket.io-client'),
+    socket = io.connect('http://'+service.ip+':'+service.port);
+
     /* common */
     three = THREE.Bootstrap();
 
-    //var socket = io();
-
     socket.on('connect', function(){
-      console.log(socket);
-      //socket.emit('createPlayer', 0);
-      t.loadWorld(socket);
-      socket.emit('requestOldPlayers', 0);
-
+      socket.emit('newPlayer', uuid);
     });
 
     socket.on('createPlayer', function(data){
-      console.log(socket);
-      //console.log(socket.id+" = "+data.playerId);
-      // if( !thisPlayer ){
-      //   t.createPlayer(data);
-      //   socket.emit('requestPlayers', thisPlayer.playerId);
-      //   socket.emit('add', data);
-      // }
+      t.loadWorld(socket);
       t.createPlayer(data);
-
-    });
-
-    socket.on('addOtherPlayer', function(data){
-      console.log(socket);
-      console.log("addOtherPlayer");
-      t.addOtherPlayer(data);
+      socket.emit('requestPlayers', uuid);
     });
 
     socket.on('addPlayer', function(data){
-      console.log('addPlayer');
-
-      // var a = [];
-      // for(var i = 0; i < objects.length; i++){
-      //   a.push(objects[i].playerId);
-      // }
-      // console.log(a);
-      //
-      // if (objects.filter(function(e){ e.playerId == data.playerId }).length > 0) {
-      //   console.log("F:"+data.playerId);
-      // }
-
-      var d = objects.find( function( p ) {
-        return p.playerId === data.playerId;
-      } );
-
-      if( !d ) {
-        console.log("player:"+data.playerId+" not present will create");
-        t.addOtherPlayer(data);
-      }else{
-        console.log("player:"+data.playerId+" present");
+      var index = t.contains(objects, data.playerId);
+      if(index == -1){
+        if(uuid != data.playerId){
+          t.addOtherPlayer(data);
+        }
       }
-
-      //if(thisPlayer.playerId != data.playerId){
-      // t.addOtherPlayer(data);
-      //}
     });
 
     socket.on('updatePlayers', function(data){
-      console.log(socket.id+" = "+data.playerId);
+      //may need to check uuid and data.playerId dont match or data is not incorrect between
+      console.log(uuid+" = "+data.playerId);
       t.updateObject(data);
     });
 

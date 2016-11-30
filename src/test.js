@@ -164,7 +164,6 @@ var test = {
       }
 
       if(socket){
-        //this.updatePlayerData(pass);
         socket.emit('updatePlayer', pass);
       }
 
@@ -216,11 +215,7 @@ var test = {
     thisPlayer = data;
 
     // no idea why this does not work
-    //var obj = this.create_cube(data, 0x7777ff, 0.8);
-
-    var cube_geometry = new THREE.BoxGeometry(data.size, data.size, data.size);
-    var cube_material = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: false});
-    obj = new THREE.Mesh(cube_geometry, cube_material);
+    var obj = this.create_cube(data, 0x7777ff, 0.8);
 
     obj.playerId = data.playerId;
 
@@ -252,10 +247,7 @@ var test = {
 
   addOtherPlayer: function(data){
 
-    //var obj = this.create_cube(data, 0x777777, 0.9);
-    var cube_geometry = new THREE.BoxGeometry(data.size, data.size, data.size);
-    var cube_material = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: false});
-    var obj = new THREE.Mesh(cube_geometry, cube_material);
+    var obj = this.create_cube(data, 0xff7777, 0.9);
 
     obj.playerId = data.playerId;
 
@@ -286,6 +278,17 @@ var test = {
     })
     objects.splice(index, 1);
 
+  },
+
+  genUUID() {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  },
+
+  contains: function( objects, id ) {
+    var index = objects.findIndex(function(obj){
+      return obj.playerId === id;
+    });
+    return index;
   }
 
 };
