@@ -1,6 +1,10 @@
 
 var host = {
 
+  b: function(){
+    console.log("boop");
+  },
+
   player: function( id ){
     this.playerId = id;
     this.x = Math.random()*3;
@@ -14,17 +18,38 @@ var host = {
     this.turnSpeed = 0.03;
   },
 
-  addPlayer: function( id ){
+  addPlayer: function( players, id ){
     player = new this.player(id);
     players.push( player );
+    console.log(players);
     return player;
   },
 
+  updatePlayerData: function(players, data){
+
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == data.playerId){
+        players[i].x = data.x;
+        players[i].y = data.y;
+        players[i].z = data.z;
+        players[i].r_x = data.r_x;
+        players[i].r_y = data.r_y;
+        players[i].r_z = data.r_z;
+      }
+    }
+
+  },
+
   removePlayer: function( id ){
+    var index = this.contains( players, id );
+    players.splice(index, 1);
+  },
+
+  contains: function( players, id ) {
     var index = players.findIndex(function(pd){
       return pd.playerId === id;
-    })
-    players.splice(index, 1);
+    });
+    return index;
   }
 
 };

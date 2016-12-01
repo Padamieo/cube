@@ -48,7 +48,7 @@ var test = {
       obj1.position.y = 0;
       obj1.position.z = tempObject[i][2];
       three.scene.add( obj1 );
-      tempObjects.push( obj1 );
+      objects.push( obj1 );
     }
   },
 
@@ -91,7 +91,7 @@ var test = {
   },
 
   registerEvents: function(){
-    // document.addEventListener('click', onMouseClick, false );
+    document.addEventListener('click', this.onMouseClick, false );
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
@@ -109,6 +109,19 @@ var test = {
   onKeyUp: function( event ){
     //event = event || window.event;
     keyState[event.keyCode || event.which] = false;
+  },
+
+  onMouseClick: function( event ){
+    console.log('click');
+    //console.log(thisPlayer.playerId);
+    var obj = test.ray(thisPlayer.playerId);
+    var v = obj.children[0];
+    var raycaster = new THREE.Raycaster();
+
+    raycaster.setFromCamera( v, obj );
+
+    console.log(v);
+
   },
 
   checkKeyStates: function(socket){
@@ -149,7 +162,9 @@ var test = {
       change = true
     }
 
-    if( change == true ){
+    if( change ){
+
+      //console.log("PASS: "+thisPlayer.playerId+" = "+socket.id);
 
       var pass = {
         playerId: thisPlayer.playerId,
@@ -162,7 +177,6 @@ var test = {
       }
 
       if(socket){
-        this.updatePlayerData(pass);
         socket.emit('updatePlayer', pass);
       }
 
@@ -170,40 +184,25 @@ var test = {
 
   },
 
-  updatePlayerData: function(data){
+  updateObject: function(data){
 
     for(var i = 0; i < players.length; i++){
       if(players[i].playerId == data.playerId){
-        players[i].x = data.x;
-        players[i].y = data.y;
-        players[i].z = data.z;
-        players[i].r_x = data.r_x;
-        players[i].r_y = data.r_y;
-        players[i].r_z = data.r_z;
-      }
-    }
-
-  },
-
-  updateObject: function(data){
-
-    for(var i = 0; i < objects.length; i++){
-      if(objects[i].playerId == data.playerId){
-        objects[i].position.x = data.x;
-        objects[i].position.y = data.y;
-        objects[i].position.z = data.z;
-        objects[i].rotation.x = data.r_x;
-        objects[i].rotation.y = data.r_y;
-        objects[i].rotation.z = data.r_z;
+        players[i].position.x = data.x;
+        players[i].position.y = data.y;
+        players[i].position.z = data.z;
+        players[i].rotation.x = data.r_x;
+        players[i].rotation.y = data.r_y;
+        players[i].rotation.z = data.r_z;
       }
     }
 
   },
 
   getObject: function(playerId){
-    for(var i = 0; i < objects.length; i++){
-      if(objects[i].playerId == playerId){
-        return objects[i];
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == playerId){
+        return players[i];
       }
     }
   },
@@ -235,11 +234,14 @@ var test = {
 
     obj.rotation.set(0,0,0);
     obj.position.x = 0;
-    obj.position.y = data.y;
+    obj.position.y = 0;
     obj.position.z = 0;
 
-    objects.push( obj );
+    players.push( obj );
     three.scene.add( obj );
+
+    var arrowHelper = this.arrow();
+    obj.add( arrowHelper );
 
     //camera look at the player
     //this.updateCameraPosition( data.playerId );
@@ -259,9 +261,19 @@ var test = {
 
   },
 
+  arrow: function(){
+    var from = new THREE.Vector3( 0, 0, 0 );
+    var to = new THREE.Vector3( -1, 0, 0 );
+    var direction = to.clone().sub(from);
+    var length = direction.length();
+    var arrowHelper = new THREE.ArrowHelper(direction.normalize(), from, length, 0xff0000 );
+    //scene.add( arrowHelper );
+    return arrowHelper;
+  },
+
   addOtherPlayer: function(data){
 
-    var obj = this.create_cube(data, 0x777777, 0.9);
+    var obj = this.create_cube(data, 0xff7777, 0.9);
 
     obj.playerId = data.playerId;
 
@@ -270,26 +282,39 @@ var test = {
     obj.position.y = data.y;
     obj.position.z = data.z;
 
-    objects.push( obj );
+    // otherPlayersId.push( data.playerId );
+    // otherPlayers.push( obj );
+    players.push( obj );
     three.scene.add( obj );
 
   },
 
   removeOtherPlayer: function(socket_id){
 
-    //remove the objects
-    for(var i = 0; i < objects.length; i++){
-      if(objects[i].playerId == socket_id){
-        three.scene.remove( objects[i] );
+    //remove the players
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == socket_id){
+        three.scene.remove( players[i] );
       }
     }
 
-    //remove listing in objects array incase
-    var index = objects.findIndex(function(obj){
+    //remove listing in players array incase
+    var index = players.findIndex(function(obj){
       return obj.playerId === socket_id;
     })
-    objects.splice(index, 1);
+    players.splice(index, 1);
 
+  },
+
+  genUUID() {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  },
+
+  contains: function( array, id ) {
+    var index = array.findIndex(function(a){
+      return a.playerId === id;
+    });
+    return index;
   }
 
 };
