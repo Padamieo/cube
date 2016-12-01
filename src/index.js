@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var t = require('./test.js');
 
 var three, player, socket, thisPlayer, camera, scene;
-var players = [], objects = [], tempObjects = [];
+var players = [], objects = [];
 
 var otherPlayers = [], otherPlayersId = [];
 
@@ -13,7 +13,6 @@ var keyState = {};
 const uuid = t.genUUID();
 
 const ipcRenderer = require('electron').ipcRenderer;
-
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -79,7 +78,7 @@ function myFunction(){
     });
 
     socket.on('addPlayer', function(data){
-      var index = t.contains(objects, data.playerId);
+      var index = t.contains(players, data.playerId);
       if(index == -1){
         if(uuid != data.playerId){
           t.addOtherPlayer(data);

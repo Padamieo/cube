@@ -48,7 +48,7 @@ var test = {
       obj1.position.y = 0;
       obj1.position.z = tempObject[i][2];
       three.scene.add( obj1 );
-      tempObjects.push( obj1 );
+      objects.push( obj1 );
     }
   },
 
@@ -173,23 +173,23 @@ var test = {
 
   updateObject: function(data){
 
-    for(var i = 0; i < objects.length; i++){
-      if(objects[i].playerId == data.playerId){
-        objects[i].position.x = data.x;
-        objects[i].position.y = data.y;
-        objects[i].position.z = data.z;
-        objects[i].rotation.x = data.r_x;
-        objects[i].rotation.y = data.r_y;
-        objects[i].rotation.z = data.r_z;
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == data.playerId){
+        players[i].position.x = data.x;
+        players[i].position.y = data.y;
+        players[i].position.z = data.z;
+        players[i].rotation.x = data.r_x;
+        players[i].rotation.y = data.r_y;
+        players[i].rotation.z = data.r_z;
       }
     }
 
   },
 
   getObject: function(playerId){
-    for(var i = 0; i < objects.length; i++){
-      if(objects[i].playerId == playerId){
-        return objects[i];
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == playerId){
+        return players[i];
       }
     }
   },
@@ -221,10 +221,10 @@ var test = {
 
     obj.rotation.set(0,0,0);
     obj.position.x = 0;
-    obj.position.y = data.y;
+    obj.position.y = 0;
     obj.position.z = 0;
 
-    objects.push( obj );
+    players.push( obj );
     three.scene.add( obj );
 
     //camera look at the player
@@ -256,27 +256,27 @@ var test = {
     obj.position.y = data.y;
     obj.position.z = data.z;
 
-    otherPlayersId.push( data.playerId );
-    otherPlayers.push( obj );
-    objects.push( obj );
+    // otherPlayersId.push( data.playerId );
+    // otherPlayers.push( obj );
+    players.push( obj );
     three.scene.add( obj );
 
   },
 
   removeOtherPlayer: function(socket_id){
 
-    //remove the objects
-    for(var i = 0; i < objects.length; i++){
-      if(objects[i].playerId == socket_id){
-        three.scene.remove( objects[i] );
+    //remove the players
+    for(var i = 0; i < players.length; i++){
+      if(players[i].playerId == socket_id){
+        three.scene.remove( players[i] );
       }
     }
 
-    //remove listing in objects array incase
-    var index = objects.findIndex(function(obj){
+    //remove listing in players array incase
+    var index = players.findIndex(function(obj){
       return obj.playerId === socket_id;
     })
-    objects.splice(index, 1);
+    players.splice(index, 1);
 
   },
 
@@ -284,9 +284,9 @@ var test = {
     return '_' + Math.random().toString(36).substr(2, 9);
   },
 
-  contains: function( objects, id ) {
-    var index = objects.findIndex(function(obj){
-      return obj.playerId === id;
+  contains: function( array, id ) {
+    var index = array.findIndex(function(a){
+      return a.playerId === id;
     });
     return index;
   }
