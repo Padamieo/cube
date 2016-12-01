@@ -91,7 +91,7 @@ var test = {
   },
 
   registerEvents: function(){
-    // document.addEventListener('click', onMouseClick, false );
+    document.addEventListener('click', this.onMouseClick, false );
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
@@ -109,6 +109,19 @@ var test = {
   onKeyUp: function( event ){
     //event = event || window.event;
     keyState[event.keyCode || event.which] = false;
+  },
+
+  onMouseClick: function( event ){
+    console.log('click');
+    //console.log(thisPlayer.playerId);
+    var obj = test.ray(thisPlayer.playerId);
+    var v = obj.children[0];
+    var raycaster = new THREE.Raycaster();
+
+    raycaster.setFromCamera( v, obj );
+
+    console.log(v);
+
   },
 
   checkKeyStates: function(socket){
@@ -227,6 +240,9 @@ var test = {
     players.push( obj );
     three.scene.add( obj );
 
+    var arrowHelper = this.arrow();
+    obj.add( arrowHelper );
+
     //camera look at the player
     //this.updateCameraPosition( data.playerId );
     //three.camera.lookAt( obj.position );
@@ -243,6 +259,16 @@ var test = {
     // camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
     // three.scene.add( camera );
 
+  },
+
+  arrow: function(){
+    var from = new THREE.Vector3( 0, 0, 0 );
+    var to = new THREE.Vector3( -1, 0, 0 );
+    var direction = to.clone().sub(from);
+    var length = direction.length();
+    var arrowHelper = new THREE.ArrowHelper(direction.normalize(), from, length, 0xff0000 );
+    //scene.add( arrowHelper );
+    return arrowHelper;
   },
 
   addOtherPlayer: function(data){
