@@ -26,6 +26,7 @@ var ip_address = t.getAddress();
 
 http.listen(0, ip_address, function(){
   console.log('listening on *:' + http.address().port );
+  ipcRenderer.send('outside', http.address().port );
 });
 
 

@@ -113,14 +113,33 @@ var test = {
 
   onMouseClick: function( event ){
     console.log('click');
-    //console.log(thisPlayer.playerId);
-    var obj = test.ray(thisPlayer.playerId);
-    var v = obj.children[0];
-    var raycaster = new THREE.Raycaster();
 
-    raycaster.setFromCamera( v, obj );
+    // var obj = test.ray(thisPlayer.playerId);
+    // var v = obj.children[0];
+    // var raycaster = new THREE.Raycaster();
+    // raycaster.setFromCamera( v, obj );
+    // console.log(v);
 
-    console.log(v);
+
+    var raycaster = new THREE.Raycaster(); // create once
+    var mouse = new THREE.Vector2(); // create once
+
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    raycaster.setFromCamera( mouse, three.camera );
+
+    var intersects = raycaster.intersectObjects( objects, true );
+
+    if ( intersects.length > 0 ) {
+      console.log(intersects);
+      //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+
+      var arrow = new THREE.ArrowHelper( three.camera.getWorldDirection(), three.camera.getWorldPosition(), 100, Math.random() * 0xffffff );
+      three.scene.add( arrow );
+    }
+
+
 
   },
 
