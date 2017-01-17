@@ -120,29 +120,29 @@ function createWindow () {
 
 
   //current test
-  function test(port){
-    console.log("running natman-api");
-    var natman = require('natman-api');
+  // function test(port){
+  //   console.log("running natman-api");
+  //   var natman = require('natman-api');
+  //
+  //   var privatePort = port; //The port on your machine that you want to forward
+  //   var publicPort = 80; //The port you want to open to the rest of the world.
+  //
+  //   natman(privatePort, publicPort);
+  // };
 
-    var privatePort = port; //The port on your machine that you want to forward
-    var publicPort = 80; //The port you want to open to the rest of the world.
-
-    natman(privatePort, publicPort);
-  };
-
-  var getIP = require('external-ip')();
-
-  getIP(function (err, ip) {
-    if (err) {
-      throw err;
-    }
-    console.log(ip);
-  });
+  // var getIP = require('external-ip')();
+  //
+  // getIP(function (err, ip) {
+  //   if (err) {
+  //     throw err;
+  //   }
+  //   console.log(ip);
+  // });
 
   ipcMain.on('outside', function(event, port){
     console.log("triggered outside:"+port);
-    getIP();
-    test(port);
+    //getIP();
+    //test(port);
   });
   //current test end
 
