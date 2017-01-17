@@ -26,11 +26,11 @@ var ip_address = t.getAddress();
 
 http.listen(0, ip_address, function(){
   console.log('listening on *:' + http.address().port );
-  ipcRenderer.send('outside', http.address().port );
+  //ipcRenderer.send('outside', http.address().port );
 });
 
 
-function myFunction(){
+(function startup(){
 
   document.getElementById("host").onclick = function(){
     console.log("hosting");
@@ -99,4 +99,4 @@ function myFunction(){
 
   }
 
-}
+})()
