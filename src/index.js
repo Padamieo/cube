@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 
-var t = require('./test.js');
+var t = require('./game.js');
 
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [];
@@ -66,16 +66,28 @@ http.listen(0, ip_address, function(){
     socket = io.connect('http://'+service.ip+':'+service.port);
 
     /* common */
-    three = THREE.Bootstrap();
+    //three = THREE.Bootstrap();
 
     socket.on('connect', function(){
       socket.emit('newPlayer', uuid);
     });
 
+		socket.on('something', function(data){
+			console.log("we got something");
+			console.log(data);
+		})
+
+    socket.on('startMatch', function(data){
+      //t.loadWorld(socket);
+			console.log("match start?");
+			console.log(data);
+    });
+
     socket.on('createPlayer', function(data){
-      t.loadWorld(socket);
-      t.createPlayer(data);
-      socket.emit('requestPlayers', uuid);
+		//	t.loadWorld(socket);
+		//	t.createPlayer(data);
+    console.log("waiting");
+  	//socket.emit('requestPlayers', uuid);
     });
 
     socket.on('addPlayer', function(data){

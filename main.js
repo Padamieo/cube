@@ -84,9 +84,12 @@ function createWindow () {
 
           // have player replace cube
 
-          socket.emit('createPlayer', player);
+          //socket.emit('createPlayer', player);
 
-          socket.broadcast.emit('addPlayer', player);
+          //socket.broadcast.emit('addPlayer', player);
+
+					socket.emit('something', players);
+					socket.broadcast.emit('somethingShare', player);
 
         }else{
           console.log("duplicate connection");
@@ -117,35 +120,6 @@ function createWindow () {
     });
 
   });
-
-
-  //current test
-  // function test(port){
-  //   console.log("running natman-api");
-  //   var natman = require('natman-api');
-  //
-  //   var privatePort = port; //The port on your machine that you want to forward
-  //   var publicPort = 80; //The port you want to open to the rest of the world.
-  //
-  //   natman(privatePort, publicPort);
-  // };
-
-  // var getIP = require('external-ip')();
-  //
-  // getIP(function (err, ip) {
-  //   if (err) {
-  //     throw err;
-  //   }
-  //   console.log(ip);
-  // });
-
-  ipcMain.on('outside', function(event, port){
-    console.log("triggered outside:"+port);
-    //getIP();
-    //test(port);
-  });
-  //current test end
-
 
   ipcMain.on('advertise', function(event, service) {
     console.log('advertise');
