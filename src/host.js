@@ -25,6 +25,19 @@ var host = {
     return player;
   },
 
+	user: function( id, host, name ){
+		this.playerId = id;
+		this.host = host;
+		this.name = name;
+	},
+
+	addUser: function( users, id, name){
+		var host = (users.length == 0 ? true : false );
+		var user = new this.user(id, host, name);
+    users.push( user );
+    return user;
+	},
+
   updatePlayerData: function(players, data){
 
     for(var i = 0; i < players.length; i++){

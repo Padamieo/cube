@@ -15,6 +15,7 @@ const url = require('url')
 const Discover = require('node-discover');
 
 var players = [];
+var users = [];
 var host = require('./app/host.js');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -71,15 +72,28 @@ function createWindow () {
     });
 
     io.on('connection', function(socket){
-      console.log('new connection');
-      console.log(socket.id);
+
+			socket.on('newUser', function(id, name){
+				var user = host.addUser(users, id, name);
+				socket.emit( 'createUser', user );
+				socket.broadcast.emit( 'shareUser', user );
+			})
+
+			socket.on('requestUsers', function(id){
+				for (var i = 0; i < users.length; i++){
+					if (users[i].playerId != id){
+						socket.emit('addUser', users[i]);
+					}
+				}
+			});
+
 
       socket.on('newPlayer', function(id){
         if(host.contains( players, id ) == -1){
           //if players is 0 create all cubes
 
           //console.log(players.length+1);
-          //var id = socket.id;
+
           var player = host.addPlayer(players, id);
 
           // have player replace cube
@@ -88,7 +102,7 @@ function createWindow () {
 
           //socket.broadcast.emit('addPlayer', player);
 
-					socket.emit('something', players);
+					socket.emit('something', player);
 					socket.broadcast.emit('somethingShare', player);
 
         }else{
@@ -122,7 +136,7 @@ function createWindow () {
   });
 
   ipcMain.on('advertise', function(event, service) {
-    console.log('advertise');
+    //console.log('advertise');
 
     var d = Discover();
 
@@ -147,7 +161,7 @@ function createWindow () {
     var d = Discover();
 
     var success = d.join("service-details", function (data) {
-      console.log("something join");
+      //console.log("something join");
         if (data.details) {
           //connect to the new redis master
           console.log(data.details);
@@ -155,7 +169,7 @@ function createWindow () {
         }
     });
 
-    console.log(success);
+    //console.log(success);
 
   });
 

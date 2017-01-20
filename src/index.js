@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var t = require('./game.js');
 
 var three, player, socket, thisPlayer, camera, scene;
-var players = [], objects = [];
+var players = [], objects = [], users = [];
 
 var otherPlayers = [], otherPlayersId = [];
 
@@ -69,19 +69,48 @@ http.listen(0, ip_address, function(){
     //three = THREE.Bootstrap();
 
     socket.on('connect', function(){
-      socket.emit('newPlayer', uuid);
+      //socket.emit('newPlayer', uuid);
+			var nameUser = "name";
+			socket.emit('newUser', uuid, nameUser);
     });
 
-		socket.on('something', function(data){
-			console.log("we got something");
+
+		socket.on('createUser', function(data){
+			console.log("createUser");
+			users.push(data);
+			//change page visual, add this player to list with ready button if hosting
+			socket.emit('requestUsers', uuid);
+			console.log(data);
+		})
+
+		socket.on('addUser', function(data){
+			console.log("addUser");
+			var index = t.contains(users, data.playerId);
+			if(index == -1){
+				if(uuid != data.playerId){
+					//t.addOtherPlayer(data);
+					console.log(data);
+					users.push(data);
+					//add user to page of listed users
+				}
+			}
+		});
+
+		socket.on('shareUser', function(data){
+			console.log("shareUser");
+			users.push(data);
 			console.log(data);
 		})
 
     socket.on('startMatch', function(data){
+			//three = THREE.Bootstrap();
       //t.loadWorld(socket);
 			console.log("match start?");
 			console.log(data);
     });
+
+
+
 
     socket.on('createPlayer', function(data){
 		//	t.loadWorld(socket);
