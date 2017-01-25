@@ -2,13 +2,17 @@
   "name": "cube-hide-and-seek",
   "version": "0.0.1",
   "description": "electron game running on socket.io and electron",
+	"browser": {
+		"jQuery": "./node_modules/jquery/dist/jquery.js"
+	},
   "dependencies": {
     "electron": "*",
     "express": "^4.10.2",
     "socket.io": "^1.3.5",
     "node-discover": "^0.6.2",
     "three": "*",
-    "threestrap" : "git://github.com/unconed/threestrap.git"
+    "threestrap" : "git://github.com/unconed/threestrap.git",
+		"jquery": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

@@ -1,6 +1,9 @@
 var app = require('express')();
 var http = require('http').Server(app);
 
+//this works but may need some sort of compiler
+var $ = require('jQuery');
+
 var t = require('./game.js');
 
 var three, player, socket, thisPlayer, camera, scene;
@@ -31,6 +34,10 @@ http.listen(0, ip_address, function(){
 
 
 (function startup(){
+
+	$( "#test" ).click(function() {
+	  console.log( "test" );
+	});
 
   document.getElementById("host").onclick = function(){
     console.log("hosting");
