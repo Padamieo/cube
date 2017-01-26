@@ -139,8 +139,6 @@ var test = {
       three.scene.add( arrow );
     }
 
-
-
   },
 
   checkKeyStates: function(socket){

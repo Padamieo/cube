@@ -5,17 +5,25 @@
 
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 1px Helvetica, Arial; background: #fff }
-
+      body { font: 12px Helvetica, Arial; background: #fff }
+			.hide {
+				display: none;
+			}
     </style>
 
   </head>
   <body>
 
-    <button id="host">Host</button>
+		<div id="start">
+	    <button id="host">Host</button>
+	    <button id="join">Join</button>
+		</div>
 
-    <button id="join">Join</button>
-		<button id="test">Join</button>
+		<!-- <button id="test">test</button> -->
+
+		<div id="lobby">
+			<ul id="users"></ul>
+		</div>
 
     <script src="index.js"></script>
     <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> --> <!-- would like to referance out localyhosted version -->

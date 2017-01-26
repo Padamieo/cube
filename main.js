@@ -87,6 +87,12 @@ function createWindow () {
 				}
 			});
 
+			socket.on('start', function(){
+				//what do we do here
+				socket.emit( 'startMatch' );
+				socket.broadcast.emit( 'startMatch' );
+			});
+
 
       socket.on('newPlayer', function(id){
         if(host.contains( players, id ) == -1){

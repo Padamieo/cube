@@ -35,14 +35,8 @@ http.listen(0, ip_address, function(){
 
 (function startup(){
 
-	$( "#test" ).click(function() {
-	  console.log( "test" );
-	});
-
   document.getElementById("host").onclick = function(){
     console.log("hosting");
-
-    //var ipcRenderer = require('electron').ipcRenderer;
 
     ipcRenderer.send('setup', ip_address);
 
@@ -51,12 +45,15 @@ http.listen(0, ip_address, function(){
       common(service);
     });
 
+		$( "#startMatch" ).click(function() {
+			$( "#lobby" ).hide();
+			socket.emit('start');
+		});
+
   };
 
   document.getElementById("join").onclick = function(){
     console.log("joining");
-
-    //var ipcRenderer = require('electron').ipcRenderer;
 
     ipcRenderer.send('find', 'local');
 
@@ -67,7 +64,10 @@ http.listen(0, ip_address, function(){
 
   };
 
+
   function common(service){
+
+		$( "#start" ).hide(); //may need to change to animation change
 
     io = require('socket.io-client'),
     socket = io.connect('http://'+service.ip+':'+service.port);
@@ -76,17 +76,26 @@ http.listen(0, ip_address, function(){
     //three = THREE.Bootstrap();
 
     socket.on('connect', function(){
+
       //socket.emit('newPlayer', uuid);
 			var nameUser = "name";
 			socket.emit('newUser', uuid, nameUser);
+
     });
 
+		function createYes(data){
+			$("#users").append('<li id="'+data.playerId+'" >'+data.name+'</li>');
+		}
 
 		socket.on('createUser', function(data){
 			console.log("createUser");
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
+			createYes(data);
+			if(data.host){
+				$("#lobby").append('<button id="startMatch">Start</button>');
+			}
 			console.log(data);
 		})
 
@@ -98,6 +107,7 @@ http.listen(0, ip_address, function(){
 					//t.addOtherPlayer(data);
 					console.log(data);
 					users.push(data);
+					createYes(data);
 					//add user to page of listed users
 				}
 			}
@@ -107,11 +117,12 @@ http.listen(0, ip_address, function(){
 			console.log("shareUser");
 			users.push(data);
 			console.log(data);
+			createYes(data);
 		})
 
     socket.on('startMatch', function(data){
-			//three = THREE.Bootstrap();
-      //t.loadWorld(socket);
+			three = THREE.Bootstrap();
+      t.loadWorld(socket);
 			console.log("match start?");
 			console.log(data);
     });
