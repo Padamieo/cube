@@ -45,7 +45,8 @@ http.listen(0, ip_address, function(){
       common(service);
     });
 
-		$( "#startMatch" ).click(function() {
+		$(document).on("click", "#startMatch", function(){
+			console.log("startMatch");
 			$( "#lobby" ).hide();
 			socket.emit('start');
 		});
@@ -72,8 +73,6 @@ http.listen(0, ip_address, function(){
     io = require('socket.io-client'),
     socket = io.connect('http://'+service.ip+':'+service.port);
 
-    /* common */
-    //three = THREE.Bootstrap();
 
     socket.on('connect', function(){
 
@@ -123,18 +122,28 @@ http.listen(0, ip_address, function(){
     socket.on('startMatch', function(data){
 			three = THREE.Bootstrap();
       t.loadWorld(socket);
+
+			//following should be a function
+			data.forEach(function( player ){
+				//players.push( player ); //need to push update to users, not players array
+				if(player.playerId == uuid ){
+					t.createPlayer(player);
+				}else{
+					t.addOtherPlayer(player);
+				}
+			})
+
 			console.log("match start?");
 			console.log(data);
     });
 
-
-
+		//console.log(Math.log(1)); // use this to calculate number of cubes to players in match
 
     socket.on('createPlayer', function(data){
-		//	t.loadWorld(socket);
-		//	t.createPlayer(data);
-    console.log("waiting");
-  	//socket.emit('requestPlayers', uuid);
+			// t.loadWorld(socket);
+			// t.createPlayer(data);
+	    console.log("waiting");
+	  	//socket.emit('requestPlayers', uuid);
     });
 
     socket.on('addPlayer', function(data){

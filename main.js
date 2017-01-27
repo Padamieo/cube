@@ -88,9 +88,10 @@ function createWindow () {
 			});
 
 			socket.on('start', function(){
+				players = host.createPlayers(users);
 				//what do we do here
-				socket.emit( 'startMatch' );
-				socket.broadcast.emit( 'startMatch' );
+				socket.emit( 'startMatch', players );
+				socket.broadcast.emit( 'startMatch', players );
 			});
 
 
