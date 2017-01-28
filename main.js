@@ -74,9 +74,11 @@ function createWindow () {
     io.on('connection', function(socket){
 
 			socket.on('newUser', function(id, name){
-				var user = host.addUser(users, id, name);
-				socket.emit( 'createUser', user );
-				socket.broadcast.emit( 'shareUser', user );
+        if(host.contains( users, id ) == -1){
+  				var user = host.addUser(users, id, name);
+  				socket.emit( 'createUser', user );
+  				socket.broadcast.emit( 'addUser', user );
+        }
 			})
 
 			socket.on('requestUsers', function(id){
@@ -94,7 +96,7 @@ function createWindow () {
 				socket.broadcast.emit( 'startMatch', players );
 			});
 
-
+      /*
       socket.on('newPlayer', function(id){
         if(host.contains( players, id ) == -1){
           //if players is 0 create all cubes
@@ -125,6 +127,8 @@ function createWindow () {
           }
         }
       });
+
+      */
 
       socket.on('updatePlayer', function(data){
         host.updatePlayerData(players, data);

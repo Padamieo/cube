@@ -41,12 +41,12 @@ var host = {
 
 	createPlayers: function( users ){
 		var ref = this;
-		var players = [];
+		var p = [];
 		users.forEach(function( user ){
-			var player = new ref.test( user );
-			players.push( player );
+			var s = new ref.test( user );
+			p.push( s );
 		})
-		return players;
+		return p;
 	},
 
   // addPlayer: function( players, id ){
