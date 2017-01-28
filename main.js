@@ -94,41 +94,13 @@ function createWindow () {
 				players = host.createPlayers(users);
 
         for (var i = 0; i < players.length; i++){
-      	//players.forEach(function( player ){
           if(players[i].host === true){
             socket.emit( 'startMatch', players[i] );
           }else{
             socket.broadcast.emit( 'startMatch', players[i] );
           }
         };
-
-				//socket.emit( 'startMatch', players );
-				//socket.broadcast.emit( 'startMatch', players );
 			});
-
-      /*
-      socket.on('newPlayer', function(id){
-        if(host.contains( players, id ) == -1){
-          //if players is 0 create all cubes
-
-          //console.log(players.length+1);
-
-          var player = host.addPlayer(players, id);
-
-          // have player replace cube
-
-          //socket.emit('createPlayer', player);
-
-          //socket.broadcast.emit('addPlayer', player);
-
-					socket.emit('something', player);
-					socket.broadcast.emit('somethingShare', player);
-
-        }else{
-          console.log("duplicate connection");
-        }
-
-      });
 
       socket.on('requestPlayers', function(id){
         for (var i = 0; i < players.length; i++){
@@ -137,8 +109,6 @@ function createWindow () {
           }
         }
       });
-
-      */
 
       socket.on('updatePlayer', function(data){
         host.updatePlayerData(players, data);

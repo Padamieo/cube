@@ -112,46 +112,15 @@ http.listen(0, ip_address, function(){
 			}
 		});
 
-
     socket.on('startMatch', function(data){
       if(!thisPlayer){
-
-      if(data.playerId == uuid){
-  			three = THREE.Bootstrap();
-        t.loadWorld(socket);
-
-        console.log(data);
-        //var index = t.contains(data, uuid);
-        //console.log(data[index]);
-
-        t.createPlayer(data);
-
-        socket.emit('requestPlayers', uuid);
-
-        /*
-        //first of all confirm users matches data passed
-
-  			//following should be a function
-        // maybe follw similiar to create player
-  			data.forEach(function( player ){
-          var index = t.contains(players, player.playerId);
-          if(index == -1){
-            if(uuid != player.playerId){
-      				//players.push( player ); //need to push update to users, not players array
-      				if(player.playerId == uuid ){
-      					t.createPlayer(player);
-      				}else{
-                t.addOtherPlayer(player);
-              }
-            }
-  				}
-  			})
-        */
-
-  			console.log("match start?");
-  			console.log(data);
+        if(data.playerId == uuid){
+    			three = THREE.Bootstrap();
+          t.loadWorld(socket);
+          t.createPlayer(data);
+          socket.emit('requestPlayers', uuid);
+        }
       }
-    }
     });
 
 		//console.log(Math.log(1)); // use this to calculate number of cubes to players in match
