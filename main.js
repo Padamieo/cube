@@ -90,10 +90,20 @@ function createWindow () {
 			});
 
 			socket.on('start', function(){
+        //confirm request is from host
 				players = host.createPlayers(users);
-				//what do we do here
-				socket.emit( 'startMatch', players );
-				socket.broadcast.emit( 'startMatch', players );
+
+        for (var i = 0; i < players.length; i++){
+      	//players.forEach(function( player ){
+          if(players[i].host === true){
+            socket.emit( 'startMatch', players[i] );
+          }else{
+            socket.broadcast.emit( 'startMatch', players[i] );
+          }
+        };
+
+				//socket.emit( 'startMatch', players );
+				//socket.broadcast.emit( 'startMatch', players );
 			});
 
       /*
