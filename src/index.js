@@ -88,6 +88,7 @@ http.listen(0, ip_address, function(){
 
 		socket.on('createUser', function(data){
 			console.log("createUser");
+      
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
@@ -95,7 +96,7 @@ http.listen(0, ip_address, function(){
 			if(data.host){
 				$("#lobby").append('<button id="startMatch">Start</button>');
 			}
-			console.log(data);
+
 		})
 
 		socket.on('addUser', function(data){
@@ -103,11 +104,8 @@ http.listen(0, ip_address, function(){
 			var index = t.contains(users, data.playerId);
 			if(index == -1){
 				if(uuid != data.playerId){
-					//t.addOtherPlayer(data);
-					console.log(data);
 					users.push(data);
 					createYes(data);
-					//add user to page of listed users
 				}
 			}
 		});
@@ -124,13 +122,6 @@ http.listen(0, ip_address, function(){
     });
 
 		//console.log(Math.log(1)); // use this to calculate number of cubes to players in match
-
-    socket.on('createPlayer', function(data){
-			// t.loadWorld(socket);
-			// t.createPlayer(data);
-	    console.log("waiting");
-	  	//socket.emit('requestPlayers', uuid);
-    });
 
     socket.on('addPlayer', function(data){
       var index = t.contains(players, data.playerId);

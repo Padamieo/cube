@@ -5,19 +5,6 @@ var host = {
     console.log("boop");
   },
 
-  player: function( id ){
-    this.playerId = id;
-    this.x = Math.random()*3;
-    this.y = 0; //Math.random()*1;
-    this.z = Math.random()*3;
-    this.r_x = 0;
-    this.r_y = 0;
-    this.r_z = 0;
-    this.size = 1;
-    this.speed = 0.1;
-    this.turnSpeed = 0.03;
-  },
-
 	test: function( user ){
 		this.playerId = user.playerId;
 		this.host = user.host;
@@ -48,13 +35,6 @@ var host = {
 		})
 		return p;
 	},
-
-  // addPlayer: function( players, id ){
-  //   player = new this.player(id);
-  //   players.push( player );
-  //   console.log(players);
-  //   return player;
-  // },
 
 	addUser: function( users, id, name){
 		var host = (users.length == 0 ? true : false );

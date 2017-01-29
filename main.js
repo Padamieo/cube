@@ -152,8 +152,6 @@ function createWindow () {
     var pass = [];
 
     function partB() {
-      // console.log("pardB");
-      // console.log(pass);
       if(pass){
         if(pass.length == 1){
           event.sender.send('found', pass[0].details);
@@ -163,19 +161,12 @@ function createWindow () {
       }else{
         console.log("could not find a game ): ");
       }
-
     }
 
     var d = Discover();
 
 
     var success = d.join("service-details", function (data) {
-      // //console.log("something join");
-      //   if (data.details) {
-      //     //connect to the new redis master
-      //     console.log(data.details);
-      //     event.sender.send('found', data.details);
-      //   }
       if (data.details) {
          console.log("B"+data);
         pass.push( data );
