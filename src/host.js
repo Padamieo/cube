@@ -5,7 +5,7 @@ var host = {
     console.log("boop");
   },
 
-	test: function( user ){
+	player: function( user ){
 		this.playerId = user.playerId;
 		this.host = user.host;
 		this.name = user.name;
@@ -30,7 +30,7 @@ var host = {
 		var ref = this;
 		var p = [];
 		users.forEach(function( user ){
-			var s = new ref.test( user );
+			var s = new ref.player( user );
 			p.push( s );
 		})
 		return p;
