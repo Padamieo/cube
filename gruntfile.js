@@ -29,7 +29,7 @@ module.exports = function(grunt){
   		build:{
   			files:[{
   				cwd: 'src/',
-  				src: ['**', '!**/index.js', '!**/*.jpg', '!**/*.css'],
+  				src: ['**', '!**/index.js', '!**/*.jpg'],
   				dest: 'app/',
   				nonull: false,
   				expand: true,
@@ -38,6 +38,24 @@ module.exports = function(grunt){
   			},]
   		}
   	},
+
+		modernizr: {
+		  dist: {
+		    "parseFiles": true,
+		    "customTests": [],
+		    "devFile": "/PATH/TO/modernizr-dev.js",
+		    "dest": "/PATH/TO/modernizr-output.js",
+		    "tests": [
+		      // Tests
+		    ],
+		    "options": [
+		      "setClasses",
+					"csstransitions",
+					"cssanimations"
+		    ],
+		    "uglify": true
+		  }
+		}
 
     watch:{
       options: {
@@ -60,6 +78,7 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks("grunt-modernizr");
 
 	// our default task, others will come later
 	grunt.registerTask('default', [
