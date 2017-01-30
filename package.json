@@ -17,11 +17,12 @@
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-copy": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-less": "*",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-watch": "*",
     "grunt-modernizr": "^1.0.2",
-		"grunt-contrib-cssmin": "*",
-		"grunt-contrib-less": "*"
+    "grunt-modernizr-builder": "^0.1.9"
   },
   "main": "main.js",
   "scripts": {

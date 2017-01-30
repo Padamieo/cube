@@ -39,23 +39,15 @@ module.exports = function(grunt){
   		}
   	},
 
-		modernizr: {
-		  dist: {
-		    "parseFiles": true,
-		    "customTests": [],
-		    "devFile": "/PATH/TO/modernizr-dev.js",
-		    "dest": "/PATH/TO/modernizr-output.js",
-		    "tests": [
-		      // Tests
-		    ],
-		    "options": [
-		      "setClasses",
-					"csstransitions",
-					"cssanimations"
-		    ],
-		    "uglify": true
-		  }
-		}
+		modernizr_builder: {
+	    build: {
+        options: {
+          features: 'csstransitions,cssanimations',
+          options: 'prefixed,prefixes',
+          dest: 'temp/modernizr-custom.js'
+        }
+	    }
+		},
 
     watch:{
       options: {
@@ -78,7 +70,7 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks("grunt-modernizr");
+	grunt.loadNpmTasks("grunt-modernizr-builder");
 
 	// our default task, others will come later
 	grunt.registerTask('default', [
@@ -86,5 +78,9 @@ module.exports = function(grunt){
     'copy:build',
     'watch'
   ]);
+
+	grunt.registerTask('test', [
+		'modernizr_builder'
+	]);
 
 };
