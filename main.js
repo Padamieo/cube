@@ -93,6 +93,8 @@ function createWindow () {
         //confirm request is from host
 				players = host.createPlayers(users);
 
+				players = host.boop(players);
+
         for (var i = 0; i < players.length; i++){
           if(players[i].host === true){
             socket.emit( 'startMatch', players[i] );

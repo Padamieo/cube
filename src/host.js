@@ -11,7 +11,7 @@ var host = {
 		this.name = user.name;
     this.x = Math.random()*3;
     this.y = 0; //Math.random()*1;
-    this.z = Math.random()*3;
+    this.z = 0;
     this.r_x = 0;
     this.r_y = 0;
     this.r_z = 0;
@@ -34,6 +34,18 @@ var host = {
 			p.push( s );
 		})
 		return p;
+	},
+
+	boop: function( play ){
+		var ref = this;
+		play.forEach(function( p1 ){
+			play.forEach(function( p2 ){
+				if(p1.x < p2.x){
+					console.log(p1.x+" < "+p2.x);
+				}
+			})
+		})
+		return play;
 	},
 
 	addUser: function( users, id, name){
