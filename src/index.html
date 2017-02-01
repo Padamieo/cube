@@ -13,43 +13,83 @@
 
 	<link rel="stylesheet" type="text/css" href="css/default.css" />
 	<link rel="stylesheet" type="text/css" href="css/component.css" />
-	<!-- <link rel="stylesheet" type="text/css" href="css/animations.css" /> -->
+	<link rel="stylesheet" type="text/css" href="css/animations.css" />
 
   </head>
   <body>
 
-		<div id="start">
+		<!-- <div id="start">
 	    <button id="host">Host</button>
 	    <button id="join">Join</button>
-		</div>
+		</div> -->
 
-		<!-- <button id="test">test</button> -->
-
-		<div id="lobby">
+		<!-- <div id="lobby">
 			<ul id="users"></ul>
-		</div>
+		</div> -->
 
-		<!--
-			<div class="pt-triggers">
+    <button id="iterateEffects" class="pt-touch-button">Show next page transition</button>
 
-				<button id="test" data-animation="5" class="pt-touch-button">Show next page transition</button>
-
-				<button id="iterateEffects" class="pt-touch-button">Show next page transition</button>
-
-			</div>
 
 			<div id="pt-main" class="pt-perspective">
 
-				<div class="pt-page pt-page-1"><h1><span>A collection of</span><strong>Page</strong> test1</h1>
-					<div><p>test</p></div>
+
+        <!-- startup screen -->
+        <div class="pt-page pt-page-1">
+          <h1><strong>cube</strong> game</h1>
+
+          <div id="login" class="pt-triggers">
+    				<button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button>
+    			</div>
+
+        </div>
+
+        <!-- main menu -->
+				<div class="pt-page pt-page-1">
+          <h1><strong>main</strong> menu</h1>
+
+          <button id="test" data-animation="5" class="pt-touch-button">Show next page transition</button>
+
+          <div id="start" class="pt-triggers">
+
+            <button id="host" data-animation="5" class="pt-touch-button" >Host</button>
+            <button id="join" data-animation="20" class="pt-touch-button" >Join</button>
+
+            <button id="options" data-animation="6" class="pt-touch-button" >options</button>
+            <button id="exit" data-animation="6" class="pt-touch-button" >exit</button>
+
+    			</div>
+
+        </div>
+
+        <!-- hosting -->
+				<div class="pt-page pt-page-2">
+					<h1><strong>waiting</strong> players</h1>
+          <!-- <button id="test" data-animation="1" class="pt-touch-button">Show next page transition</button> -->
+
+          <div id="lobby">
+            <ul id="users"></ul>
+          </div>
+
+          <div id="lobby2" class="pt-triggers">
+            <button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button>
+            <button id="stop" data-animation="6" class="pt-touch-button" >stop hosting</button>
+          </div>
+
 				</div>
 
-				<div class="pt-page pt-page-2">
-					<h1><span>A collection of</span><strong>Page</strong> test2</h1>
-				</div>
+        <!-- options -->
+        <div class="pt-page pt-page-4">
+          <h1><strong>Options</strong> settings</h1>
+
+          <button id="test" data-animation="5" class="pt-touch-button">Show next page transition</button>
+
+          <div id="settings" class="pt-triggers">
+            <p>options</p>
+    			</div>
+
+        </div>
 
 			</div>
-		-->
 
     <script src="index.js"></script>
     <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> --> <!-- would like to referance out localyhosted version -->

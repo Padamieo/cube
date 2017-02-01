@@ -40,7 +40,7 @@ var PageTransitions = (function() {
 			++animcursor;
 		} );
 
-		$( '#test' ).on( 'click', function(v) {
+		$( '.pt-touch-button' ).on( 'click', function(v) {
 			nextPage( $(this).data( 'animation' )  );
 		} );
 
