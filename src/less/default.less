@@ -13,6 +13,10 @@
 }
 
 *, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+*:focus {
+  outline: none;
+}
+
 body, html { font-size: 100%; padding: 0; margin: 0;}
 
 /* Clearfix hack by Nicolas Gallagher: http://nicolasgallagher.com/micro-clearfix-hack/ */
@@ -22,7 +26,7 @@ body, html { font-size: 100%; padding: 0; margin: 0;}
 body {
 	font-family: 'Lato', Calibri, Arial, sans-serif;
 	color: #fff;
-	background: #333;
+	background: @dark;
 	overflow: hidden;
 }
 
@@ -37,8 +41,8 @@ a:hover {
 
 /* Header Style */
 .codrops-top {
-	background: #fff;
-	background: rgba(255, 255, 255, 0.1);
+	background: @white;
+	background: fade(@white, 10%);
 	text-transform: uppercase;
 	position: fixed;
 	width: 100%;
@@ -52,12 +56,12 @@ a:hover {
 .codrops-top a {
 	padding: 0 1em;
 	letter-spacing: 0.1em;
-	color: #fff;
+	color: @white;
 	display: inline-block;
 }
 
 .codrops-top a:hover {
-	background: rgba(255,255,255,0.2);
+	background: fade(@white, 20%);
 }
 
 .codrops-top span.right {
@@ -74,3 +78,22 @@ a:hover {
 // .hide {
 // 	display: none;
 // }
+
+input{
+	letter-spacing: 1px;
+	width: 100%;
+	border: 2px solid @white;
+	margin: 10px 0 0px;
+	padding: 0px 20px;
+	height: 50px;
+	background: fade(@white, 20%);
+	color: @white;
+	.transition(background 0.5s ease);
+	&:focus {
+		background: fade(@dark, 10%);
+	}
+
+	&#username{
+			text-align: center;
+	}
+}

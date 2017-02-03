@@ -8,8 +8,8 @@
 
   <div class="codrops-top clearfix">
     <button id="iterateEffects" data-animation="5">cycle</button>
-		<!-- <a class="codrops-icon codrops-icon-prev" href="http://tympanus.net/Tutorials/AutomaticFigureNumbering/"><span>Previous Demo</span></a> -->
-		<span class="right"><a class="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=15001"><span>Back to the Codrops Article</span></a></span>
+		<!-- <a href="#"><span>Previous Demo</span></a> -->
+		<span class="right"><a class="" href="#"><span>username change?</span></a></span>
 	</div>
 
 		<!-- <div id="start">
@@ -26,20 +26,19 @@
 
 			<div id="pt-main" class="pt-perspective">
 
-
         <!-- startup screen -->
         <div class="pt-page pt-page-1">
           <h1><strong>cube</strong> game</h1>
 
           <div id="login" class="pt-triggers">
-            <input type="text" name="username">
-    				<button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button>
+            <input id="username" type="text" name="username">
+    				<button id="test" data-animation="6" class="pt-touch-button">enter</button>
     			</div>
 
         </div>
 
         <!-- main menu -->
-				<div class="pt-page pt-page-1">
+				<div class="pt-page pt-page-2">
           <h1><strong>main</strong> menu</h1>
 
           <div id="start" class="pt-triggers">
@@ -55,7 +54,7 @@
         </div>
 
         <!-- hosting -->
-				<div class="pt-page pt-page-2">
+				<div class="pt-page pt-page-3">
 					<h1><strong>waiting</strong> players</h1>
           <!-- <button id="test" data-animation="1" class="pt-touch-button">Show next page transition</button> -->
 
@@ -65,18 +64,29 @@
 
           <div id="lobby" class="pt-triggers">
             <ul id="users"></ul>
-            <button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button>
+            <!-- <button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button> -->
             <button id="stop" data-animation="6" class="pt-touch-button" >stop hosting</button>
           </div>
 
 				</div>
+
+        <!-- searching / joining -->
+        <div class="pt-page pt-page-4">
+          <h1><strong>search</strong> join</h1>
+          <!-- <button id="test" data-animation="1" class="pt-touch-button">Show next page transition</button> -->
+
+          <div class="pt-triggers">
+            <button id="stop" data-animation="6" class="pt-touch-button" >stop search</button>
+          </div>
+
+        </div>
 
         <!-- game -->
 				<div id="game" class="pt-page pt-page-2">
 				</div>
 
         <!-- options -->
-        <div class="pt-page pt-page-4">
+        <div class="pt-page pt-page-5">
           <h1><strong>Options</strong> settings</h1>
 
           <button id="test" data-animation="5" class="pt-touch-button">Show next page transition</button>

@@ -40,9 +40,9 @@ html, body { height: 100%; }
 	overflow: auto;
 }
 
-.pt-page-ontop {
-	z-index: 999;
-}
+// .pt-page-ontop {
+// 	z-index: 999;
+// }
 
 /* Text Styles, Colors, Backgrounds */
 
@@ -144,7 +144,7 @@ html, body { height: 100%; }
 }
 
 .pt-touch-button {
-	background: #fff;
+	background: @white;
 	color: #aaa;
 }
 
@@ -157,37 +157,37 @@ html, body { height: 100%; }
 }
 
 .pt-touch-button:hover{
-	/*background: red;*/
-
-	
-	box-shadow: 0 0px 0 rgba(0,0,0,0.1);
+	background: darken(@white, 2.5%);
+	//background: desaturate(spin(#0ac2d2, 180), 50%);
+	//color: @dark;
+	box-shadow: 0px 0px 0px rgba(0,0,0,0.1);
 }
 
 .touch .pt-triggers .dl-menuwrapper {
 	display: none;
 }
 
-.pt-message {
-	display: none;
-	position: absolute;
-	z-index: 99999;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	background: #da475c;
-	color: #fff;
-	text-align: center;
-}
-
-.pt-message p {
-	margin: 0;
-	line-height: 60px;
-	font-size: 26px;
-}
-
-.no-cssanimations .pt-message {
-	display: block;
-}
+// .pt-message {
+// 	display: none;
+// 	position: absolute;
+// 	z-index: 99999;
+// 	bottom: 0;
+// 	left: 0;
+// 	width: 100%;
+// 	background: #da475c;
+// 	color: #fff;
+// 	text-align: center;
+// }
+//
+// .pt-message p {
+// 	margin: 0;
+// 	line-height: 60px;
+// 	font-size: 26px;
+// }
+//
+// .no-cssanimations .pt-message {
+// 	display: block;
+// }
 
 @media screen and (max-width: 47.4375em) {
 	.pt-page h1 {
