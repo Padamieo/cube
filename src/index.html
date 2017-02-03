@@ -1,22 +1,16 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
-
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 12px Helvetica, Arial; background: #fff }
-			.hide {
-				display: none;
-			}
-    </style>
-
-	<link rel="stylesheet" type="text/css" href="css/default.css" />
-	<link rel="stylesheet" type="text/css" href="css/component.css" />
-	<link rel="stylesheet" type="text/css" href="css/animations.css" />
-
+    <title>cube game</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
   </head>
   <body>
+
+  <div class="codrops-top clearfix">
+    <button id="iterateEffects" data-animation="5">cycle</button>
+		<!-- <a class="codrops-icon codrops-icon-prev" href="http://tympanus.net/Tutorials/AutomaticFigureNumbering/"><span>Previous Demo</span></a> -->
+		<span class="right"><a class="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=15001"><span>Back to the Codrops Article</span></a></span>
+	</div>
 
 		<!-- <div id="start">
 	    <button id="host">Host</button>
@@ -27,7 +21,7 @@
 			<ul id="users"></ul>
 		</div> -->
 
-    <button id="iterateEffects" class="pt-touch-button">Show next page transition</button>
+    <!-- <button id="iterateEffects" data-animation="5" class="pt-touch-button">Show next page transition</button> -->
 
 
 			<div id="pt-main" class="pt-perspective">
@@ -38,6 +32,7 @@
           <h1><strong>cube</strong> game</h1>
 
           <div id="login" class="pt-triggers">
+            <input type="text" name="username">
     				<button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button>
     			</div>
 
@@ -46,8 +41,6 @@
         <!-- main menu -->
 				<div class="pt-page pt-page-1">
           <h1><strong>main</strong> menu</h1>
-
-          <button id="test" data-animation="5" class="pt-touch-button">Show next page transition</button>
 
           <div id="start" class="pt-triggers">
 
@@ -66,15 +59,20 @@
 					<h1><strong>waiting</strong> players</h1>
           <!-- <button id="test" data-animation="1" class="pt-touch-button">Show next page transition</button> -->
 
-          <div id="lobby">
+          <!-- <div id="lobby">
             <ul id="users"></ul>
-          </div>
+          </div> -->
 
-          <div id="lobby2" class="pt-triggers">
+          <div id="lobby" class="pt-triggers">
+            <ul id="users"></ul>
             <button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button>
             <button id="stop" data-animation="6" class="pt-touch-button" >stop hosting</button>
           </div>
 
+				</div>
+
+        <!-- game -->
+				<div id="game" class="pt-page pt-page-2">
 				</div>
 
         <!-- options -->
@@ -93,7 +91,7 @@
 
     <script src="index.js"></script>
     <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> --> <!-- would like to referance out localyhosted version -->
-		<script src="modernizr-custom.js"></script>
-		<script src="pagetransitions.js"></script>
+		<!-- <script src="modernizr-custom.js"></script> -->
+		<!-- <script src="pagetransitions.js"></script> -->
   </body>
 </html>

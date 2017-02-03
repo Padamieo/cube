@@ -88,7 +88,7 @@ http.listen(0, ip_address, function(){
 
 		socket.on('createUser', function(data){
 			console.log("createUser");
-      
+
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
@@ -113,7 +113,7 @@ http.listen(0, ip_address, function(){
     socket.on('startMatch', function(data){
       if(!thisPlayer){
         if(data.playerId == uuid){
-    			three = THREE.Bootstrap();
+    			three = THREE.Bootstrap({element: '#game'});
           t.loadWorld(socket);
           t.createPlayer(data);
           socket.emit('requestPlayers', uuid);
