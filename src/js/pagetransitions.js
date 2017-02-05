@@ -40,11 +40,15 @@ var PageTransitions = (function() {
 			++animcursor;
 		} );
 
-		$( '.pt-touch-button' ).on( 'click', function(v) {
-			nextPage( $(this).data( 'animation' )  );
-		} );
+		// $( '.pt-touch-button' ).on( 'click', function(v) {
+		// 	var b = $(this).data( 'animation' );
+		// 	console.log( b );
+		// 	var options = { animation: b, showPage: 3};
+		// 	nextPage( options );
+		// } );
 
 	}
+
 
 
 	function nextPage(options ) {

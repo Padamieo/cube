@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "electron game running on socket.io and electron",
   "browser": {
-    "jQuery": "./node_modules/jquery/dist/jquery.js"
+    "jQuery": "./node_modules/jquery/dist/jquery.js",
+    "game": "src/game.js"
   },
   "dependencies": {
     "electron": "*",
@@ -13,6 +14,11 @@
     "three": "*",
     "threestrap": "git://github.com/unconed/threestrap.git",
     "jquery": "*"
+  },
+  "browserify-shim": {
+    "game": {
+      "exports": "game"
+    }
   },
   "devDependencies": {
     "grunt": "~0.4.5",

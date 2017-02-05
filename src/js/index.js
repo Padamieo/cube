@@ -15,6 +15,8 @@ var keyState = {};
 
 const uuid = t.genUUID();
 
+var nameUser = '';
+
 const ipcRenderer = require('electron').ipcRenderer;
 
 app.get('/', function(req, res){
@@ -43,6 +45,8 @@ http.listen(0, ip_address, function(){
     ipcRenderer.on('hosting', function(event, service){
       ipcRenderer.send('advertise', service);
       common(service);
+      var options = { animation: 6, showPage: 2 };
+      PageTransitions.nextPage( options );
     });
 
 		$(document).on("click", "#startMatch", function(){
@@ -65,6 +69,18 @@ http.listen(0, ip_address, function(){
 
   };
 
+  document.getElementById("test").onclick = function(){
+    console.log("submit name");
+    var value = $( "#username" ).val();
+    if(value){
+      nameUser = value;
+    }else{
+      nameUser = "name";
+    }
+  	var options = { animation: 6, showPage: 1 };
+  	PageTransitions.nextPage( options );
+  };
+
 
   function common(service){
 
@@ -77,7 +93,7 @@ http.listen(0, ip_address, function(){
     socket.on('connect', function(){
 
       //socket.emit('newPlayer', uuid);
-			var nameUser = "name";
+			//var nameUser = "name";
 			socket.emit('newUser', uuid, nameUser);
 
     });
@@ -94,7 +110,7 @@ http.listen(0, ip_address, function(){
 			socket.emit('requestUsers', uuid);
 			createYes(data);
 			if(data.host){
-				$("#lobby").append('<button id="startMatch">Start</button>');
+				$("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
 			}
 
 		})
@@ -118,6 +134,8 @@ http.listen(0, ip_address, function(){
           t.createPlayer(data);
           socket.emit('requestPlayers', uuid);
         }
+        var options = { animation: 6, showPage: 4 };
+        PageTransitions.nextPage( options );
       }
     });
 

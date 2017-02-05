@@ -14,14 +14,12 @@ module.exports = function(grunt){
       app:{
         files:{
           'app/index.js': [
-            //'node_modules/socket.io/socket.io.js',
-            //'node_modules/socket.io-client/socket.io.js',
 						'node_modules/jquery/dist/jquery.js',
             'node_modules/three/build/three.js',
 						'node_modules/three/examples/js/SkyShader.js',
             'node_modules/threestrap/build/threestrap.js',
-            'src/js/index.js',
-						'temp/modernizr-custom.js',
+						'src/js/index.js',
+          	'temp/modernizr-custom.js',
 						'src/js/pagetransitions.js'
           ]
         }
@@ -104,7 +102,7 @@ module.exports = function(grunt){
   ]);
 
 	grunt.registerTask('test', [
-		'less'
+		'modernizr_builder'
 	]);
 
 };
