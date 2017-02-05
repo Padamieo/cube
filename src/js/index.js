@@ -51,7 +51,7 @@ http.listen(0, ip_address, function(){
 
 		$(document).on("click", "#startMatch", function(){
 			console.log("startMatch");
-			$( "#lobby" ).hide();
+			//$( "#lobby" ).hide();
 			socket.emit('start');
 		});
 
@@ -65,6 +65,7 @@ http.listen(0, ip_address, function(){
     ipcRenderer.on('found', function(event, service){
       //list found services
       common(service);
+      menuchange('join');
     });
 
   };
@@ -77,14 +78,38 @@ http.listen(0, ip_address, function(){
     }else{
       nameUser = "name";
     }
-  	var options = { animation: 6, showPage: 1 };
-  	PageTransitions.nextPage( options );
+    menuchange('main');
+  };
+
+  function menuchange(pagename){
+    switch (pagename) {
+      case 'main':
+        page = 0;
+        break;
+      case 'host':
+        page = 2;
+        break;
+      case 'options':
+        page = 5;
+        break;
+      case 'join':
+        page = 3;
+        break;
+      case 'game':
+        page = 4;
+        break;
+      case 'start':
+        page = 0;
+    }
+    
+    var options = { animation: 6, showPage: 1 };
+    PageTransitions.nextPage( options );
   };
 
 
   function common(service){
 
-		$( "#start" ).hide(); //may need to change to animation change
+		//$( "#start" ).hide(); //may need to change to animation change
 
     io = require('socket.io-client'),
     socket = io.connect('http://'+service.ip+':'+service.port);
@@ -134,8 +159,7 @@ http.listen(0, ip_address, function(){
           t.createPlayer(data);
           socket.emit('requestPlayers', uuid);
         }
-        var options = { animation: 6, showPage: 4 };
-        PageTransitions.nextPage( options );
+        menuchange('game');
       }
     });
 

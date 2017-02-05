@@ -155,7 +155,10 @@ function createWindow () {
 
     function partB() {
       if(pass){
-        if(pass.length == 1){
+        if(pass.length == 0){
+          console.log("none found yet");
+          //setTimeout(partB, 3000);
+        }else if(pass.length == 1){
           event.sender.send('found', pass[0].details);
         }else{
           console.log("more than one found");
