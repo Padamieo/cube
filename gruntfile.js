@@ -18,6 +18,7 @@ module.exports = function(grunt){
             'node_modules/three/build/three.js',
 						'node_modules/three/examples/js/SkyShader.js',
             'node_modules/threestrap/build/threestrap.js',
+						'src/game.js',
 						'src/js/index.js',
           	'temp/modernizr-custom.js',
 						'src/js/pagetransitions.js'

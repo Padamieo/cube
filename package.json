@@ -13,6 +13,7 @@
     "node-discover": "^0.6.2",
     "three": "*",
     "threestrap": "git://github.com/unconed/threestrap.git",
+    "SpinKit":"git://github.com/tobiasahlin/SpinKit.git",
     "jquery": "*"
   },
   "browserify-shim": {

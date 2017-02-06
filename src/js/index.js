@@ -4,7 +4,9 @@ var http = require('http').Server(app);
 //this works but may need some sort of compiler
 var $ = require('jQuery');
 
-var t = require('./game.js');
+//var t = require('./game.js');
+console.log(test);
+var t = test;
 
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], users = [];
@@ -45,8 +47,7 @@ http.listen(0, ip_address, function(){
     ipcRenderer.on('hosting', function(event, service){
       ipcRenderer.send('advertise', service);
       common(service);
-      var options = { animation: 6, showPage: 2 };
-      PageTransitions.nextPage( options );
+      menuchange('host');
     });
 
 		$(document).on("click", "#startMatch", function(){
@@ -101,7 +102,7 @@ http.listen(0, ip_address, function(){
       case 'start':
         page = 0;
     }
-    
+
     var options = { animation: 6, showPage: 1 };
     PageTransitions.nextPage( options );
   };
@@ -123,7 +124,7 @@ http.listen(0, ip_address, function(){
 
     });
 
-		function createYes(data){
+		function addUser(data){
 			$("#users").append('<li id="'+data.playerId+'" >'+data.name+'</li>');
 		}
 
@@ -133,7 +134,7 @@ http.listen(0, ip_address, function(){
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
-			createYes(data);
+			addUser(data);
 			if(data.host){
 				$("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
 			}
@@ -146,7 +147,7 @@ http.listen(0, ip_address, function(){
 			if(index == -1){
 				if(uuid != data.playerId){
 					users.push(data);
-					createYes(data);
+					addUser(data);
 				}
 			}
 		});
@@ -158,8 +159,8 @@ http.listen(0, ip_address, function(){
           t.loadWorld(socket);
           t.createPlayer(data);
           socket.emit('requestPlayers', uuid);
+          menuchange('game');
         }
-        menuchange('game');
       }
     });
 
