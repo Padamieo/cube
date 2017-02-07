@@ -14,12 +14,14 @@ module.exports = function(grunt){
       app:{
         files:{
           'app/index.js': [
-            //'node_modules/socket.io/socket.io.js',
-            //'node_modules/socket.io-client/socket.io.js',
+						'node_modules/jquery/dist/jquery.js',
             'node_modules/three/build/three.js',
 						'node_modules/three/examples/js/SkyShader.js',
             'node_modules/threestrap/build/threestrap.js',
-            'src/index.js'
+						'src/game.js',
+						'src/js/index.js',
+          	'temp/modernizr-custom.js',
+						'src/js/pagetransitions.js'
           ]
         }
       }
@@ -29,7 +31,7 @@ module.exports = function(grunt){
   		build:{
   			files:[{
   				cwd: 'src/',
-  				src: ['**', '!**/index.js', '!**/*.jpg', '!**/*.css'],
+  				src: ['**', '!**/js/*.js', '!**/*.jpg', '!**/*.less'],
   				dest: 'app/',
   				nonull: false,
   				expand: true,
@@ -38,6 +40,30 @@ module.exports = function(grunt){
   			},]
   		}
   	},
+
+		modernizr_builder: {
+	    build: {
+        options: {
+          features: 'csstransitions,cssanimations',
+          options: 'prefixed,prefixes',
+          dest: 'temp/modernizr-custom.js'
+        }
+	    }
+		},
+
+		less: {
+			live: {
+				options: {
+					strictMath: true,
+					sourceMap: true,
+					outputSourceFiles: true,
+					sourceMapURL: 'style.css.map',
+					sourceMapFilename: 'app/css/style.css.map'
+				},
+				src: 'src/less/style.less',
+				dest: 'app/css/style.css'
+			}
+		},
 
     watch:{
       options: {
@@ -51,7 +77,11 @@ module.exports = function(grunt){
       html:{
         files: ['src/**.html'],
         tasks: ['copy:build'],
-      }
+      },
+			less:{
+				files: ['src/*/**.less'],
+				tasks: ['less'],
+			}
     }
 
 	});
@@ -60,12 +90,20 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks("grunt-modernizr-builder");
+	grunt.loadNpmTasks("grunt-contrib-less");
 
 	// our default task, others will come later
 	grunt.registerTask('default', [
+		'modernizr_builder',
     'uglify:app',
     'copy:build',
+		'less',
     'watch'
   ]);
+
+	grunt.registerTask('test', [
+		'modernizr_builder'
+	]);
 
 };

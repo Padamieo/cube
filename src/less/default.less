@@ -1,0 +1,103 @@
+/* General Demo Style */
+/*@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700|Satisfy);*/
+
+@font-face {
+	font-family: 'codropsicons';
+	src:url('../fonts/codropsicons/codropsicons.eot');
+	src:url('../fonts/codropsicons/codropsicons.eot?#iefix') format('embedded-opentype'),
+		url('../fonts/codropsicons/codropsicons.woff') format('woff'),
+		url('../fonts/codropsicons/codropsicons.ttf') format('truetype'),
+		url('../fonts/codropsicons/codropsicons.svg#codropsicons') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+*, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+*:focus {
+  outline: none;
+}
+
+body, html { font-size: 100%; padding: 0; margin: 0;}
+
+/* Clearfix hack by Nicolas Gallagher: http://nicolasgallagher.com/micro-clearfix-hack/ */
+.clearfix:before, .clearfix:after { content: " "; display: table; }
+.clearfix:after { clear: both; }
+
+body {
+	font-family: 'Lato', Calibri, Arial, sans-serif;
+	color: #fff;
+	background: @dark;
+	overflow: hidden;
+}
+
+a {
+	color: #ddd;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #fff;
+}
+
+/* Header Style */
+.codrops-top {
+	background: @white;
+	background: fade(@white, 10%);
+	text-transform: uppercase;
+	position: fixed;
+	width: 100%;
+	font-size: 0.68em;
+	line-height: 2.2;
+	z-index: 50000;
+	top: 0;
+	left: 0;
+}
+
+.codrops-top a {
+	padding: 0 1em;
+	letter-spacing: 0.1em;
+	color: @white;
+	display: inline-block;
+}
+
+.codrops-top a:hover {
+	background: fade(@white, 20%);
+}
+
+.codrops-top span.right {
+	float: right;
+}
+
+.codrops-top span.right a {
+	float: left;
+	display: block;
+}
+
+/* custom original */
+
+// .hide {
+// 	display: none;
+// }
+
+input{
+	letter-spacing: 1px;
+	width: 100%;
+	border: 2px solid @white;
+	margin: 10px 0 0px;
+	padding: 0px 20px;
+	height: 50px;
+	background: fade(@white, 20%);
+	color: @white;
+	.transition(background 0.5s ease);
+	&:focus {
+		background: fade(@dark, 10%);
+	}
+
+	&#username{
+			text-align: center;
+	}
+}
+
+.spinner{
+	background-color: #fff !important;
+}

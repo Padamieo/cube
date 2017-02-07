@@ -1,23 +1,98 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
-
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 1px Helvetica, Arial; background: #fff }
-
-    </style>
-
+    <title>cube game</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
   </head>
   <body>
 
-    <button id="host">Host</button>
+  <div class="codrops-top clearfix">
+    <button id="iterateEffects" data-animation="5">cycle</button>
+		<!-- <a href="#"><span>Previous Demo</span></a> -->
+		<span class="right"><a class="" href="#"><span>username change?</span></a></span>
+	</div>
 
-    <button id="join">Join</button>
+		<!-- <div id="start">
+	    <button id="host">Host</button>
+	    <button id="join">Join</button>
+		</div> -->
+
+		<!-- <div id="lobby">
+			<ul id="users"></ul>
+		</div> -->
+
+    <!-- <button id="iterateEffects" data-animation="5" class="pt-touch-button">Show next page transition</button> -->
+
+
+			<div id="pt-main" class="pt-perspective">
+
+        <!-- startup screen -->
+        <div class="pt-page pt-page-1">
+          <h1><strong>cube</strong> game</h1>
+
+          <div id="login" class="pt-triggers">
+            <input id="username" type="text" name="username">
+    				<button id="test" class="pt-touch-button">enter</button>
+    			</div>
+
+        </div>
+
+        <!-- main menu -->
+				<div class="pt-page pt-page-2">
+          <h1><strong>main</strong> menu</h1>
+
+          <div id="start" class="pt-triggers">
+
+            <button id="host" class="pt-touch-button" >Host</button>
+            <button id="join" class="pt-touch-button" >Join</button>
+            <button id="options" class="pt-touch-button" >options</button>
+            <button id="exit" class="pt-touch-button" >exit</button>
+
+    			</div>
+
+        </div>
+
+        <!-- hosting -->
+				<div class="pt-page pt-page-3">
+					<h1><strong>waiting</strong> players</h1>
+          <!-- <button id="test" data-animation="1" class="pt-touch-button">Show next page transition</button> -->
+
+          <!-- <div id="lobby">
+            <ul id="users"></ul>
+          </div> -->
+
+          <div id="lobby" class="pt-triggers">
+            <ul id="users"></ul>
+            <!-- <button id="test" data-animation="6" class="pt-touch-button">Show next page transition</button> -->
+            <button id="stop" data-animation="6" class="pt-touch-button" >stop hosting</button>
+          </div>
+
+				</div>
+
+        <!-- searching / joining -->
+        <div class="pt-page pt-page-4">
+          <h1><strong>search</strong> join</h1>
+          <div class="pt-triggers">
+            <div class="spinner sk-rotating-plane"></div>
+            <button id="stop" data-animation="6" class="pt-touch-button" >stop search</button>
+          </div>
+        </div>
+
+        <!-- game -->
+				<div id="game" class="pt-page pt-page-5">
+				</div>
+
+        <!-- options -->
+        <div class="pt-page pt-page-6">
+          <h1><strong>Options</strong> settings</h1>
+          <div id="settings" class="pt-triggers">
+            <p>options</p>
+    			</div>
+        </div>
+
+			</div>
 
     <script src="index.js"></script>
     <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> --> <!-- would like to referance out localyhosted version -->
-
   </body>
 </html>

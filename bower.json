@@ -1,0 +1,10 @@
+{
+  "name": "temp bower",
+  "version": "0.0.1",
+  "dependencies": {
+  },
+  "private": true,
+  "devDependencies": {
+    "pagetransitions": "svn+https://github.com/codrops/PageTransitions"
+  }
+}

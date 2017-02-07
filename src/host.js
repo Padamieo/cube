@@ -5,25 +5,55 @@ var host = {
     console.log("boop");
   },
 
-  player: function( id ){
-    this.playerId = id;
+	player: function( user ){
+		this.playerId = user.playerId;
+		this.host = user.host;
+		this.name = user.name;
     this.x = Math.random()*3;
     this.y = 0; //Math.random()*1;
-    this.z = Math.random()*3;
+    this.z = 0;
     this.r_x = 0;
     this.r_y = 0;
     this.r_z = 0;
     this.size = 1;
     this.speed = 0.1;
     this.turnSpeed = 0.03;
-  },
+	},
 
-  addPlayer: function( players, id ){
-    player = new this.player(id);
-    players.push( player );
-    console.log(players);
-    return player;
-  },
+	user: function( id, host, name ){
+		this.playerId = id;
+		this.host = host;
+		this.name = name;
+	},
+
+	createPlayers: function( users ){
+		var ref = this;
+		var p = [];
+		users.forEach(function( user ){
+			var s = new ref.player( user );
+			p.push( s );
+		})
+		return p;
+	},
+
+	boop: function( play ){
+		var ref = this;
+		play.forEach(function( p1 ){
+			play.forEach(function( p2 ){
+				if(p1.x < p2.x){
+					console.log(p1.x+" < "+p2.x);
+				}
+			})
+		})
+		return play;
+	},
+
+	addUser: function( users, id, name){
+		var host = (users.length == 0 ? true : false );
+		var user = new this.user(id, host, name);
+    users.push( user );
+    return user;
+	},
 
   updatePlayerData: function(players, data){
 

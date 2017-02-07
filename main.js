@@ -15,6 +15,7 @@ const url = require('url')
 const Discover = require('node-discover');
 
 var players = [];
+var users = [];
 var host = require('./app/host.js');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -71,28 +72,37 @@ function createWindow () {
     });
 
     io.on('connection', function(socket){
-      console.log('new connection');
-      console.log(socket.id);
 
-      socket.on('newPlayer', function(id){
-        if(host.contains( players, id ) == -1){
-          //if players is 0 create all cubes
-
-          //console.log(players.length+1);
-          //var id = socket.id;
-          var player = host.addPlayer(players, id);
-
-          // have player replace cube
-
-          socket.emit('createPlayer', player);
-
-          socket.broadcast.emit('addPlayer', player);
-
-        }else{
-          console.log("duplicate connection");
+			socket.on('newUser', function(id, name){
+        if(host.contains( users, id ) == -1){
+  				var user = host.addUser(users, id, name);
+  				socket.emit( 'createUser', user );
+  				socket.broadcast.emit( 'addUser', user );
         }
+			})
 
-      });
+			socket.on('requestUsers', function(id){
+				for (var i = 0; i < users.length; i++){
+					if (users[i].playerId != id){
+						socket.emit('addUser', users[i]);
+					}
+				}
+			});
+
+			socket.on('start', function(){
+        //confirm request is from host
+				players = host.createPlayers(users);
+
+				players = host.boop(players);
+
+        for (var i = 0; i < players.length; i++){
+          if(players[i].host === true){
+            socket.emit( 'startMatch', players[i] );
+          }else{
+            socket.broadcast.emit( 'startMatch', players[i] );
+          }
+        };
+			});
 
       socket.on('requestPlayers', function(id){
         for (var i = 0; i < players.length; i++){
@@ -118,37 +128,8 @@ function createWindow () {
 
   });
 
-
-  //current test
-  // function test(port){
-  //   console.log("running natman-api");
-  //   var natman = require('natman-api');
-  //
-  //   var privatePort = port; //The port on your machine that you want to forward
-  //   var publicPort = 80; //The port you want to open to the rest of the world.
-  //
-  //   natman(privatePort, publicPort);
-  // };
-
-  // var getIP = require('external-ip')();
-  //
-  // getIP(function (err, ip) {
-  //   if (err) {
-  //     throw err;
-  //   }
-  //   console.log(ip);
-  // });
-
-  ipcMain.on('outside', function(event, port){
-    console.log("triggered outside:"+port);
-    //getIP();
-    //test(port);
-  });
-  //current test end
-
-
   ipcMain.on('advertise', function(event, service) {
-    console.log('advertise');
+    //console.log('advertise');
 
     var d = Discover();
 
@@ -170,18 +151,38 @@ function createWindow () {
   ipcMain.on('find', function(event, scope) {
     console.log('find '+scope);
 
+    var pass = [];
+
+    function partB() {
+      if(pass){
+        if(pass.length == 0){
+          console.log("none found yet");
+          //setTimeout(partB, 3000);
+        }else if(pass.length == 1){
+          event.sender.send('found', pass[0].details);
+        }else{
+          console.log("more than one found");
+        }
+      }else{
+        console.log("could not find a game ): ");
+      }
+    }
+
     var d = Discover();
 
+
     var success = d.join("service-details", function (data) {
-      console.log("something join");
-        if (data.details) {
-          //connect to the new redis master
-          console.log(data.details);
-          event.sender.send('found', data.details);
-        }
+      if (data.details) {
+         console.log("B"+data);
+        pass.push( data );
+      }
     });
 
-    console.log(success);
+    if(success){
+      setTimeout(partB, 3000); //this time should change depending on find type
+    }else{
+      console.log("could not find a game ): ");
+    }
 
   });
 
