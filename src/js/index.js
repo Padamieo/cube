@@ -5,7 +5,7 @@ var http = require('http').Server(app);
 var $ = require('jQuery');
 
 //var t = require('./game.js');
-console.log(test);
+//console.log(test);
 var t = test;
 
 var three, player, socket, thisPlayer, camera, scene;
@@ -47,7 +47,6 @@ http.listen(0, ip_address, function(){
     ipcRenderer.on('hosting', function(event, service){
       ipcRenderer.send('advertise', service);
       common(service);
-      menuchange('host');
     });
 
 		$(document).on("click", "#startMatch", function(){
@@ -62,11 +61,10 @@ http.listen(0, ip_address, function(){
     console.log("joining");
 
     ipcRenderer.send('find', 'local');
-
+		menuchange('join');
     ipcRenderer.on('found', function(event, service){
       //list found services
       common(service);
-      menuchange('join');
     });
 
   };
@@ -82,10 +80,22 @@ http.listen(0, ip_address, function(){
     menuchange('main');
   };
 
+	document.getElementById("options").onclick = function(){
+    menuchange('options');
+  };
+
+	document.getElementById("exit").addEventListener("click", function (e) {
+	  const remote = require('electron').remote;
+		var window = remote.getCurrentWindow();
+		window.close();
+	});
+
+
   function menuchange(pagename){
+
     switch (pagename) {
       case 'main':
-        page = 0;
+        page = 1;
         break;
       case 'host':
         page = 2;
@@ -101,9 +111,10 @@ http.listen(0, ip_address, function(){
         break;
       case 'start':
         page = 0;
+				break;
     }
 
-    var options = { animation: 6, showPage: 1 };
+    var options = { animation: 6, showPage: page };
     PageTransitions.nextPage( options );
   };
 
@@ -118,7 +129,6 @@ http.listen(0, ip_address, function(){
 
     socket.on('connect', function(){
 
-      //socket.emit('newPlayer', uuid);
 			//var nameUser = "name";
 			socket.emit('newUser', uuid, nameUser);
 
@@ -135,6 +145,7 @@ http.listen(0, ip_address, function(){
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
 			addUser(data);
+			menuchange('host');
 			if(data.host){
 				$("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
 			}

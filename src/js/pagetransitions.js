@@ -29,16 +29,16 @@ var PageTransitions = (function() {
 
 		$pages.eq( current ).addClass( 'pt-page-current' );
 
-		$iterate.on( 'click', function() {
-			if( isAnimating ) {
-				return false;
-			}
-			if( animcursor > 67 ) {
-				animcursor = 1;
-			}
-			nextPage( animcursor );
-			++animcursor;
-		} );
+		// $iterate.on( 'click', function() {
+		// 	if( isAnimating ) {
+		// 		return false;
+		// 	}
+		// 	if( animcursor > 67 ) {
+		// 		animcursor = 1;
+		// 	}
+		// 	nextPage( animcursor );
+		// 	++animcursor;
+		// } );
 
 		// $( '.pt-touch-button' ).on( 'click', function(v) {
 		// 	var b = $(this).data( 'animation' );
@@ -49,9 +49,7 @@ var PageTransitions = (function() {
 
 	}
 
-
-
-	function nextPage(options ) {
+	function nextPage( options ) {
 
 		var animation = (options.animation) ? options.animation : options;
 
@@ -62,23 +60,23 @@ var PageTransitions = (function() {
 		isAnimating = true;
 
 		var $currPage = $pages.eq( current );
+		console.log($currPage);
+		console.log(options.showPage+" "+pagesCount);
 
-		if(options.showPage){
-			if( options.showPage < pagesCount - 1 ) {
-				current = options.showPage;
-			}
-			else {
-				current = 0;
-			}
-		}
-		else{
-			if( current < pagesCount - 1 ) {
-				++current;
-			}
-			else {
-				current = 0;
-			}
-		}
+		// if(options.showPage){
+		// 	if( options.showPage < pagesCount - 1 ) {
+		// 		current = options.showPage;
+		// 	} else {
+		// 		current = 0;
+		// 	}
+		// } else {
+		// 	if( current < pagesCount - 1 ) {
+		// 		++current;
+		// 	} else {
+		// 		current = 0;
+		// 	}
+		// }
+		current = options.showPage;
 
 		var $nextPage = $pages.eq( current ).addClass( 'pt-page-current' ),
 			outClass = '', inClass = '';

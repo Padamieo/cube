@@ -5,6 +5,6 @@
   },
   "private": true,
   "devDependencies": {
-    "PageTransitions": "svn+https://github.com/codrops/PageTransitions"
+    "pagetransitions": "svn+https://github.com/codrops/PageTransitions"
   }
 }
