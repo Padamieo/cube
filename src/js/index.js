@@ -36,16 +36,25 @@ http.listen(0, ip_address, function(){
   //ipcRenderer.send('outside', http.address().port );
 });
 
+$( document ).ready(function() {
+  startup();
+});
 
-(function startup(){
+function startup(){
+
+  //focus for this page
+  $( "#username" ).focus();
 
   document.getElementById("host").onclick = function(){
-    console.log("hosting");
+    console.log("host");
 
     ipcRenderer.send('setup', ip_address);
+    console.log("setup");
 
     ipcRenderer.on('hosting', function(event, service){
+      console.log("hosting");
       ipcRenderer.send('advertise', service);
+      console.log(service);
       common(service);
     });
 
@@ -61,7 +70,7 @@ http.listen(0, ip_address, function(){
     console.log("joining");
 
     ipcRenderer.send('find', 'local');
-		menuchange('join');
+		ui.menuchange('join');
     ipcRenderer.on('found', function(event, service){
       //list found services
       common(service);
@@ -69,12 +78,12 @@ http.listen(0, ip_address, function(){
 
 		ipcRenderer.on('unfound', function(event, service){
 			console.log("unfound");
-			//common(service);
+      ui.fadeSpinner();
 		});
 
   };
 
-  document.getElementById("test").onclick = function(){
+  document.getElementById("login").onclick = function(){
     console.log("submit name");
     var value = $( "#username" ).val();
     if(value){
@@ -82,50 +91,35 @@ http.listen(0, ip_address, function(){
     }else{
       nameUser = "name";
     }
-    menuchange('main');
+    ui.menuchange('main');
   };
 
 	document.getElementById("options").onclick = function(){
-    menuchange('options');
+    ui.menuchange('options');
   };
 
-	document.getElementById("exit").addEventListener("click", function (e) {
-	  const remote = require('electron').remote;
-		var window = remote.getCurrentWindow();
-		window.close();
-	});
-
-
-  function menuchange(pagename){
-
-    switch (pagename) {
-      case 'main':
-        page = 1;
-        break;
-      case 'host':
-        page = 2;
-        break;
-      case 'options':
-        page = 5;
-        break;
-      case 'join':
-        page = 3;
-        break;
-      case 'game':
-        page = 4;
-        break;
-      case 'start':
-        page = 0;
-				break;
-    }
-
-    var options = { animation: 6, showPage: page };
-    PageTransitions.nextPage( options );
+  document.getElementById("stop-search").onclick = function(){
+    ui.resetSpinner();
+    ui.menuchange('main');
   };
 
+  document.getElementById("stop-hosting").onclick = function(){
+    socket.emit('dissembly');
+    io = null;
+    socket = null;
+    //console.log("sdad");
+    //may need to disable start
+    ui.menuchange('main');
+  };
+
+  document.getElementById("exit-options").onclick = function(){
+    ui.menuchange('main');
+  };
+
+  ui.exitAppSetup();
 
   function common(service){
-
+    console.log("common started");
 		//$( "#start" ).hide(); //may need to change to animation change
 
     io = require('socket.io-client'),
@@ -146,7 +140,7 @@ http.listen(0, ip_address, function(){
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
 			ui.addUser(data);
-			menuchange('host');
+			ui.menuchange('host');
 			if(data.host){
 				$("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
 			}
@@ -171,7 +165,7 @@ http.listen(0, ip_address, function(){
           t.loadWorld(socket);
           t.createPlayer(data);
           socket.emit('requestPlayers', uuid);
-          menuchange('game');
+          ui.menuchange('game');
         }
       }
     });
@@ -199,4 +193,4 @@ http.listen(0, ip_address, function(){
 
   }
 
-})()
+};

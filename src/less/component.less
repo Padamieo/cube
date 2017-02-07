@@ -141,26 +141,32 @@ html, body { height: 100%; }
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-}
 
-.pt-touch-button {
-	background: @white;
-	color: #aaa;
 }
 
 .pt-triggers .dl-menuwrapper button {
 	margin-bottom: 0;
 }
 
-.pt-touch-button:active {
-	box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-}
+.pt-touch-button{
+	background: @white;
+	color: #aaa;
 
-.pt-touch-button:hover{
-	background: darken(@white, 2.5%);
-	//background: desaturate(spin(#0ac2d2, 180), 50%);
-	//color: @dark;
-	box-shadow: 0px 0px 0px rgba(0,0,0,0.1);
+	&:active {
+		box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+	}
+
+	&:hover{
+		background: darken(@white, 4%);
+		//background: desaturate(spin(#0ac2d2, 180), 50%);
+		//color: @dark;
+		box-shadow: 0px 0px 0px rgba(0,0,0,0.1);
+	}
+
+	&:focus{
+		background: darken(@white, 4%);
+	}
+
 }
 
 .touch .pt-triggers .dl-menuwrapper {

@@ -79,7 +79,7 @@ function createWindow () {
   				socket.emit( 'createUser', user );
   				socket.broadcast.emit( 'addUser', user );
         }
-			})
+			});
 
 			socket.on('requestUsers', function(id){
 				for (var i = 0; i < users.length; i++){
@@ -122,6 +122,15 @@ function createWindow () {
         console.log(d);
         // host.removePlayer( socket.id );
         // socket.broadcast.emit('removePlayer', socket.id );
+      });
+
+      socket.on('dissembly', function(){
+        app = null;
+        console.log(http);
+        http = null;
+        console.log(http);
+        io = null;
+
       });
 
     });

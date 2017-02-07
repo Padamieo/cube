@@ -60,8 +60,6 @@ var PageTransitions = (function() {
 		isAnimating = true;
 
 		var $currPage = $pages.eq( current );
-		console.log($currPage);
-		console.log(options.showPage+" "+pagesCount);
 
 		// if(options.showPage){
 		// 	if( options.showPage < pagesCount - 1 ) {
