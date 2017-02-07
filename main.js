@@ -158,6 +158,7 @@ function createWindow () {
         if(pass.length == 0){
           console.log("none found yet");
           //setTimeout(partB, 3000);
+					event.sender.send('unfound');
         }else if(pass.length == 1){
           event.sender.send('found', pass[0].details);
         }else{
@@ -169,7 +170,6 @@ function createWindow () {
     }
 
     var d = Discover();
-
 
     var success = d.join("service-details", function (data) {
       if (data.details) {

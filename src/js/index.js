@@ -6,7 +6,7 @@ var $ = require('jQuery');
 
 //var t = require('./game.js');
 //console.log(test);
-var t = test;
+var t = game;
 
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], users = [];
@@ -66,6 +66,11 @@ http.listen(0, ip_address, function(){
       //list found services
       common(service);
     });
+
+		ipcRenderer.on('unfound', function(event, service){
+			console.log("unfound");
+			//common(service);
+		});
 
   };
 
@@ -134,17 +139,13 @@ http.listen(0, ip_address, function(){
 
     });
 
-		function addUser(data){
-			$("#users").append('<li id="'+data.playerId+'" >'+data.name+'</li>');
-		}
-
 		socket.on('createUser', function(data){
 			console.log("createUser");
 
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
-			addUser(data);
+			ui.addUser(data);
 			menuchange('host');
 			if(data.host){
 				$("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
@@ -158,7 +159,7 @@ http.listen(0, ip_address, function(){
 			if(index == -1){
 				if(uuid != data.playerId){
 					users.push(data);
-					addUser(data);
+					ui.addUser(data);
 				}
 			}
 		});
