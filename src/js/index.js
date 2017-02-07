@@ -100,7 +100,7 @@ function startup(){
 
   document.getElementById("stop-search").onclick = function(){
     ui.resetSpinner();
-    ui.menuchange('main');
+    ui.menuchange('main'); // may need to add a
   };
 
   document.getElementById("stop-hosting").onclick = function(){
