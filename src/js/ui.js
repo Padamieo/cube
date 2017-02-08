@@ -1,5 +1,15 @@
 var ui = {
 
+	addButton: function(where, text, id, pend){
+		var insert = ( id ? 'id="'+id+'"' : '' );
+		var add = '<button '+insert+' class="pt-touch-button" >'+text+'</button>';
+		if(pend){
+			$(where).prepend(add);
+		}else{
+			$(where).append(add);
+		}
+	},
+
 	addUser: function(data){
 		$("#users").append('<li id="'+data.playerId+'" >'+data.name+'</li>');
 	},
@@ -10,7 +20,7 @@ var ui = {
 	},
 
 	fadeSpinner: function(item){
-		this.addText('unable to find any avaliable host', '#search');
+		//this.addText('unable to find any avaliable host', '#search');
 		$( '.spinner' ).fadeOut( "fast");
 	},
 

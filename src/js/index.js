@@ -71,9 +71,15 @@ function startup(){
 
     ipcRenderer.send('find', 'local');
 		ui.menuchange('join');
-    ipcRenderer.on('found', function(event, service){
-      //list found services
-      common(service);
+    ipcRenderer.on('found', function(event, services){
+			ui.fadeSpinner();
+			$.each(services, function( index, value ) {
+				//console.log(value);
+				ui.addButton("#search .pt-triggers", 'join1', 'join2', true);
+				//needs to add on click trigger to common service
+			});
+      //common(service);
+
     });
 
 		ipcRenderer.on('unfound', function(event, service){
@@ -142,7 +148,8 @@ function startup(){
 			ui.addUser(data);
 			ui.menuchange('host');
 			if(data.host){
-				$("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
+				// $("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
+				ui.addButton("#lobby", 'Start', 'startMatch');
 			}
 
 		})

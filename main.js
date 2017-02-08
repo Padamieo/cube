@@ -168,9 +168,8 @@ function createWindow () {
           console.log("none found yet");
           //setTimeout(partB, 3000);
 					event.sender.send('unfound');
-        }else if(pass.length == 1){
-          event.sender.send('found', pass[0].details);
         }else{
+          event.sender.send('found', pass);
           console.log("more than one found");
         }
       }else{
