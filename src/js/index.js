@@ -71,12 +71,20 @@ function startup(){
 
     ipcRenderer.send('find', 'local');
 		ui.menuchange('join');
+
     ipcRenderer.on('found', function(event, services){
 			ui.fadeSpinner();
 			$.each(services, function( index, value ) {
-				//console.log(value);
-				ui.addButton("#search .pt-triggers", 'join1', 'join2', true);
+
+				ui.addButton("#search .pt-triggers", 'join2', "A"+index, true);
 				//needs to add on click trigger to common service
+        document.getElementById("A"+index).onclick = function(){
+          var dets = value.details;
+          console.log(value.details);
+          console.log("pressed join");
+          common(dets);
+        };
+
 			});
       //common(service);
 
@@ -89,40 +97,7 @@ function startup(){
 
   };
 
-  document.getElementById("login").onclick = function(){
-    console.log("submit name");
-    var value = $( "#username" ).val();
-    if(value){
-      nameUser = value;
-    }else{
-      nameUser = "name";
-    }
-    ui.menuchange('main');
-  };
-
-	document.getElementById("options").onclick = function(){
-    ui.menuchange('options');
-  };
-
-  document.getElementById("stop-search").onclick = function(){
-    ui.resetSpinner();
-    ui.menuchange('main'); // may need to add a
-  };
-
-  document.getElementById("stop-hosting").onclick = function(){
-    socket.emit('dissembly');
-    io = null;
-    socket = null;
-    //console.log("sdad");
-    //may need to disable start
-    ui.menuchange('main');
-  };
-
-  document.getElementById("exit-options").onclick = function(){
-    ui.menuchange('main');
-  };
-
-  ui.exitAppSetup();
+  ui.buttonSetup();
 
   function common(service){
     console.log("common started");
@@ -150,6 +125,8 @@ function startup(){
 			if(data.host){
 				// $("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
 				ui.addButton("#lobby", 'Start', 'startMatch');
+        ui.addButton("#lobby", 'stop hosting', 'stop-hosting');
+        // <button id="stop-hosting" class="pt-touch-button" >stop hosting</button>
 			}
 
 		})

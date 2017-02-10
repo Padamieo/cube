@@ -61,6 +61,45 @@ var ui = {
 			var window = remote.getCurrentWindow();
 			window.close();
 		});
+	},
+
+	buttonSetup: function(){
+		var ref = this;
+
+		document.getElementById("register").onclick = function(){
+			console.log("submit name");
+			var value = $( "#username" ).val();
+			if(value){
+				nameUser = value;
+			}else{
+				nameUser = "name";
+			}
+			ref.menuchange('main');
+		};
+
+		document.getElementById("options").onclick = function(){
+			ref.menuchange('options');
+		};
+
+		document.getElementById("stop-search").onclick = function(){
+			ref.resetSpinner();
+			ref.menuchange('main'); // may need to add a
+		};
+
+		$(document).on("click", "#stop-hosting", function(){
+			socket.emit('dissembly');
+			io = null;
+			socket = null;
+			//console.log("sdad");
+			//may need to disable start
+			ref.menuchange('main');
+		});
+
+		document.getElementById("exit-options").onclick = function(){
+			ref.menuchange('main');
+		};
+
+		this.exitAppSetup();
 	}
 
 };
