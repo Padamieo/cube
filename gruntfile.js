@@ -1,6 +1,6 @@
 module.exports = function(grunt){
 
-  //var pkg = grunt.file.readJSON('package.json');
+	require('load-grunt-tasks')(grunt);
 
 	grunt.initConfig({
   	pkg: grunt.file.readJSON('package.json'),
@@ -86,13 +86,6 @@ module.exports = function(grunt){
     }
 
 	});
-
-	// Load the grunt tasks
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks("grunt-modernizr-builder");
-	grunt.loadNpmTasks("grunt-contrib-less");
 
 	// our default task, others will come later
 	grunt.registerTask('default', [

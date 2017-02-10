@@ -14,7 +14,8 @@
     "three": "*",
     "threestrap": "git://github.com/unconed/threestrap.git",
     "SpinKit":"git://github.com/tobiasahlin/SpinKit.git",
-    "jquery": "*"
+    "jquery": "*",
+		"load-grunt-tasks": "*"
   },
   "browserify-shim": {
     "game": {
