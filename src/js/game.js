@@ -52,11 +52,39 @@ var game = {
     }
   },
 
+  temp2: function(){
+    var amount = 5;
+    var h = require('./host.js');
+
+    //'#'+(Math.random()*0xFFFFFF<<0).toString(16);
+
+    for (var i = 0; i < amount; i++) {
+      var user = { host: false, playerId: i, name: i }
+      pee = h.player(user);
+      console.log(pee.x);
+      tempObject.push(pee);
+    }
+
+    for (var i = 0; i < tempObject.length; i++) {
+
+    }
+
+    tempObject.forEach(function( p1 ){
+      play.forEach(function( p2 ){
+        if(p1.x < p2.x){
+          console.log(p1.x+" < "+p2.x);
+        }
+      })
+    })
+
+  },
+
   loadWorld: function(socket){
 
     // add all the generated cubes, or do they come in later
     //temp version
-    this.temp();
+    //this.temp();
+    this.temp2();
 
     // sky = new THREE.Sky();
 		// three.scene.add( sky.mesh );
