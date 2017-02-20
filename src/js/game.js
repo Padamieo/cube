@@ -55,28 +55,95 @@ var game = {
   temp2: function(){
     var amount = 5;
     var h = require('./host.js');
+    var tempObject = [];
 
     //'#'+(Math.random()*0xFFFFFF<<0).toString(16);
 
     for (var i = 0; i < amount; i++) {
       var user = { host: false, playerId: i, name: i }
-      pee = h.player(user);
-      console.log(pee.x);
+      var pee = new h.player(user);
       tempObject.push(pee);
     }
 
-    for (var i = 0; i < tempObject.length; i++) {
+    this.sortArrayObects(tempObject, "x");
+    this.space(tempObject, "x");
+    var l = this.largest(tempObject, "x");
+    this.shiftt(tempObject, "x", (l/2));
 
+    this.sortArrayObects(tempObject, "y");
+    this.space(tempObject, "y");
+    var l = this.largest(tempObject, "y");
+    this.shiftt(tempObject, "y", (l/2));
+
+    this.sortArrayObects(tempObject, "z");
+    this.space(tempObject, "z");
+    var l = this.largest(tempObject, "z");
+    this.shiftt(tempObject, "z", (l/2));
+
+    //var close = this.example(tempObject);
+
+    var temp = {
+      size: 1
+    };
+
+
+    for (var i = 0; i < tempObject.length; i++) {
+      var obj1 = this.create_cube(temp, 0xfff000, 0.8);
+      obj1.rotation.set(0,0,0);
+      obj1.position.x = tempObject[i].x;
+      obj1.position.y = tempObject[i].y;
+      obj1.position.z = tempObject[i].z;
+      three.scene.add( obj1 );
+      objects.push( obj1 );
     }
 
+  },
+
+  largest: function(array, key){
+    var largest = 0;
+    array.forEach(function( obj ){
+      if(obj[key] > largest){
+        largest = obj[key];
+      }
+    });
+    return largest;
+  },
+
+  shiftt: function(array, key, shift){
+    //array.forEach(function( obj ){
+    for (var i = 0; i < array.length; i++) {
+      array[i][key] = array[i][key]-shift;
+    };
+  },
+
+  space: function(array, key, distance){
+    for (var i = 0; i < array.length; i++) {
+      array[i][key] = array[i][key]+(i*0.8);
+    }
+  },
+
+  sortArrayObects: function(array, key){
+    array.sort(function(a, b) {
+      return a[key] - b[key];
+    });
+  },
+
+
+  proximityTest: function(tempObject){
+    tooClose = false;
     tempObject.forEach(function( p1 ){
-      play.forEach(function( p2 ){
-        if(p1.x < p2.x){
-          console.log(p1.x+" < "+p2.x);
+      tempObject.forEach(function( p2 ){
+        //console.log(p1.playerId);
+        if( p1.playerId === p2.playerId ){
+          return;
+        }
+
+        if( p1.x+3 > p2.x || p1.x-3 < p2.x ){
+          tooClose = true;
         }
       })
     })
-
+    return tooClose;
   },
 
   loadWorld: function(socket){
