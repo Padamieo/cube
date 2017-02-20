@@ -1,5 +1,7 @@
 'use strict';
 
+const pkg = require('./package.json');
+
 const electron = require('electron')
 // Module to control application life.
 const app = electron.app
@@ -45,8 +47,9 @@ function createWindow () {
   }))
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
-
+	if(pkg.development){
+  	mainWindow.webContents.openDevTools();
+	}
 
   ipcMain.on('setup', function(event, ip) {
 

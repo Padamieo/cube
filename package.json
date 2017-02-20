@@ -2,6 +2,7 @@
   "name": "cube-hide-and-seek",
   "version": "0.0.1",
   "description": "electron game running on socket.io and electron",
+	"development": true,
   "browser": {
     "jQuery": "./node_modules/jquery/dist/jquery.js",
     "game": "src/game.js"
@@ -14,8 +15,7 @@
     "three": "*",
     "threestrap": "git://github.com/unconed/threestrap.git",
     "SpinKit":"git://github.com/tobiasahlin/SpinKit.git",
-    "jquery": "*",
-		"load-grunt-tasks": "*"
+    "jquery": "*"
   },
   "browserify-shim": {
     "game": {
@@ -30,7 +30,8 @@
     "grunt-contrib-uglify": "*",
     "grunt-contrib-watch": "*",
     "grunt-modernizr": "^1.0.2",
-    "grunt-modernizr-builder": "^0.1.9"
+    "grunt-modernizr-builder": "^0.1.9",
+		"load-grunt-tasks": "*"
   },
   "main": "main.js",
   "scripts": {

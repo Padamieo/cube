@@ -100,6 +100,22 @@ var ui = {
 		};
 
 		this.exitAppSetup();
+	},
+
+	setl: function(term){
+		if(localStorage != undefined){
+			if(localStorage.getItem(term) === null){
+				localStorage.setItem(term, true );
+			}
+		}else{
+			console.log("localstorage does not work");
+		}
+	},
+
+	getl: function(term){
+		if(localStorage != undefined){
+			localStorage.getItem(term);
+		}
 	}
 
 };

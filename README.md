@@ -8,9 +8,18 @@
 ### starting up app up from commandline.
 
 - npm start
+- nodemon -x npm start
 
 ### Todo
 
-- remove require of host.js and test.js add to grunt build task
+- define random placement of cubes
+- fix fire (projectile) acuracy and confirm with server/players
+- add in game ui score/players/end game
 - stop using three strap go back to basic three.js use, keep it basic
 - figure out selection of server rather than auto join
+- add dev mode and quick enter game
+- local storage for users based on name (storage.js)
+- add set of controls
+- add in language support, not languages
+- find game by ip
+- host game by external ip
