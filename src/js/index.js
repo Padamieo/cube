@@ -154,8 +154,6 @@ function startup(){
       }
     });
 
-		//console.log(Math.log(1)); // use this to calculate number of cubes to players in match
-
     socket.on('addPlayer', function(data){
       var index = t.contains(players, data.playerId);
       if(index == -1){

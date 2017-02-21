@@ -52,6 +52,8 @@ var game = {
     }
   },
 
+	/*
+
   temp2: function(){
     var amount = 5;
     var h = require('./host.js');
@@ -68,24 +70,23 @@ var game = {
     this.sortArrayObects(tempObject, "x");
     this.space(tempObject, "x");
     var l = this.largest(tempObject, "x");
-    this.shiftt(tempObject, "x", (l/2));
+    this.shiftall(tempObject, "x", (l/2));
 
     this.sortArrayObects(tempObject, "y");
     this.space(tempObject, "y");
     var l = this.largest(tempObject, "y");
-    this.shiftt(tempObject, "y", (l/2));
+    this.shiftall(tempObject, "y", (l/2));
 
     this.sortArrayObects(tempObject, "z");
     this.space(tempObject, "z");
     var l = this.largest(tempObject, "z");
-    this.shiftt(tempObject, "z", (l/2));
+    this.shiftall(tempObject, "z", (l/2));
 
     //var close = this.example(tempObject);
 
     var temp = {
       size: 1
     };
-
 
     for (var i = 0; i < tempObject.length; i++) {
       var obj1 = this.create_cube(temp, 0xfff000, 0.8);
@@ -109,8 +110,7 @@ var game = {
     return largest;
   },
 
-  shiftt: function(array, key, shift){
-    //array.forEach(function( obj ){
+  shiftall: function(array, key, shift){
     for (var i = 0; i < array.length; i++) {
       array[i][key] = array[i][key]-shift;
     };
@@ -129,29 +129,31 @@ var game = {
   },
 
 
-  proximityTest: function(tempObject){
-    tooClose = false;
-    tempObject.forEach(function( p1 ){
-      tempObject.forEach(function( p2 ){
-        //console.log(p1.playerId);
-        if( p1.playerId === p2.playerId ){
+  proximityTest: function(array, dis){
+		var dis = ( dis ? dis : 3 );
+    close = false;
+    array.forEach(function( obj1 ){
+      array.forEach(function( obj2 ){
+        if( obj1.playerId === obj2.playerId ){
           return;
         }
 
-        if( p1.x+3 > p2.x || p1.x-3 < p2.x ){
-          tooClose = true;
+        if( obj1.x+dis > obj2.x || obj1.x-dis < obj2.x ){
+          close = true;
         }
       })
     })
-    return tooClose;
+    return close;
   },
+
+	*/
 
   loadWorld: function(socket){
 
     // add all the generated cubes, or do they come in later
     //temp version
     //this.temp();
-    this.temp2();
+    //this.temp2();
 
     // sky = new THREE.Sky();
 		// three.scene.add( sky.mesh );

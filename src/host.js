@@ -5,19 +5,29 @@ var host = {
     console.log("boop");
   },
 
+	cube_defaults: function(obj, random, size){
+		var r = ( random ? random : 3 );
+		var s = ( size ? size : 1 );
+		obj.x = Math.random()*r;
+		obj.y = Math.random()*r;
+		obj.z = Math.random()*r;
+		obj.r_x = 0;
+		obj.r_y = 0;
+		obj.r_z = 0;
+		obj.size = s;
+		return obj;
+	},
+
 	player: function( user ){
-		this.playerId = user.playerId;
-		this.host = user.host;
-		this.name = user.name;
-    this.x = Math.random()*3;
-    this.y = Math.random()*3;
-    this.z = Math.random()*3;
-    this.r_x = 0;
-    this.r_y = 0;
-    this.r_z = 0;
-    this.size = 1;
-    this.speed = 0.1;
-    this.turnSpeed = 0.03;
+		var u = {};
+		u.playerId = user.playerId;
+		u.host = user.host;
+		u.name = user.name;
+		u.type = 'user';
+		u = host.cube_defaults(u);
+    u.speed = 0.1;
+    u.turnSpeed = 0.03;
+		return u;
 	},
 
 	user: function( id, host, name ){
@@ -36,16 +46,43 @@ var host = {
 		return p;
 	},
 
-	boop: function( play ){
-		var ref = this;
-		play.forEach(function( p1 ){
-			play.forEach(function( p2 ){
-				if(p1.x < p2.x){
-					console.log(p1.x+" < "+p2.x);
-				}
-			})
-		})
-		return play;
+	boop: function( playersArray ){
+
+		if(playersArray.length+1 < 10){
+			var v = 10;
+		}else{
+			var v = Math.log(playersArray.length);
+		}
+		//console.log("B"+v);
+
+		for (var i = 0; i < v; i++) {
+			var cube = {};
+			cube.type = 'cube';
+			cube = host.cube_defaults(cube);
+			playersArray.push(cube);
+		}
+
+		this.sortArrayObects(playersArray, "x");
+    this.space(playersArray, "x");
+    var x = this.largest(playersArray, "x");
+    this.shiftall(playersArray, "x", (x/2));
+
+    this.sortArrayObects(playersArray, "y");
+    this.space(playersArray, "y");
+    var y = this.largest(playersArray, "y");
+    this.shiftall(playersArray, "y", (y/2));
+
+    this.sortArrayObects(playersArray, "z");
+    this.space(playersArray, "z");
+    var z = this.largest(playersArray, "z");
+    this.shiftall(playersArray, "z", (z/2));
+
+		//var close = this.example(tempObject);
+
+		//split arrays only return players and create other group
+
+		return playersArray;
+
 	},
 
 	addUser: function( users, id, name){
@@ -80,6 +117,51 @@ var host = {
       return pd.playerId === id;
     });
     return index;
+  },
+
+	largest: function(array, key){
+    var largest = 0;
+    array.forEach(function( obj ){
+      if(obj[key] > largest){
+        largest = obj[key];
+      }
+    });
+    return largest;
+  },
+
+  shiftall: function(array, key, shift){
+    for (var i = 0; i < array.length; i++) {
+      array[i][key] = array[i][key]-shift;
+    };
+  },
+
+  space: function(array, key, distance){
+    for (var i = 0; i < array.length; i++) {
+      array[i][key] = array[i][key]+(i*0.8);
+    }
+  },
+
+  sortArrayObects: function(array, key){
+    array.sort(function(a, b) {
+      return a[key] - b[key];
+    });
+  },
+
+  proximityTest: function(array, dis){
+		var dis = ( dis ? dis : 3 );
+    close = false;
+    array.forEach(function( obj1 ){
+      array.forEach(function( obj2 ){
+        if( obj1.playerId === obj2.playerId ){
+          return;
+        }
+
+        if( obj1.x+dis > obj2.x || obj1.x-dis < obj2.x ){
+          close = true;
+        }
+      })
+    })
+    return close;
   }
 
 };
