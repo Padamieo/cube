@@ -48,12 +48,12 @@ var host = {
 
 	boop: function( playersArray ){
 
-		if(playersArray.length+1 < 10){
-			var v = 10;
+		if(playersArray.length >= 1){
+			var v = 5;
 		}else{
-			var v = Math.log(playersArray.length);
+			var v = (Math.log(playersArray.length)*10).toFixed(0);
+			console.log(v+"IMPORTANT");
 		}
-		//console.log("B"+v);
 
 		for (var i = 0; i < v; i++) {
 			var cube = {};
@@ -61,7 +61,19 @@ var host = {
 			cube = host.cube_defaults(cube);
 			playersArray.push(cube);
 		}
+		// console.log(playersArray.length);
+		// console.log(Math.log(2));
+		// console.log(Math.log(6));
 
+		var coArray = ["x","y","z"];
+		for(var i = 0; i < coArray.length; i++){
+			this.sortArrayObects( playersArray, coArray[i] );
+	    this.space (playersArray, coArray[i] );
+	    var largest = this.largest( playersArray, coArray[i] );
+	    this.shiftall( playersArray, array[i], (largest/2) );
+		}
+
+		/*
 		this.sortArrayObects(playersArray, "x");
     this.space(playersArray, "x");
     var x = this.largest(playersArray, "x");
@@ -76,12 +88,15 @@ var host = {
     this.space(playersArray, "z");
     var z = this.largest(playersArray, "z");
     this.shiftall(playersArray, "z", (z/2));
+		*/
 
 		//var close = this.example(tempObject);
 
-		//split arrays only return players and create other group
+		var o = host.group(playersArray, 'type');
+		objects = [];
+		objects = o.cube;
 
-		return playersArray;
+		return o.user;
 
 	},
 
@@ -93,7 +108,6 @@ var host = {
 	},
 
   updatePlayerData: function(players, data){
-
     for(var i = 0; i < players.length; i++){
       if(players[i].playerId == data.playerId){
         players[i].x = data.x;
@@ -104,8 +118,17 @@ var host = {
         players[i].r_z = data.r_z;
       }
     }
-
   },
+
+	group: function(arr, key) {
+		return arr.reduce(function(obj, x) {
+			if (!obj[x[key]]) {
+				obj[x[key]] = [];
+			}
+			obj[x[key]].push(x);
+			return obj;
+		}, {});
+	},
 
   removePlayer: function( id ){
     var index = this.contains( players, id );

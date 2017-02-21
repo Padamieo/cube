@@ -33,10 +33,9 @@ body {
 a {
 	color: #ddd;
 	text-decoration: none;
-}
-
-a:hover {
-	color: #fff;
+	&:hover {
+		color: #fff;
+	}
 }
 
 /* Header Style */
@@ -89,7 +88,7 @@ input{
 	background: fade(@white, 20%);
 	color: @white;
 	.transition(background 0.5s ease);
-	
+
 	&:focus {
 		background: fade(@dark, 10%);
 	}

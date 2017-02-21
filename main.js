@@ -18,6 +18,7 @@ const Discover = require('node-discover');
 
 var players = [];
 var users = [];
+var objects = [];
 var host = require('./app/host.js');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -99,11 +100,13 @@ function createWindow () {
 				players = host.boop(players);
 
         for (var i = 0; i < players.length; i++){
-          if(players[i].host === true){
-            socket.emit( 'startMatch', players[i] );
-          }else{
-            socket.broadcast.emit( 'startMatch', players[i] );
-          }
+					//if(players[i].type === 'user'){
+	          if(players[i].host === true){
+	            socket.emit( 'startMatch', players[i] );
+	          }else{
+	            socket.broadcast.emit( 'startMatch', players[i] );
+	          }
+					//}
         };
 			});
 
