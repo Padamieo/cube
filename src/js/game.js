@@ -221,6 +221,7 @@ var game = {
     var mouse = new THREE.Vector2(); // create once
 
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    console.log(window.innerWidth/2);
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( mouse, three.camera );
@@ -228,18 +229,44 @@ var game = {
     var intersects = raycaster.intersectObjects( objects, true );
 
     if ( intersects.length > 0 ) {
-      console.log(intersects);
+    //  console.log(intersects);
       //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+      var a = three.camera.getWorldDirection();
+      //var b = three.camera.getWorldPosition();
+      //var b = ;
+      var obj = game.getObject(thisPlayer.playerId);
+      var b = obj.getWorldPosition();
+      console.log(obj);
+      var c = 100;
+      var d = Math.random() * 0xffffff;
 
-      var arrow = new THREE.ArrowHelper( three.camera.getWorldDirection(), three.camera.getWorldPosition(), 100, Math.random() * 0xffffff );
+      var e = [a,b,c,d];
+
+      //console.log(e);
+
       //this.addShot(arrow);
-			//socket.emit('playerShoot', arrow);
+			socket.emit('playerShoot', e);
+
     }
 
   },
 
 	addShot: function(data){
-		three.scene.add( data );
+    //console.log(data);
+    if(data){
+      //sound.startSound([0,0,0]);
+
+      //tried setting colour and it did not work
+      //var c = new THREE.MeshLambertMaterial({color: data[3] , transparent:true, opacity:0.3, side: THREE.DoubleSide});
+
+      var arrow = new THREE.ArrowHelper( data[0], data[1], data[2], data[3]);
+      //console.log(arrow);
+      three.scene.add( arrow );
+
+      //use tween to fade it out, also use oncomplete to destroy arrow
+      //new TWEEN.Tween( cube.material ).to( { opacity: 0 }, 1000 ).start();
+
+    }
 	},
 
   checkKeyStates: function(socket){

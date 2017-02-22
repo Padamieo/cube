@@ -4,10 +4,6 @@ var http = require('http').Server(app);
 //this works but may need some sort of compiler
 var $ = require('jQuery');
 
-//var t = require('./game.js');
-//console.log(test);
-var t = game;
-
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], users = [];
 
@@ -15,7 +11,7 @@ var otherPlayers = [], otherPlayersId = [];
 
 var keyState = {};
 
-const uuid = t.genUUID();
+const uuid = game.genUUID();
 
 var nameUser = '';
 
@@ -29,7 +25,7 @@ app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
 
-var ip_address = t.getAddress();
+var ip_address = game.getAddress();
 
 http.listen(0, ip_address, function(){
   console.log('listening on *:' + http.address().port );
@@ -41,6 +37,9 @@ $( document ).ready(function() {
 });
 
 function startup(){
+
+  //not sure when best to initialize sound
+  sound.init();
 
   //focus for this page
   $( "#username" ).focus();
@@ -132,7 +131,7 @@ function startup(){
 
 		socket.on('addUser', function(data){
 			console.log("addUser");
-			var index = t.contains(users, data.playerId);
+			var index = game.contains(users, data.playerId);
 			if(index == -1){
 				if(uuid != data.playerId){
 					users.push(data);
@@ -145,8 +144,8 @@ function startup(){
       if(!thisPlayer){
         if(data.playerId == uuid){
     			three = THREE.Bootstrap({element: '#game'});
-          t.loadWorld(socket);
-          t.createPlayer(data);
+          game.loadWorld(socket);
+          game.createPlayer(data);
           socket.emit('requestPlayers', uuid);
 					socket.emit('requestCubes');
           ui.menuchange('game');
@@ -155,39 +154,33 @@ function startup(){
     });
 
     socket.on('addPlayer', function(data){
-      var index = t.contains(players, data.playerId);
+      var index = game.contains(players, data.playerId);
       if(index == -1){
         if(uuid != data.playerId){
-          t.addOtherPlayer(data);
+          game.addOtherPlayer(data);
         }
       }
     });
 
 		socket.on('addCubes', function(data){
-			// var index = t.contains(players, data.playerId);
-			// if(index == -1){
-			// 	if(uuid != data.playerId){
-			// 		t.addOtherPlayer(data);
-			// 	}
-			// }
-			console.log(data);
 			for (var i = 0; i < data.length; i++){
-				t.addCube(data[i]);
+				game.addCube(data[i]);
 			}
 		});
 
     socket.on('updatePlayers', function(data){
       //may need to check uuid and data.playerId dont match or data is not incorrect between
       console.log(uuid+" = "+data.playerId);
-      t.updateObject(data);
+      game.updateObject(data);
     });
 
 		socket.on('updateShots', function(data){
-			t.addShot(data);
+      console.log(data);
+			game.addShot(data);
 		});
 
     socket.on('removePlayer', function(data){
-      t.removeOtherPlayer(data);
+      game.removeOtherPlayer(data);
     });
 
   }

@@ -132,7 +132,8 @@ function createWindow () {
 
 			socket.on('playerShoot', function(data){
 				//may need to store shots
-				socket.broadcast.emit('updatePlayers', data);
+        socket.emit('updateShots', data);
+				socket.broadcast.emit('updateShots', data);
 			});
 
       socket.on('disconnect', function(d){
