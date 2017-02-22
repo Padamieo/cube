@@ -97,7 +97,10 @@ function createWindow () {
         //confirm request is from host
 				players = host.createPlayers(users);
 
-				players = host.boop(players);
+				var o = host.boop(players);
+				objects = o.cube;
+				players = o.user;
+				console.log("o");
 
         for (var i = 0; i < players.length; i++){
 					//if(players[i].type === 'user'){
@@ -118,10 +121,19 @@ function createWindow () {
         }
       });
 
+			socket.on('requestCubes', function(){
+				socket.emit('addCubes', objects);
+			});
+
       socket.on('updatePlayer', function(data){
         host.updatePlayerData(players, data);
         socket.broadcast.emit('updatePlayers', data);
       });
+
+			socket.on('playerShoot', function(data){
+				//may need to store shots
+				socket.broadcast.emit('updatePlayers', data);
+			});
 
       socket.on('disconnect', function(d){
         console.log("need uuid to remove now");

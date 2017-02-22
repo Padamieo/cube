@@ -60,7 +60,7 @@ function startup(){
 
 		$(document).on("click", "#startMatch", function(){
 			console.log("startMatch");
-			//$( "#lobby" ).hide();
+			//$( "#lobby" ).hide();updatePlayers
 			socket.emit('start');
 		});
 
@@ -106,7 +106,6 @@ function startup(){
     io = require('socket.io-client'),
     socket = io.connect('http://'+service.ip+':'+service.port);
 
-
     socket.on('connect', function(){
 
 			//var nameUser = "name";
@@ -149,6 +148,7 @@ function startup(){
           t.loadWorld(socket);
           t.createPlayer(data);
           socket.emit('requestPlayers', uuid);
+					socket.emit('requestCubes');
           ui.menuchange('game');
         }
       }
@@ -163,11 +163,28 @@ function startup(){
       }
     });
 
+		socket.on('addCubes', function(data){
+			// var index = t.contains(players, data.playerId);
+			// if(index == -1){
+			// 	if(uuid != data.playerId){
+			// 		t.addOtherPlayer(data);
+			// 	}
+			// }
+			console.log(data);
+			for (var i = 0; i < data.length; i++){
+				t.addCube(data[i]);
+			}
+		});
+
     socket.on('updatePlayers', function(data){
       //may need to check uuid and data.playerId dont match or data is not incorrect between
       console.log(uuid+" = "+data.playerId);
       t.updateObject(data);
     });
+
+		socket.on('updateShots', function(data){
+			t.addShot(data);
+		});
 
     socket.on('removePlayer', function(data){
       t.removeOtherPlayer(data);

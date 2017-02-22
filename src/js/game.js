@@ -72,15 +72,15 @@ var game = {
     var l = this.largest(tempObject, "x");
     this.shiftall(tempObject, "x", (l/2));
 
-    this.sortArrayObects(tempObject, "y");
-    this.space(tempObject, "y");
-    var l = this.largest(tempObject, "y");
-    this.shiftall(tempObject, "y", (l/2));
-
-    this.sortArrayObects(tempObject, "z");
-    this.space(tempObject, "z");
-    var l = this.largest(tempObject, "z");
-    this.shiftall(tempObject, "z", (l/2));
+    // this.sortArrayObects(tempObject, "y");
+    // this.space(tempObject, "y");
+    // var l = this.largest(tempObject, "y");
+    // this.shiftall(tempObject, "y", (l/2));
+		//
+    // this.sortArrayObects(tempObject, "z");
+    // this.space(tempObject, "z");
+    // var l = this.largest(tempObject, "z");
+    // this.shiftall(tempObject, "z", (l/2));
 
     //var close = this.example(tempObject);
 
@@ -89,11 +89,11 @@ var game = {
     };
 
     for (var i = 0; i < tempObject.length; i++) {
-      var obj1 = this.create_cube(temp, 0xfff000, 0.8);
+      var obj1 = this.create_cube(temp, 0xfff000, 1);
       obj1.rotation.set(0,0,0);
       obj1.position.x = tempObject[i].x;
-      obj1.position.y = tempObject[i].y;
-      obj1.position.z = tempObject[i].z;
+      obj1.position.y = 0; //tempObject[i].y;
+      obj1.position.z = 0; //tempObject[i].z;
       three.scene.add( obj1 );
       objects.push( obj1 );
     }
@@ -118,7 +118,7 @@ var game = {
 
   space: function(array, key, distance){
     for (var i = 0; i < array.length; i++) {
-      array[i][key] = array[i][key]+(i*0.8);
+      array[i][key] = array[i][key]+(i*1.5);
     }
   },
 
@@ -127,7 +127,6 @@ var game = {
       return a[key] - b[key];
     });
   },
-
 
   proximityTest: function(array, dis){
 		var dis = ( dis ? dis : 3 );
@@ -159,7 +158,7 @@ var game = {
 		// three.scene.add( sky.mesh );
 
     //add an ambient light
-    var ambient = new THREE.AmbientLight( 0x333333 );
+    var ambient = new THREE.AmbientLight( 0x756e4e );
     three.scene.add( ambient );
 
     //add a directional light
@@ -233,10 +232,15 @@ var game = {
       //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
       var arrow = new THREE.ArrowHelper( three.camera.getWorldDirection(), three.camera.getWorldPosition(), 100, Math.random() * 0xffffff );
-      three.scene.add( arrow );
+      //this.addShot(arrow);
+			//socket.emit('playerShoot', arrow);
     }
 
   },
+
+	addShot: function(data){
+		three.scene.add( data );
+	},
 
   checkKeyStates: function(socket){
 
@@ -402,6 +406,19 @@ var game = {
     three.scene.add( obj );
 
   },
+
+	addCube: function(data){
+		var obj = this.create_cube(data, 0xfff777, 0.9);
+		obj.playerId = data.playerId;
+
+		obj.rotation.set(0,0,0);
+		obj.position.x = data.x;
+		obj.position.y = data.y;
+		obj.position.z = data.z;
+
+		objects.push( obj );
+		three.scene.add( obj );
+	},
 
   removeOtherPlayer: function(socket_id){
 

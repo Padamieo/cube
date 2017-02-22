@@ -61,6 +61,7 @@ var host = {
 			cube = host.cube_defaults(cube);
 			playersArray.push(cube);
 		}
+
 		// console.log(playersArray.length);
 		// console.log(Math.log(2));
 		// console.log(Math.log(6));
@@ -70,33 +71,13 @@ var host = {
 			this.sortArrayObects( playersArray, coArray[i] );
 	    this.space (playersArray, coArray[i] );
 	    var largest = this.largest( playersArray, coArray[i] );
-	    this.shiftall( playersArray, array[i], (largest/2) );
+	    this.shiftall( playersArray, coArray[i], (largest/2) );
 		}
-
-		/*
-		this.sortArrayObects(playersArray, "x");
-    this.space(playersArray, "x");
-    var x = this.largest(playersArray, "x");
-    this.shiftall(playersArray, "x", (x/2));
-
-    this.sortArrayObects(playersArray, "y");
-    this.space(playersArray, "y");
-    var y = this.largest(playersArray, "y");
-    this.shiftall(playersArray, "y", (y/2));
-
-    this.sortArrayObects(playersArray, "z");
-    this.space(playersArray, "z");
-    var z = this.largest(playersArray, "z");
-    this.shiftall(playersArray, "z", (z/2));
-		*/
 
 		//var close = this.example(tempObject);
 
 		var o = host.group(playersArray, 'type');
-		objects = [];
-		objects = o.cube;
-
-		return o.user;
+		return o;
 
 	},
 
@@ -160,7 +141,7 @@ var host = {
 
   space: function(array, key, distance){
     for (var i = 0; i < array.length; i++) {
-      array[i][key] = array[i][key]+(i*0.8);
+      array[i][key] = array[i][key]+(i*1.1);
     }
   },
 
