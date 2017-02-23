@@ -17,7 +17,7 @@ var sound = {
 
 	},
 
-	startSound: function(pos) {
+	startSound: function(sound, user) {
 		var ref = this;
 		// Note: this loads asynchronously
 		var request = new XMLHttpRequest();
@@ -27,12 +27,12 @@ var sound = {
 		// Our asynchronous callback
 		request.onload = function() {
 			var audioData = request.response;
-			ref.audioGraph(audioData, pos);
+			ref.audioGraph(audioData, sound, user);
 		};
 		request.send();
 	},
 
-	audioGraph: function(audioData, set) {
+	audioGraph: function(audioData, sound, user) {
 		var panner;
 		var ref = this;
 
@@ -42,12 +42,12 @@ var sound = {
 		ref.context.decodeAudioData(audioData, function(soundBuffer){
 			ref.soundSource.buffer = soundBuffer;
 			panner = ref.context.createPanner();
-			panner.setPosition(set[0], set[1], set[2]);
+			panner.setPosition(sound.x, sound.y, sound.z);
 			ref.soundSource.connect(panner);
 			panner.connect(ref.context.destination);
 
 			// Each context has a single 'Listener'
-			ref.context.listener.setPosition(0, 0, 0);
+			ref.context.listener.setPosition(user.x, user.y, user.z);
 
 			// Finally
 			ref.playSound(ref.soundSource);

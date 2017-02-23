@@ -175,7 +175,7 @@ function startup(){
     });
 
 		socket.on('updateShots', function(data){
-      console.log(data);
+      //console.log(data);
 			game.addShot(data);
 		});
 

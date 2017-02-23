@@ -52,107 +52,11 @@ var game = {
     }
   },
 
-	/*
-
-  temp2: function(){
-    var amount = 5;
-    var h = require('./host.js');
-    var tempObject = [];
-
-    //'#'+(Math.random()*0xFFFFFF<<0).toString(16);
-
-    for (var i = 0; i < amount; i++) {
-      var user = { host: false, playerId: i, name: i }
-      var pee = new h.player(user);
-      tempObject.push(pee);
-    }
-
-    this.sortArrayObects(tempObject, "x");
-    this.space(tempObject, "x");
-    var l = this.largest(tempObject, "x");
-    this.shiftall(tempObject, "x", (l/2));
-
-    // this.sortArrayObects(tempObject, "y");
-    // this.space(tempObject, "y");
-    // var l = this.largest(tempObject, "y");
-    // this.shiftall(tempObject, "y", (l/2));
-		//
-    // this.sortArrayObects(tempObject, "z");
-    // this.space(tempObject, "z");
-    // var l = this.largest(tempObject, "z");
-    // this.shiftall(tempObject, "z", (l/2));
-
-    //var close = this.example(tempObject);
-
-    var temp = {
-      size: 1
-    };
-
-    for (var i = 0; i < tempObject.length; i++) {
-      var obj1 = this.create_cube(temp, 0xfff000, 1);
-      obj1.rotation.set(0,0,0);
-      obj1.position.x = tempObject[i].x;
-      obj1.position.y = 0; //tempObject[i].y;
-      obj1.position.z = 0; //tempObject[i].z;
-      three.scene.add( obj1 );
-      objects.push( obj1 );
-    }
-
-  },
-
-  largest: function(array, key){
-    var largest = 0;
-    array.forEach(function( obj ){
-      if(obj[key] > largest){
-        largest = obj[key];
-      }
-    });
-    return largest;
-  },
-
-  shiftall: function(array, key, shift){
-    for (var i = 0; i < array.length; i++) {
-      array[i][key] = array[i][key]-shift;
-    };
-  },
-
-  space: function(array, key, distance){
-    for (var i = 0; i < array.length; i++) {
-      array[i][key] = array[i][key]+(i*1.5);
-    }
-  },
-
-  sortArrayObects: function(array, key){
-    array.sort(function(a, b) {
-      return a[key] - b[key];
-    });
-  },
-
-  proximityTest: function(array, dis){
-		var dis = ( dis ? dis : 3 );
-    close = false;
-    array.forEach(function( obj1 ){
-      array.forEach(function( obj2 ){
-        if( obj1.playerId === obj2.playerId ){
-          return;
-        }
-
-        if( obj1.x+dis > obj2.x || obj1.x-dis < obj2.x ){
-          close = true;
-        }
-      })
-    })
-    return close;
-  },
-
-	*/
-
   loadWorld: function(socket){
 
     // add all the generated cubes, or do they come in later
     //temp version
-    //this.temp();
-    //this.temp2();
+    this.temp();
 
     // sky = new THREE.Sky();
 		// three.scene.add( sky.mesh );
@@ -165,6 +69,8 @@ var game = {
     directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
     directionalLight.position.set( 2, 1.2, 10 ).normalize();
     three.scene.add( directionalLight );
+
+		three.scene.background = new THREE.Color("#202020");
 
     this.registerEvents();
 
@@ -216,7 +122,6 @@ var game = {
     // raycaster.setFromCamera( v, obj );
     // console.log(v);
 
-
     var raycaster = new THREE.Raycaster(); // create once
     var mouse = new THREE.Vector2(); // create once
 
@@ -236,8 +141,12 @@ var game = {
       //var b = ;
       var obj = game.getObject(thisPlayer.playerId);
       var b = obj.getWorldPosition();
-      console.log(obj);
-      var c = 100;
+      //var c = 100;
+			//console.log(intersects);
+			//console.log(intersects[0].distance);
+			var c = intersects[0].distance;
+			// var c = obj.distanceTo( vec2 );
+			// console.log(c);
       var d = Math.random() * 0xffffff;
 
       var e = [a,b,c,d];
@@ -254,7 +163,13 @@ var game = {
 	addShot: function(data){
     //console.log(data);
     if(data){
-      //sound.startSound([0,0,0]);
+
+      var obj = game.getObject(thisPlayer.playerId);
+      var playerpos = obj.getWorldPosition();
+			console.log(data[1]);
+			//if(){
+				//sound.startSound(data[1], playerpos);
+			//}
 
       //tried setting colour and it did not work
       //var c = new THREE.MeshLambertMaterial({color: data[3] , transparent:true, opacity:0.3, side: THREE.DoubleSide});
@@ -263,8 +178,9 @@ var game = {
       //console.log(arrow);
       three.scene.add( arrow );
 
-      //use tween to fade it out, also use oncomplete to destroy arrow
-      //new TWEEN.Tween( cube.material ).to( { opacity: 0 }, 1000 ).start();
+			//use tween to fade it out, also use oncomplete to destroy arrow
+			var TWEEN = require('tween.js');
+      new TWEEN.Tween( arrow.material ).to( { opacity: 0 }, 1000 ).start();
 
     }
 	},
@@ -359,12 +275,23 @@ var game = {
     three.camera.position.z = obj.position.z + 2.5 * Math.cos( obj.rotation.y );
   },
 
-  create_cube: function(data, color, opacity){
-    var obj = new THREE.Mesh(
-      new THREE.CubeGeometry(data.size, data.size, data.size),
-      new THREE.MeshLambertMaterial({color: color, transparent:true, opacity:opacity, side: THREE.DoubleSide})
-    );
-    return obj;
+  create_cube: function(data, color, opacity, alt){
+
+		var material =  new THREE.MeshLambertMaterial({color: color, transparent:true, opacity:opacity, side: THREE.DoubleSide});
+
+		// var material = new THREE.MeshStandardMaterial({color: "#000", roughness: 1});
+		// var envMap = new THREE.TextureLoader().load('s.png');
+		// envMap.mapping = THREE.SphericalReflectionMapping;
+		// material.envMap = envMap;
+
+		//var RoundedBoxGeometry = require('three-rounded-box')(THREE); //may want to bring in via uglify
+		//var cube = new RoundedBoxGeometry(data.size, data.size, data.size, data.size*0.05, data.size*0.1);
+
+		var cube = new THREE.CubeGeometry(data.size, data.size, data.size);
+
+		var obj = new THREE.Mesh( cube, material );
+		return obj;
+
   },
 
   createPlayer: function(data){
