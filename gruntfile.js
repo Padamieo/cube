@@ -18,7 +18,6 @@ module.exports = function(grunt){
 						'node_modules/jquery/dist/jquery.js',
             'node_modules/three/build/three.js',
 						'node_modules/three/examples/js/SkyShader.js',
-            'node_modules/threestrap/build/threestrap.js',
 						'src/js/ui.js',
 						'src/js/sound.js',
 						'src/js/game.js',

@@ -27,6 +27,7 @@ var game = {
     return addresses;
   },
 
+  /*
   temp: function(){
     var dis = 3;
     var tempObject = [
@@ -51,12 +52,59 @@ var game = {
       objects.push( obj1 );
     }
   },
+  */
 
-  loadWorld: function(socket){
+  loadWorld: function(socket,data){
+
+    console.log("loadWorld");
+
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(this.width, this.height);
+    container = document.getElementById('game');
+    container.appendChild(this.renderer.domElement);
+
+    this.scene = new THREE.Scene;
+    this.scene.background = new THREE.Color("#202020");
+
+    directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+    directionalLight.position.set( 2, 1.2, 10 ).normalize();
+    this.scene.add( directionalLight );
+
+    var ambient = new THREE.AmbientLight( 0x756e4e );
+    this.scene.add( ambient );
+
+    this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 10000);
+    this.camera.position.y = 0;
+    this.camera.position.z = 0;
+
+    this.scene.add(this.camera);
+
+    this.registerEvents(socket);
+
+    this.createPlayer(data);
+
+    console.log("render");
+    this.render(socket);
+
+  },
+
+  render: function (socket) {
+  	var ref = this;
+  	requestAnimationFrame(function(){ref.render()});
+    if ( thisPlayer ){
+      this.checkKeyStates(socket);
+    }
+  	this.renderer.render(this.scene, this.camera);
+  },
+
+  loadWorld2: function(socket){
 
     // add all the generated cubes, or do they come in later
     //temp version
-    this.temp();
+    //this.temp();
 
     // sky = new THREE.Sky();
 		// three.scene.add( sky.mesh );
@@ -129,7 +177,7 @@ var game = {
     console.log(window.innerWidth/2);
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    raycaster.setFromCamera( mouse, three.camera );
+    raycaster.setFromCamera( mouse, this.camera );
 
     var intersects = raycaster.intersectObjects( objects, true );
 
@@ -224,6 +272,7 @@ var game = {
     }
 
     if( change ){
+      console.log("checkKeyStates");
 
       //console.log("PASS: "+thisPlayer.playerId+" = "+socket.id);
 
@@ -310,7 +359,7 @@ var game = {
     obj.position.z = 0;
 
     players.push( obj );
-    three.scene.add( obj );
+    this.scene.add( obj );
 
     var arrowHelper = this.arrow();
     obj.add( arrowHelper );
@@ -319,14 +368,14 @@ var game = {
     //this.updateCameraPosition( data.playerId );
     //three.camera.lookAt( obj.position );
 
-    three.camera.position.set( 3, 1, 0 );
-    three.camera.lookAt( obj.position );
+    this.camera.position.set( 3, 1, 0 );
+    this.camera.lookAt( obj.position );
 
     obj.position.x = data.x;
     obj.position.y = data.y;
     obj.position.z = data.z;
 
-    obj.add( three.camera );
+    obj.add( this.camera );
 
     // camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
     // three.scene.add( camera );
@@ -354,10 +403,8 @@ var game = {
     obj.position.y = data.y;
     obj.position.z = data.z;
 
-    // otherPlayersId.push( data.playerId );
-    // otherPlayers.push( obj );
     players.push( obj );
-    three.scene.add( obj );
+    this.scene.add( obj );
 
   },
 
@@ -371,7 +418,7 @@ var game = {
 		obj.position.z = data.z;
 
 		objects.push( obj );
-		three.scene.add( obj );
+		this.scene.add( obj );
 	},
 
   removeOtherPlayer: function(socket_id){

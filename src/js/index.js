@@ -7,8 +7,6 @@ var $ = require('jQuery');
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], users = [];
 
-var otherPlayers = [], otherPlayersId = [];
-
 var keyState = {};
 
 const uuid = game.genUUID();
@@ -143,11 +141,13 @@ function startup(){
     socket.on('startMatch', function(data){
       if(!thisPlayer){
         if(data.playerId == uuid){
-    			three = THREE.Bootstrap({element: '#game'});
-          game.loadWorld(socket);
-          game.createPlayer(data);
+    			//three = THREE.Bootstrap({element: '#game'});
+          game.loadWorld(socket, data);
+
+          //game.createPlayer(data);
           socket.emit('requestPlayers', uuid);
 					socket.emit('requestCubes');
+
           ui.menuchange('game');
         }
       }
