@@ -81,8 +81,6 @@ var game = {
     this.camera.position.z = 0;
     this.scene.add(this.camera);
 
-		//console.log(this.camera);
-
 		this.TWEEN = require('tween.js');
 
     this.registerEvents(socket);
@@ -252,40 +250,58 @@ var game = {
 
 	},
 
+	fovChange: function(f){
+		console.log(this.camera.fov);
+		var current = this.camera.fov;
+		if( f ){
+			this.camera.fov = current+1;
+		}else{
+			this.camera.fov = current-1;
+		}
+		this.camera.updateProjectionMatrix();
+	},
+
   checkKeyStates: function(socket){
 
     var change = false;
     var obj = this.getObject(thisPlayer.playerId);
 
-    if (keyState[38] || keyState[87]) {
+		if( keyState[38] ){
+			this.fovChange(true);
+		}
+		if( keyState[40] ){
+			this.fovChange(false);
+		}
+
+    if ( keyState[87] ) {
       //obj.rotation.x += thisPlayer.turnSpeed;
       obj.rotateZ (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if (keyState[40] || keyState[83]) {
+    if ( keyState[83] ) {
       //obj.rotation.x -= thisPlayer.turnSpeed;
       obj.rotateZ (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if (keyState[37] || keyState[65]) {
+    if ( keyState[65] ) {
       //obj.rotation.y += thisPlayer.turnSpeed;
       obj.rotateY (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if (keyState[39] || keyState[68]) {
+    if ( keyState[68] ) {
       obj.rotateY (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if (keyState[81]) {
+    if ( keyState[81] ) {
       obj.rotateX (thisPlayer.turnSpeed);
       change = true
     }
 
-    if (keyState[69]) {
+    if ( keyState[69] ) {
       obj.rotateX (-thisPlayer.turnSpeed);
       change = true
     }
