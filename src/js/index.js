@@ -4,9 +4,9 @@ var http = require('http').Server(app);
 //this works but may need some sort of compiler
 var $ = require('jQuery');
 
+// no longer required?
 var three, player, socket, thisPlayer, camera, scene;
 var players = [], objects = [], users = [];
-
 var keyState = {};
 
 const uuid = game.genUUID();

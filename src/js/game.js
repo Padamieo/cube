@@ -79,8 +79,11 @@ var game = {
     this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 10000);
     this.camera.position.y = 0;
     this.camera.position.z = 0;
-
     this.scene.add(this.camera);
+
+		//console.log(this.camera);
+
+		this.TWEEN = require('tween.js');
 
     this.registerEvents(socket);
 
@@ -97,6 +100,11 @@ var game = {
     if ( thisPlayer ){
       this.checkKeyStates(socket);
     }
+
+		if ( this.TWEEN ){
+			this.TWEEN.update();
+		}
+
   	this.renderer.render(this.scene, this.camera);
   },
 
@@ -177,14 +185,16 @@ var game = {
     console.log(window.innerWidth/2);
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    raycaster.setFromCamera( mouse, this.camera );
+		console.log(game.camera);
+
+    raycaster.setFromCamera( mouse, game.camera );
 
     var intersects = raycaster.intersectObjects( objects, true );
 
     if ( intersects.length > 0 ) {
     //  console.log(intersects);
       //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
-      var a = three.camera.getWorldDirection();
+      var a = game.camera.getWorldDirection();
       //var b = three.camera.getWorldPosition();
       //var b = ;
       var obj = game.getObject(thisPlayer.playerId);
@@ -214,7 +224,7 @@ var game = {
 
       var obj = game.getObject(thisPlayer.playerId);
       var playerpos = obj.getWorldPosition();
-			console.log(data[1]);
+			console.log(data[2]);
 			//if(){
 				//sound.startSound(data[1], playerpos);
 			//}
@@ -222,15 +232,24 @@ var game = {
       //tried setting colour and it did not work
       //var c = new THREE.MeshLambertMaterial({color: data[3] , transparent:true, opacity:0.3, side: THREE.DoubleSide});
 
+			//maybe conver value before
+			// http://stackoverflow.com/questions/21646738/convert-hex-to-rgba
+
       var arrow = new THREE.ArrowHelper( data[0], data[1], data[2], data[3]);
-      //console.log(arrow);
-      three.scene.add( arrow );
+      //console.log(arrow.line.scale.y);
+      this.scene.add( arrow );
 
 			//use tween to fade it out, also use oncomplete to destroy arrow
-			var TWEEN = require('tween.js');
-      new TWEEN.Tween( arrow.material ).to( { opacity: 0 }, 1000 ).start();
-
+			// var target = { x : 20, y: 20 };
+      // this.tween = new this.TWEEN.Tween( obj.position ).to( target, 1000 ).start();
+			// this.tween.easing(this.TWEEN.Easing.Elastic.InOut);
+			// this.tween.repeat(Infinity);
+			// this.tween.yoyo(true);
+			//
+			// this.tween.onStart(function() { console.log("start") });
+			// this.tween.onComplete(function() { console.log("complete") });
     }
+
 	},
 
   checkKeyStates: function(socket){
@@ -319,9 +338,9 @@ var game = {
 
   updateCameraPosition: function(playerId){
     var obj = this.getObject(playerId);
-    three.camera.position.x = obj.position.x + 2* Math.sin( obj.rotation.y );
-    three.camera.position.y = obj.position.y + 2;
-    three.camera.position.z = obj.position.z + 2.5 * Math.cos( obj.rotation.y );
+    this.camera.position.x = obj.position.x + 2* Math.sin( obj.rotation.y );
+    this.camera.position.y = obj.position.y + 2;
+    this.camera.position.z = obj.position.z + 2.5 * Math.cos( obj.rotation.y );
   },
 
   create_cube: function(data, color, opacity, alt){
