@@ -13,8 +13,6 @@
 
 ### Todo
 
-- stop using three strap go back to basic three.js use, keep it basic
-  - resize render on size change
 - fix fire (projectile) acuracy and confirm with server/players
 - add in game ui score/players/end game
 - refine menus, maybe look at handlebars.js

@@ -135,12 +135,6 @@ var game = {
 
   onMouseClick: function( event ){
 
-    // var obj = game.ray(thisPlayer.playerId);
-    // var v = obj.children[0];
-    // var raycaster = new THREE.Raycaster();
-    // raycaster.setFromCamera( v, obj );
-    // console.log(v);
-
     var raycaster = new THREE.Raycaster(); // create once
     var mouse = new THREE.Vector2(); // create once
 
@@ -153,12 +147,6 @@ var game = {
     raycaster.setFromCamera( mouse, game.camera );
 
     var intersects = raycaster.intersectObjects( game.objects, true );
-
-    // var intersects2 = raycaster.intersectObjects( game.players, true );
-    // if ( intersects2.length > 0 ) {
-    //   console.log(intersects2);
-    // }
-
 
     if ( intersects.length > 0 ) {
       console.log(intersects);
