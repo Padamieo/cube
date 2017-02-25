@@ -49,14 +49,16 @@ var game = {
       obj1.position.y = 0;
       obj1.position.z = tempObject[i][2];
       three.scene.add( obj1 );
-      objects.push( obj1 );
+      this.objects.push( obj1 );
     }
   },
   */
 
   loadWorld: function(socket,data){
 
-    console.log("loadWorld");
+    this.objects = [];
+    this.players = [];
+    this.keyState = {};
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -69,12 +71,14 @@ var game = {
     this.scene = new THREE.Scene;
     this.scene.background = new THREE.Color("#202020");
 
+
     directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
     directionalLight.position.set( 2, 1.2, 10 ).normalize();
     this.scene.add( directionalLight );
 
     var ambient = new THREE.AmbientLight( 0x756e4e );
     this.scene.add( ambient );
+
 
     this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 10000);
     this.camera.position.y = 0;
@@ -83,20 +87,22 @@ var game = {
 
 		this.TWEEN = require('tween.js');
 
+    var WindowResize = require('three-window-resize');
+    var windowResize = new WindowResize(this.renderer, this.camera);
+
     this.registerEvents(socket);
 
     this.createPlayer(data);
 
-    console.log("render");
     this.render(socket);
 
   },
 
-  render: function (socket) {
+  render: function () {
   	var ref = this;
   	requestAnimationFrame(function(){ref.render()});
     if ( thisPlayer ){
-      this.checkKeyStates(socket);
+      this.checkKeyStates();
     }
 
 		if ( this.TWEEN ){
@@ -104,46 +110,6 @@ var game = {
 		}
 
   	this.renderer.render(this.scene, this.camera);
-  },
-
-  loadWorld2: function(socket){
-
-    // add all the generated cubes, or do they come in later
-    //temp version
-    //this.temp();
-
-    // sky = new THREE.Sky();
-		// three.scene.add( sky.mesh );
-
-    //add an ambient light
-    var ambient = new THREE.AmbientLight( 0x756e4e );
-    three.scene.add( ambient );
-
-    //add a directional light
-    directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-    directionalLight.position.set( 2, 1.2, 10 ).normalize();
-    three.scene.add( directionalLight );
-
-		three.scene.background = new THREE.Color("#202020");
-
-    this.registerEvents();
-
-    var v = this;
-
-    three.on('update', function () {
-      if ( thisPlayer ){
-
-        v.checkKeyStates(socket);
-
-        //three.camera.lookAt( player.position );
-
-        //v.updateCameraPosition( player.playerId );
-
-      }
-    });
-
-    three.init();
-
   },
 
   registerEvents: function(){
@@ -159,16 +125,15 @@ var game = {
 
   onKeyDown: function( event ){
     //event = event || window.event;
-    keyState[event.keyCode || event.which] = true;
+    game.keyState[event.keyCode || event.which] = true;
   },
 
   onKeyUp: function( event ){
     //event = event || window.event;
-    keyState[event.keyCode || event.which] = false;
+    game.keyState[event.keyCode || event.which] = false;
   },
 
   onMouseClick: function( event ){
-    console.log('click');
 
     // var obj = game.ray(thisPlayer.playerId);
     // var v = obj.children[0];
@@ -179,35 +144,38 @@ var game = {
     var raycaster = new THREE.Raycaster(); // create once
     var mouse = new THREE.Vector2(); // create once
 
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    console.log(window.innerWidth/2);
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-		console.log(game.camera);
+    mouse.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( mouse, game.camera );
 
-    var intersects = raycaster.intersectObjects( objects, true );
+    var intersects = raycaster.intersectObjects( game.objects, true );
+
+    var intersects2 = raycaster.intersectObjects( game.players, true );
+    if ( intersects2.length > 0 ) {
+      console.log(intersects2);
+    }
 
     if ( intersects.length > 0 ) {
-    //  console.log(intersects);
-      //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
-      var a = game.camera.getWorldDirection();
+
+      //console.log(intersects);
+
+      //var a = game.camera.getWorldDirection();
+      var a = intersects[0].point;
+
       //var b = three.camera.getWorldPosition();
-      //var b = ;
       var obj = game.getObject(thisPlayer.playerId);
       var b = obj.getWorldPosition();
-      //var c = 100;
-			//console.log(intersects);
-			//console.log(intersects[0].distance);
+
 			var c = intersects[0].distance;
 			// var c = obj.distanceTo( vec2 );
-			// console.log(c);
+
       var d = Math.random() * 0xffffff;
 
       var e = [a,b,c,d];
-
-      //console.log(e);
 
       //this.addShot(arrow);
 			socket.emit('playerShoot', e);
@@ -216,13 +184,77 @@ var game = {
 
   },
 
+  /* Track original opacities */
+  trackOriginalOpacities: function(mesh) {
+    var opacities = [],
+    materials = mesh.material.materials ? mesh.material.materials : [mesh.material];
+    for (var i = 0; i < materials.length; i++) {
+      materials[i].transparent = true;
+      opacities.push(materials[i].opacity);
+    }
+    mesh.userData.originalOpacities = opacities;
+  },
+
+  /* Fade mesh */
+
+  fadeMesh: function(mesh, direction, options) {
+    options = options || {};
+    // set and check
+    var current = { percentage : direction == "in" ? 1 : 0 },
+    // this check is used to work with normal and multi materials.
+    mats = mesh.material.materials ? mesh.material.materials : [mesh.material],
+
+    originals = mesh.userData.originalOpacities,
+    easing = options.easing || this.TWEEN.Easing.Linear.None,
+    duration = options.duration || 2000;
+    // check to make sure originals exist
+      if( !originals ) {
+        console.error("Fade error: originalOpacities not defined, use trackOriginalOpacities");
+        return;
+      }
+      // tween opacity back to originals
+      var tweenOpacity = new this.TWEEN.Tween(current)
+          .to({ percentage: direction == "in" ? 0 : 1 }, duration)
+          .easing(easing)
+          .onUpdate(function() {
+               for (var i = 0; i < mats.length; i++) {
+                  mats[i].opacity = originals[i] * current.percentage;
+               }
+           })
+           .onComplete(function(){
+                if(options.callback){
+                     options.callback();
+                }
+           });
+      tweenOpacity.start();
+      return tweenOpacity;
+  },
+
+  /*
+
+  How to use
+  // fade in
+  fadeMesh(mesh, "in");
+  // fade out
+  fadeMesh(mesh, "out");
+  // fade with options
+  fadeMesh(mesh, "in", {
+
+      duration: 11000,
+
+      easing: TWEEN.Easing.Quintic.InOut,
+
+      callback : function (){
+          console.log("Fade complete");
+      }
+  });
+  */
+
 	addShot: function(data){
-    //console.log(data);
     if(data){
 
       var obj = game.getObject(thisPlayer.playerId);
       var playerpos = obj.getWorldPosition();
-			console.log(data[2]);
 			//if(){
 				//sound.startSound(data[1], playerpos);
 			//}
@@ -233,9 +265,53 @@ var game = {
 			//maybe conver value before
 			// http://stackoverflow.com/questions/21646738/convert-hex-to-rgba
 
-      var arrow = new THREE.ArrowHelper( data[0], data[1], data[2], data[3]);
-      //console.log(arrow.line.scale.y);
-      this.scene.add( arrow );
+      // var arrow = new THREE.ArrowHelper( data[0], data[1], data[2], '0xffffff');
+      // console.log(arrow);
+      // this.scene.add( arrow );
+
+      var material = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        transparent:true,
+        opacity: 1
+       });
+
+      var geometry = new THREE.Geometry();
+      geometry.vertices.push(data[0]);
+      geometry.vertices.push(data[1]);
+
+      line = new THREE.Line(geometry, material);
+      this.scene.add( line );
+
+      // var ref = this;
+      // this.trackOriginalOpacities(line);
+      //
+      // this.fadeMesh(line, "out", {
+      //   duration: 1000,
+      //   easing: this.TWEEN.Easing.Quintic.InOut,
+      //   callback : function (){
+      //
+      //     console.log("Fade complete1");
+      //
+      //     ref.fadeMesh(line, "in", {
+      //       duration: 1000,
+      //       easing: ref.TWEEN.Easing.Quintic.InOut,
+      //       callback : function (){
+      //         console.log("Fade complete2");
+      //       }
+      //     });
+      //
+      //   }
+      // });
+
+
+      // var target = 20;
+      // this.tween = new this.TWEEN.Tween( line.material.linewidth ).to( target, 1000 ).start();
+      // this.tween.easing(this.TWEEN.Easing.Elastic.InOut);
+      // this.tween.repeat(Infinity);
+      // this.tween.yoyo(true);
+      //
+      // this.tween.onStart(function() { console.log("start") });
+      // this.tween.onComplete(function() { console.log("complete") });
 
 			//use tween to fade it out, also use oncomplete to destroy arrow
 			// var target = { x : 20, y: 20 };
@@ -243,7 +319,7 @@ var game = {
 			// this.tween.easing(this.TWEEN.Easing.Elastic.InOut);
 			// this.tween.repeat(Infinity);
 			// this.tween.yoyo(true);
-			//
+      //
 			// this.tween.onStart(function() { console.log("start") });
 			// this.tween.onComplete(function() { console.log("complete") });
     }
@@ -261,47 +337,46 @@ var game = {
 		this.camera.updateProjectionMatrix();
 	},
 
-  checkKeyStates: function(socket){
+  checkKeyStates: function(){
 
     var change = false;
     var obj = this.getObject(thisPlayer.playerId);
 
-		if( keyState[38] ){
+
+		if( game.keyState[38] ){
 			this.fovChange(true);
 		}
-		if( keyState[40] ){
+		if( game.keyState[40] ){
 			this.fovChange(false);
 		}
 
-    if ( keyState[87] ) {
-      //obj.rotation.x += thisPlayer.turnSpeed;
+
+    if ( game.keyState[87] ) {
       obj.rotateZ (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( keyState[83] ) {
-      //obj.rotation.x -= thisPlayer.turnSpeed;
+    if ( game.keyState[83] ) {
       obj.rotateZ (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( keyState[65] ) {
-      //obj.rotation.y += thisPlayer.turnSpeed;
+    if ( game.keyState[65] ) {
       obj.rotateY (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( keyState[68] ) {
+    if ( game.keyState[68] ) {
       obj.rotateY (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( keyState[81] ) {
+    if ( game.keyState[81] ) {
       obj.rotateX (thisPlayer.turnSpeed);
       change = true
     }
 
-    if ( keyState[69] ) {
+    if ( game.keyState[69] ) {
       obj.rotateX (-thisPlayer.turnSpeed);
       change = true
     }
@@ -321,6 +396,7 @@ var game = {
         r_z: obj.rotation.z
       }
 
+      //global socket may want to change
       if(socket){
         socket.emit('updatePlayer', pass);
       }
@@ -330,24 +406,23 @@ var game = {
   },
 
   updateObject: function(data){
-
-    for(var i = 0; i < players.length; i++){
-      if(players[i].playerId == data.playerId){
-        players[i].position.x = data.x;
-        players[i].position.y = data.y;
-        players[i].position.z = data.z;
-        players[i].rotation.x = data.r_x;
-        players[i].rotation.y = data.r_y;
-        players[i].rotation.z = data.r_z;
+    for(var i = 0; i < this.players.length; i++){
+      if(this.players[i].playerId == data.playerId){
+        this.players[i].position.x = data.x;
+        this.players[i].position.y = data.y;
+        this.players[i].position.z = data.z;
+        this.players[i].rotation.x = data.r_x;
+        this.players[i].rotation.y = data.r_y;
+        this.players[i].rotation.z = data.r_z;
       }
     }
 
   },
 
   getObject: function(playerId){
-    for(var i = 0; i < players.length; i++){
-      if(players[i].playerId == playerId){
-        return players[i];
+    for(var i = 0; i < this.players.length; i++){
+      if(this.players[i].playerId == playerId){
+        return this.players[i];
       }
     }
   },
@@ -383,7 +458,6 @@ var game = {
     //initial setup of local data store
     thisPlayer = data;
 
-    // no idea why this does not work
     var obj = this.create_cube(data, 0x7777ff, 0.8);
 
     obj.playerId = data.playerId;
@@ -393,15 +467,11 @@ var game = {
     obj.position.y = 0;
     obj.position.z = 0;
 
-    players.push( obj );
+    this.players.push( obj );
     this.scene.add( obj );
 
     var arrowHelper = this.arrow();
     obj.add( arrowHelper );
-
-    //camera look at the player
-    //this.updateCameraPosition( data.playerId );
-    //three.camera.lookAt( obj.position );
 
     this.camera.position.set( 3, 1, 0 );
     this.camera.lookAt( obj.position );
@@ -412,9 +482,6 @@ var game = {
 
     obj.add( this.camera );
 
-    // camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-    // three.scene.add( camera );
-
   },
 
   arrow: function(){
@@ -423,12 +490,20 @@ var game = {
     var direction = to.clone().sub(from);
     var length = direction.length();
     var arrowHelper = new THREE.ArrowHelper(direction.normalize(), from, length, 0xff0000 );
-    //scene.add( arrowHelper );
+    //this.scene.add( arrowHelper );
     return arrowHelper;
   },
 
   addOtherPlayer: function(data){
+    var index = this.contains(this.players, data.playerId);
+    if(index == -1){
+      if(uuid != data.playerId){
+        this.addPlayer(data);
+      }
+    }
+  },
 
+  addPlayer: function(data){
     var obj = this.create_cube(data, 0xff7777, 0.9);
 
     obj.playerId = data.playerId;
@@ -438,9 +513,9 @@ var game = {
     obj.position.y = data.y;
     obj.position.z = data.z;
 
-    players.push( obj );
+    this.players.push( obj );
+    this.objects.push( obj );
     this.scene.add( obj );
-
   },
 
 	addCube: function(data){
@@ -452,24 +527,24 @@ var game = {
 		obj.position.y = data.y;
 		obj.position.z = data.z;
 
-		objects.push( obj );
+		this.objects.push( obj );
 		this.scene.add( obj );
 	},
 
   removeOtherPlayer: function(socket_id){
 
     //remove the players
-    for(var i = 0; i < players.length; i++){
-      if(players[i].playerId == socket_id){
-        three.scene.remove( players[i] );
+    for(var i = 0; i < this.players.length; i++){
+      if(this.players[i].playerId == socket_id){
+        this.scene.remove( this.players[i] );
       }
     }
 
     //remove listing in players array incase
-    var index = players.findIndex(function(obj){
+    var index = this.players.findIndex(function(obj){
       return obj.playerId === socket_id;
     })
-    players.splice(index, 1);
+    this.players.splice(index, 1);
 
   },
 

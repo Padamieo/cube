@@ -1,10 +1,6 @@
 
 var host = {
 
-  b: function(){
-    console.log("boop");
-  },
-
 	cube_defaults: function(obj, random, size){
 		var r = ( random ? random : 3 );
 		var s = ( size ? size : 1 );

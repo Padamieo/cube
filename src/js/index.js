@@ -5,9 +5,9 @@ var http = require('http').Server(app);
 var $ = require('jQuery');
 
 // no longer required?
-var three, player, socket, thisPlayer, camera, scene;
-var players = [], objects = [], users = [];
-var keyState = {};
+var player, socket, thisPlayer;
+var users = [];
+//var keyState = {};
 
 const uuid = game.genUUID();
 
@@ -154,12 +154,7 @@ function startup(){
     });
 
     socket.on('addPlayer', function(data){
-      var index = game.contains(players, data.playerId);
-      if(index == -1){
-        if(uuid != data.playerId){
-          game.addOtherPlayer(data);
-        }
-      }
+      game.addOtherPlayer(data);
     });
 
 		socket.on('addCubes', function(data){

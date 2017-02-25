@@ -58,10 +58,6 @@ function createWindow () {
     var http = require('http').Server(app);
     var io = require('socket.io')(http);
 
-    // app.get('/', function(req, res){
-    //   res.sendfile('app/index2.html');
-    // });
-
     http.listen(0, function(){
 
       console.log('listening on *:' + http.address().port );
@@ -100,7 +96,6 @@ function createWindow () {
 				var o = host.boop(players);
 				objects = o.cube;
 				players = o.user;
-				console.log("o");
 
         for (var i = 0; i < players.length; i++){
 					//if(players[i].type === 'user'){

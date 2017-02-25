@@ -8,7 +8,8 @@
 ### starting up app up from commandline.
 
 - npm start
-- nodemon -x npm start
+- electron .
+- nodemon -x electron .
 
 ### Todo
 

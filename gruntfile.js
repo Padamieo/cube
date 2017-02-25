@@ -73,11 +73,11 @@ module.exports = function(grunt){
         spawn: false
   		},
       js:{
-        files: ['src/**.js', 'src/**/**.js'],
-        tasks: ['copy:build', 'uglify:app'],
+        files: ['src/js/**.js'],
+        tasks: ['uglify:app'],
       },
       html:{
-        files: ['src/**.html'],
+        files: ['src/**.html', 'src/**.js', 'src/**/**.json'],
         tasks: ['copy:build'],
       },
 			less:{
