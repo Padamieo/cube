@@ -42,7 +42,7 @@ var host = {
 		return p;
 	},
 
-	boop: function( playersArray ){
+	placeCubes: function( playersArray ){
 
 		if(playersArray.length >= 1){
 			var v = 5;
@@ -55,6 +55,7 @@ var host = {
 			var cube = {};
 			cube.type = 'cube';
 			cube = host.cube_defaults(cube);
+			cube.name = 'cube'+i;
 			playersArray.push(cube);
 		}
 
@@ -72,8 +73,8 @@ var host = {
 
 		//var close = this.example(tempObject);
 
-		var o = host.group(playersArray, 'type');
-		return o;
+		var organized = host.group(playersArray, 'type');
+		return organized;
 
 	},
 

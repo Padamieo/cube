@@ -154,12 +154,14 @@ var game = {
 
     var intersects = raycaster.intersectObjects( game.objects, true );
 
-    var intersects2 = raycaster.intersectObjects( game.players, true );
-    if ( intersects2.length > 0 ) {
-      console.log(intersects2);
-    }
+    // var intersects2 = raycaster.intersectObjects( game.players, true );
+    // if ( intersects2.length > 0 ) {
+    //   console.log(intersects2);
+    // }
+
 
     if ( intersects.length > 0 ) {
+      console.log(intersects);
 
       //console.log(intersects);
 
@@ -175,7 +177,13 @@ var game = {
 
       var d = Math.random() * 0xffffff;
 
-      var e = [a,b,c,d];
+      if(intersects[0].object.playerId){
+        e = intersects[0].object.playerId;
+      }else{
+        e = '';
+      }
+
+      var e = [a,b,c,d,e];
 
       //this.addShot(arrow);
 			socket.emit('playerShoot', e);
@@ -184,77 +192,31 @@ var game = {
 
   },
 
-  /* Track original opacities */
-  trackOriginalOpacities: function(mesh) {
-    var opacities = [],
-    materials = mesh.material.materials ? mesh.material.materials : [mesh.material];
-    for (var i = 0; i < materials.length; i++) {
-      materials[i].transparent = true;
-      opacities.push(materials[i].opacity);
+  confirmHit: function(id){
+    if(id === thisPlayer.playerId){
+      console.log("confirm hit");
+      var obj = game.getObject(id);
+      this.scene.remove(obj);
+      console.log("report to server");
+      socket.emit('playerKill', thisPlayer.playerId);
     }
-    mesh.userData.originalOpacities = opacities;
   },
 
-  /* Fade mesh */
-
-  fadeMesh: function(mesh, direction, options) {
-    options = options || {};
-    // set and check
-    var current = { percentage : direction == "in" ? 1 : 0 },
-    // this check is used to work with normal and multi materials.
-    mats = mesh.material.materials ? mesh.material.materials : [mesh.material],
-
-    originals = mesh.userData.originalOpacities,
-    easing = options.easing || this.TWEEN.Easing.Linear.None,
-    duration = options.duration || 2000;
-    // check to make sure originals exist
-      if( !originals ) {
-        console.error("Fade error: originalOpacities not defined, use trackOriginalOpacities");
-        return;
-      }
-      // tween opacity back to originals
-      var tweenOpacity = new this.TWEEN.Tween(current)
-          .to({ percentage: direction == "in" ? 0 : 1 }, duration)
-          .easing(easing)
-          .onUpdate(function() {
-               for (var i = 0; i < mats.length; i++) {
-                  mats[i].opacity = originals[i] * current.percentage;
-               }
-           })
-           .onComplete(function(){
-                if(options.callback){
-                     options.callback();
-                }
-           });
-      tweenOpacity.start();
-      return tweenOpacity;
+  hit: function(id){
+    console.log("hit");
+    var obj = game.getObject(id);
+    this.scene.remove(obj);
   },
-
-  /*
-
-  How to use
-  // fade in
-  fadeMesh(mesh, "in");
-  // fade out
-  fadeMesh(mesh, "out");
-  // fade with options
-  fadeMesh(mesh, "in", {
-
-      duration: 11000,
-
-      easing: TWEEN.Easing.Quintic.InOut,
-
-      callback : function (){
-          console.log("Fade complete");
-      }
-  });
-  */
 
 	addShot: function(data){
     if(data){
 
       var obj = game.getObject(thisPlayer.playerId);
+      console.log(obj);
       var playerpos = obj.getWorldPosition();
+
+      this.confirmHit(data[4]);
+
 			//if(){
 				//sound.startSound(data[1], playerpos);
 			//}
@@ -325,6 +287,52 @@ var game = {
     }
 
 	},
+
+  // part of fadeMesh tracks original opacity
+  trackOriginalOpacities: function(mesh) {
+    var opacities = [],
+    materials = mesh.material.materials ? mesh.material.materials : [mesh.material];
+    for (var i = 0; i < materials.length; i++) {
+      materials[i].transparent = true;
+      opacities.push(materials[i].opacity);
+    }
+    mesh.userData.originalOpacities = opacities;
+  },
+
+  //fade mes may need refining
+  // https://medium.com/@lachlantweedie/animation-in-three-js-using-tween-js-with-examples-c598a19b1263#.97d702fc5
+  fadeMesh: function(mesh, direction, options) {
+    options = options || {};
+    // set and check
+    var current = { percentage : direction == "in" ? 1 : 0 },
+    // this check is used to work with normal and multi materials.
+    mats = mesh.material.materials ? mesh.material.materials : [mesh.material],
+
+    originals = mesh.userData.originalOpacities,
+    easing = options.easing || this.TWEEN.Easing.Linear.None,
+    duration = options.duration || 2000;
+    // check to make sure originals exist
+      if( !originals ) {
+        console.error("Fade error: originalOpacities not defined, use trackOriginalOpacities");
+        return;
+      }
+      // tween opacity back to originals
+      var tweenOpacity = new this.TWEEN.Tween(current)
+          .to({ percentage: direction == "in" ? 0 : 1 }, duration)
+          .easing(easing)
+          .onUpdate(function() {
+               for (var i = 0; i < mats.length; i++) {
+                  mats[i].opacity = originals[i] * current.percentage;
+               }
+           })
+           .onComplete(function(){
+                if(options.callback){
+                     options.callback();
+                }
+           });
+      tweenOpacity.start();
+      return tweenOpacity;
+  },
 
 	fovChange: function(f){
 		console.log(this.camera.fov);
@@ -453,6 +461,18 @@ var game = {
 
   },
 
+  position_rotation: function(o, data){
+    o.rotation.set(
+      data.r_x,
+      data.r_y,
+      data.r_z
+    );
+    o.position.x = data.x;
+    o.position.y = data.y;
+    o.position.z = data.z;
+    return o;
+  },
+
   createPlayer: function(data){
 
     //initial setup of local data store
@@ -476,9 +496,7 @@ var game = {
     this.camera.position.set( 3, 1, 0 );
     this.camera.lookAt( obj.position );
 
-    obj.position.x = data.x;
-    obj.position.y = data.y;
-    obj.position.z = data.z;
+    obj = this.position_rotation(obj, data);
 
     obj.add( this.camera );
 
@@ -505,14 +523,8 @@ var game = {
 
   addPlayer: function(data){
     var obj = this.create_cube(data, 0xff7777, 0.9);
-
     obj.playerId = data.playerId;
-
-    obj.rotation.set(0,0,0);
-    obj.position.x = data.x;
-    obj.position.y = data.y;
-    obj.position.z = data.z;
-
+    obj = this.position_rotation(obj, data);
     this.players.push( obj );
     this.objects.push( obj );
     this.scene.add( obj );
@@ -520,13 +532,8 @@ var game = {
 
 	addCube: function(data){
 		var obj = this.create_cube(data, 0xfff777, 0.9);
-		obj.playerId = data.playerId;
-
-		obj.rotation.set(0,0,0);
-		obj.position.x = data.x;
-		obj.position.y = data.y;
-		obj.position.z = data.z;
-
+		obj.name = data.name;
+    obj = this.position_rotation(obj, data);
 		this.objects.push( obj );
 		this.scene.add( obj );
 	},

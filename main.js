@@ -93,9 +93,9 @@ function createWindow () {
         //confirm request is from host
 				players = host.createPlayers(users);
 
-				var o = host.boop(players);
-				objects = o.cube;
-				players = o.user;
+				var all = host.placeCubes(players);
+				objects = all.cube;
+				players = all.user;
 
         for (var i = 0; i < players.length; i++){
 					//if(players[i].type === 'user'){
@@ -131,6 +131,11 @@ function createWindow () {
 				socket.broadcast.emit('updateShots', data);
 			});
 
+      socket.on('playerKill', function(data){
+        //may need to change server understanding of game
+        socket.broadcast.emit('something', data);
+      });
+
       socket.on('disconnect', function(d){
         console.log("need uuid to remove now");
         console.log(d);
@@ -144,7 +149,6 @@ function createWindow () {
         http = null;
         console.log(http);
         io = null;
-
       });
 
     });
@@ -167,7 +171,6 @@ function createWindow () {
         console.log("issue sending service details");
       }
     });
-
 
   });
 

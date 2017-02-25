@@ -72,7 +72,7 @@ var ui = {
 			if(value){
 				nameUser = value;
 			}else{
-				nameUser = "name";
+				nameUser = "Player"+uuid;
 			}
 			ref.menuchange('main');
 		};

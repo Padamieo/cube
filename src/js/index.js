@@ -50,8 +50,9 @@ function startup(){
 
     ipcRenderer.on('hosting', function(event, service){
       console.log("hosting");
+      service.host_name = nameUser;
       ipcRenderer.send('advertise', service);
-      console.log(service);
+      //console.log(service);
       common(service);
     });
 
@@ -104,10 +105,7 @@ function startup(){
     socket = io.connect('http://'+service.ip+':'+service.port);
 
     socket.on('connect', function(){
-
-			//var nameUser = "name";
 			socket.emit('newUser', uuid, nameUser);
-
     });
 
 		socket.on('createUser', function(data){
@@ -125,7 +123,7 @@ function startup(){
         // <button id="stop-hosting" class="pt-touch-button" >stop hosting</button>
 			}
 
-		})
+		});
 
 		socket.on('addUser', function(data){
 			console.log("addUser");
@@ -141,10 +139,9 @@ function startup(){
     socket.on('startMatch', function(data){
       if(!thisPlayer){
         if(data.playerId == uuid){
-    			//three = THREE.Bootstrap({element: '#game'});
+
           game.loadWorld(socket, data);
 
-          //game.createPlayer(data);
           socket.emit('requestPlayers', uuid);
 					socket.emit('requestCubes');
 
@@ -165,13 +162,18 @@ function startup(){
 
     socket.on('updatePlayers', function(data){
       //may need to check uuid and data.playerId dont match or data is not incorrect between
-      console.log(uuid+" = "+data.playerId);
       game.updateObject(data);
     });
 
 		socket.on('updateShots', function(data){
       //console.log(data);
 			game.addShot(data);
+		});
+
+		socket.on('something', function(data){
+      //console.log(data);
+      game.hit(data);
+
 		});
 
     socket.on('removePlayer', function(data){
