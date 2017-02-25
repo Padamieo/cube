@@ -18,7 +18,6 @@ module.exports = function(grunt){
 						'node_modules/jquery/dist/jquery.js',
             'node_modules/three/build/three.js',
 						'node_modules/three/examples/js/SkyShader.js',
-            'node_modules/threestrap/build/threestrap.js',
 						'src/js/ui.js',
 						'src/js/sound.js',
 						'src/js/game.js',
@@ -74,11 +73,11 @@ module.exports = function(grunt){
         spawn: false
   		},
       js:{
-        files: ['src/**.js', 'src/**/**.js'],
-        tasks: ['copy:build', 'uglify:app'],
+        files: ['src/js/**.js'],
+        tasks: ['uglify:app'],
       },
       html:{
-        files: ['src/**.html'],
+        files: ['src/**.html', 'src/**.js', 'src/**/**.json'],
         tasks: ['copy:build'],
       },
 			less:{

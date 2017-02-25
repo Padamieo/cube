@@ -72,7 +72,7 @@ var ui = {
 			if(value){
 				nameUser = value;
 			}else{
-				nameUser = "name";
+				nameUser = "Player"+uuid;
 			}
 			ref.menuchange('main');
 		};
@@ -116,6 +116,19 @@ var ui = {
 		if(localStorage != undefined){
 			localStorage.getItem(term);
 		}
+	},
+
+	keypres: function(){
+		// https://github.com/wesbos/keycodes/blob/gh-pages/scripts.js
+		var body = document.querySelector('body');
+		body.onkeydown = function (e) {
+			if ( !e.metaKey ) {
+				e.preventDefault();
+			}
+			document.querySelector('.keycode-display').innerHTML = e.keyCode;
+			document.querySelector('.text-display').innerHTML =
+			keyCodes[e.keyCode] || "huh? Let me know what browser and key this was. <a href=\"https://github.com/wesbos/keycodes/issues/new?title=Missing keycode ${e.keyCode}&body=Tell me what key it was or even better, submit a Pull request!\">Submit to Github</a>";
+		};
 	}
 
 };

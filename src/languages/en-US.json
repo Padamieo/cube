@@ -3,5 +3,6 @@
   "host":"Host",
 	"join": "Join",
   "exit":"Exit",
-  "options": "Options"
+  "options": "Options",
+  "return": "Return"
 }

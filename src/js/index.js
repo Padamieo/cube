@@ -4,12 +4,10 @@ var http = require('http').Server(app);
 //this works but may need some sort of compiler
 var $ = require('jQuery');
 
-var three, player, socket, thisPlayer, camera, scene;
-var players = [], objects = [], users = [];
-
-var otherPlayers = [], otherPlayersId = [];
-
-var keyState = {};
+// no longer required?
+var player, socket, thisPlayer;
+var users = [];
+//var keyState = {};
 
 const uuid = game.genUUID();
 
@@ -52,8 +50,9 @@ function startup(){
 
     ipcRenderer.on('hosting', function(event, service){
       console.log("hosting");
+      service.host_name = nameUser;
       ipcRenderer.send('advertise', service);
-      console.log(service);
+      //console.log(service);
       common(service);
     });
 
@@ -106,10 +105,7 @@ function startup(){
     socket = io.connect('http://'+service.ip+':'+service.port);
 
     socket.on('connect', function(){
-
-			//var nameUser = "name";
 			socket.emit('newUser', uuid, nameUser);
-
     });
 
 		socket.on('createUser', function(data){
@@ -127,7 +123,7 @@ function startup(){
         // <button id="stop-hosting" class="pt-touch-button" >stop hosting</button>
 			}
 
-		})
+		});
 
 		socket.on('addUser', function(data){
 			console.log("addUser");
@@ -143,23 +139,19 @@ function startup(){
     socket.on('startMatch', function(data){
       if(!thisPlayer){
         if(data.playerId == uuid){
-    			three = THREE.Bootstrap({element: '#game'});
-          game.loadWorld(socket);
-          game.createPlayer(data);
+
+          game.loadWorld(socket, data);
+
           socket.emit('requestPlayers', uuid);
 					socket.emit('requestCubes');
+
           ui.menuchange('game');
         }
       }
     });
 
     socket.on('addPlayer', function(data){
-      var index = game.contains(players, data.playerId);
-      if(index == -1){
-        if(uuid != data.playerId){
-          game.addOtherPlayer(data);
-        }
-      }
+      game.addOtherPlayer(data);
     });
 
 		socket.on('addCubes', function(data){
@@ -170,13 +162,18 @@ function startup(){
 
     socket.on('updatePlayers', function(data){
       //may need to check uuid and data.playerId dont match or data is not incorrect between
-      console.log(uuid+" = "+data.playerId);
       game.updateObject(data);
     });
 
 		socket.on('updateShots', function(data){
       //console.log(data);
 			game.addShot(data);
+		});
+
+		socket.on('something', function(data){
+      //console.log(data);
+      game.hit(data);
+
 		});
 
     socket.on('removePlayer', function(data){

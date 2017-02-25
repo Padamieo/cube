@@ -14,10 +14,10 @@
     "jquery": "*",
     "node-discover": "^0.6.2",
     "socket.io": "^1.3.5",
-    "three": "*",
+    "three": "0.84.0",
     "three-rounded-box": "^0.1.1",
-    "threestrap": "git://github.com/unconed/threestrap.git",
-    "tween.js": "^16.6.0"
+    "tween.js": "^16.6.0",
+    "nodemon": "*"
   },
   "browserify-shim": {
     "game": {
@@ -37,6 +37,6 @@
   },
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "nodemon -x electron ."
   }
 }
