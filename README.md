@@ -5,7 +5,7 @@
 - npm install
 - **grunt** ( build app start & start watching for changes )
 
-### starting up app up from commandline.
+### starting app from commandline.
 
 - npm start
 - electron .

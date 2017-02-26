@@ -2,6 +2,7 @@ var os = require('os');
 
 var game = {
 
+  //this is not game element
   getAddress: function(idx) {
     var addresses = [],
     interfaces = os.networkInterfaces(),
@@ -54,11 +55,20 @@ var game = {
   },
   */
 
+  addLight: function(color, position, name){
+    var light = new THREE.PointLight( color, 1.5, 2000 );
+    //light.color.setHSL( h, s, l );
+    light.position.set( position.x, position.y, position.z );
+    light.name = name;
+    this.scene.add( light );
+  },
+
   loadWorld: function(socket,data){
 
     this.objects = [];
     this.players = [];
     this.keyState = {};
+    this.shots = 0;
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -71,13 +81,15 @@ var game = {
     this.scene = new THREE.Scene;
     this.scene.background = new THREE.Color("#202020");
 
-
-    directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-    directionalLight.position.set( 2, 1.2, 10 ).normalize();
-    this.scene.add( directionalLight );
+    // directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+    // directionalLight.position.set( 2, 1.2, 10 ).normalize();
+    // this.scene.add( directionalLight );
 
     var ambient = new THREE.AmbientLight( 0x756e4e );
     this.scene.add( ambient );
+
+    this.addLight(0xffffee , {x:50,y:50,z:50}, 'one');
+    //this.addLight(0xeeffff , {x:-50,y:-50,z:-50}, 'two');
 
 
     this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 10000);
@@ -142,14 +154,16 @@ var game = {
     // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
     mouse.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
+    mouse.y = - ( (window.innerHeight/3) / window.innerHeight ) * 1 + 1;
 
     raycaster.setFromCamera( mouse, game.camera );
 
     var intersects = raycaster.intersectObjects( game.objects, true );
 
+    console.log(intersects);
+
     if ( intersects.length > 0 ) {
-      console.log(intersects);
+
 
       //console.log(intersects);
 
@@ -157,34 +171,56 @@ var game = {
       var a = intersects[0].point;
 
       //var b = three.camera.getWorldPosition();
-      var obj = game.getObject(thisPlayer.playerId);
+      //var obj = game.getObject(thisPlayer.playerId);
+      var obj = game.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
 			var c = intersects[0].distance;
 			// var c = obj.distanceTo( vec2 );
 
-      var d = Math.random() * 0xffffff;
+      //var d = Math.random() * 0xffffff;
+      var d = 0xffffff;
 
       if(intersects[0].object.playerId){
         e = intersects[0].object.playerId;
       }else{
-        e = '';
+        var name = intersects[0].object.name;
+        e = { type:'cube', name: name };
       }
 
-      var e = [a,b,c,d,e];
+      var f = {to:a, from:b, distance:c, color:d, hit:e};
 
       //this.addShot(arrow);
-			socket.emit('playerShoot', e);
+			socket.emit('playerShoot', f);
+
+    }else{
+      var direction = game.camera.getWorldDirection();
+
+
+      var obj = game.scene.getObjectByName(thisPlayer.playerId);
+      var b = obj.getWorldPosition();
+
+      var c = 100;
+      var d = 0xff0000;
+
+      var a = new THREE.Vector3();
+      a.addVectors ( b, direction.multiplyScalar( c ) );
+
+      var  e = '';
+
+      var f = {to:a, from:b, distance:c, color:d, hit:e};
+
+      socket.emit('playerShoot', f);
 
     }
 
   },
 
-  confirmHit: function(id){
-    if(id === thisPlayer.playerId){
+  confirmHit: function(data){
+    if(data.name === thisPlayer.playerId){
       console.log("confirm hit");
-      var obj = game.getObject(id);
-      this.scene.remove(obj);
+
+      this.hit(data.name);
       console.log("report to server");
       socket.emit('playerKill', thisPlayer.playerId);
     }
@@ -192,21 +228,33 @@ var game = {
 
   hit: function(id){
     console.log("hit");
-    var obj = game.getObject(id);
-    this.scene.remove(obj);
+    for (var i = 0; i < game.objects.length; i++) {
+      if(game.objects[i].name == id){
+        game.objects.splice(i, 1);
+      }
+    }
+    this.remove(id);
+  },
+
+  remove: function(name) {
+    this.scene.remove(this.scene.getObjectByName(name));
   },
 
 	addShot: function(data){
     if(data){
+      console.log(data);
+
+      this.shots++;
 
       var obj = game.getObject(thisPlayer.playerId);
-      console.log(obj);
       var playerpos = obj.getWorldPosition();
 
-      this.confirmHit(data[4]);
+      if(data.hit != ''){
+        this.confirmHit(data.hit);
+      }
 
 			//if(){
-				//sound.startSound(data[1], playerpos);
+			//sound.startSound(data.to, playerpos);
 			//}
 
       //tried setting colour and it did not work
@@ -219,59 +267,40 @@ var game = {
       // console.log(arrow);
       // this.scene.add( arrow );
 
+
       var material = new THREE.LineBasicMaterial({
-        color: 0xffffff,
-        transparent:true,
+        color: data.color,
+        transparent: true,
         opacity: 1
        });
 
       var geometry = new THREE.Geometry();
-      geometry.vertices.push(data[0]);
-      geometry.vertices.push(data[1]);
+      geometry.vertices.push(data.to);
+      geometry.vertices.push(data.from);
 
       line = new THREE.Line(geometry, material);
+      line.name = "shot"+this.shots;
       this.scene.add( line );
 
-      // var ref = this;
-      // this.trackOriginalOpacities(line);
-      //
-      // this.fadeMesh(line, "out", {
-      //   duration: 1000,
-      //   easing: this.TWEEN.Easing.Quintic.InOut,
-      //   callback : function (){
-      //
-      //     console.log("Fade complete1");
-      //
-      //     ref.fadeMesh(line, "in", {
-      //       duration: 1000,
-      //       easing: ref.TWEEN.Easing.Quintic.InOut,
-      //       callback : function (){
-      //         console.log("Fade complete2");
-      //       }
-      //     });
-      //
-      //   }
-      // });
+      var ref = this;
+      this.trackOriginalOpacities(line);
 
+      this.fadeMesh(line, "out", {
+        duration: 1000,
+        easing: this.TWEEN.Easing.Back.In,
+        callback : function (){
 
-      // var target = 20;
-      // this.tween = new this.TWEEN.Tween( line.material.linewidth ).to( target, 1000 ).start();
-      // this.tween.easing(this.TWEEN.Easing.Elastic.InOut);
-      // this.tween.repeat(Infinity);
-      // this.tween.yoyo(true);
-      //
-      // this.tween.onStart(function() { console.log("start") });
-      // this.tween.onComplete(function() { console.log("complete") });
+          ref.fadeMesh(line, "in", {
+            duration: 1000,
+            easing: ref.TWEEN.Easing.Quintic.InOut,
+            callback : function (){
+              //console.log(line.name);
+              game.remove(line.name);
+            }
+          });
+        }
+      });
 
-			//use tween to fade it out, also use oncomplete to destroy arrow
-			// var target = { x : 20, y: 20 };
-      // this.tween = new this.TWEEN.Tween( obj.position ).to( target, 1000 ).start();
-			// this.tween.easing(this.TWEEN.Easing.Elastic.InOut);
-			// this.tween.repeat(Infinity);
-			// this.tween.yoyo(true);
-      //
-			// this.tween.onStart(function() { console.log("start") });
-			// this.tween.onComplete(function() { console.log("complete") });
     }
 
 	},
@@ -468,7 +497,8 @@ var game = {
 
     var obj = this.create_cube(data, 0x7777ff, 0.8);
 
-    obj.playerId = data.playerId;
+    obj.playerId = data.playerId; //may want to drop playerId in future
+    obj.name = data.playerId;
 
     obj.rotation.set(0,0,0);
     obj.position.x = 0;
@@ -511,7 +541,8 @@ var game = {
 
   addPlayer: function(data){
     var obj = this.create_cube(data, 0xff7777, 0.9);
-    obj.playerId = data.playerId;
+    obj.playerId = data.playerId; //may want to drop playerId in future
+    obj.name = data.playerId;
     obj = this.position_rotation(obj, data);
     this.players.push( obj );
     this.objects.push( obj );
@@ -526,6 +557,7 @@ var game = {
 		this.scene.add( obj );
 	},
 
+  //not sure this works, may only remove from players array
   removeOtherPlayer: function(socket_id){
 
     //remove the players

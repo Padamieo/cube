@@ -155,6 +155,7 @@ function createWindow () {
 
   });
 
+
   ipcMain.on('advertise', function(event, service) {
     //console.log('advertise');
 
@@ -178,6 +179,7 @@ function createWindow () {
     console.log('find '+scope);
 
     var pass = [];
+    console.log(pass);
 
     function partB() {
       if(pass){
@@ -198,7 +200,7 @@ function createWindow () {
 
     var success = d.join("service-details", function (data) {
       if (data.details) {
-         console.log("B"+data);
+        console.log("B"+data);
         pass.push( data );
       }
     });
@@ -210,6 +212,9 @@ function createWindow () {
     }
 
   });
+
+
+
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {

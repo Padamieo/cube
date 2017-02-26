@@ -25,10 +25,10 @@ app.get('/index.js', function(req, res){
 
 var ip_address = game.getAddress();
 
-http.listen(0, ip_address, function(){
-  console.log('listening on *:' + http.address().port );
-  //ipcRenderer.send('outside', http.address().port );
-});
+// http.listen(0, ip_address, function(){
+//   console.log('listening on *:' + http.address().port );
+//   //ipcRenderer.send('outside', http.address().port );
+// });
 
 $( document ).ready(function() {
   startup();
@@ -72,9 +72,11 @@ function startup(){
 
     ipcRenderer.on('found', function(event, services){
 			ui.fadeSpinner();
-			$.each(services, function( index, value ) {
 
-				ui.addButton("#search .pt-triggers", 'join2', "A"+index, true);
+			$.each(services, function( index, value ) {
+        console.log(value);
+        var gameName = value.details.host_name+" Game";
+				ui.addButton("#search .pt-triggers", gameName, "A"+index, true);
 				//needs to add on click trigger to common service
         document.getElementById("A"+index).onclick = function(){
           var dets = value.details;
