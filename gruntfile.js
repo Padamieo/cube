@@ -33,14 +33,26 @@ module.exports = function(grunt){
   		build:{
   			files:[{
   				cwd: 'src/',
-  				src: ['**', '!**/js/*.js', '!**/*.jpg', '!**/*.less'],
+  				src: ['**', '!**/js/*.js', '!**/*.{jpg,png}', '!**/*.less'],
   				dest: 'app/',
   				nonull: false,
   				expand: true,
   				flatten: false,
   				filter: 'isFile'
   			},]
-  		}
+  		},
+			//separate image untill optimization is in
+			img:{
+				files:[{
+  				cwd: 'src/img',
+  				src: ['**'],
+  				dest: 'app/img',
+  				nonull: false,
+  				expand: true,
+  				flatten: false,
+  				filter: 'isFile'
+  			},]
+			}
   	},
 
 		modernizr_builder: {
@@ -74,15 +86,19 @@ module.exports = function(grunt){
   		},
       js:{
         files: ['src/js/**.js'],
-        tasks: ['uglify:app'],
+        tasks: ['uglify:app']
       },
       html:{
         files: ['src/**.html', 'src/**.js', 'src/**/**.json'],
-        tasks: ['copy:build'],
+        tasks: ['copy:build']
       },
 			less:{
 				files: ['src/*/**.less'],
-				tasks: ['less'],
+				tasks: ['less']
+			},
+			img:{
+				files: ['src/*/**.png', 'src/*/**.jpg'],
+				tasks: ['copy:img']
 			}
     }
 
@@ -93,6 +109,7 @@ module.exports = function(grunt){
 		'modernizr_builder',
     'uglify:app',
     'copy:build',
+		'copy:img',
 		'less',
     'watch'
   ]);

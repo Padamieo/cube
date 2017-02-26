@@ -63,6 +63,45 @@ var game = {
     this.scene.add( light );
   },
 
+  addLightAndLensFlare: function( h, s, l, x, y, z ) {
+    var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+    light.color.setHSL( h, s, l );
+    light.position.set( x, y, z );
+    this.scene.add( light );
+    var flareColor = new THREE.Color( 0xffffff );
+    flareColor.setHSL( h, s, l + 0.5 );
+    console.log(this.width);
+    var lensFlare = new THREE.LensFlare( this.textureFlare0, this.width, 0.0, THREE.AdditiveBlending, flareColor );
+    lensFlare.add( this.textureFlare2, this.width/2, 0.0, THREE.AdditiveBlending );
+    lensFlare.add( this.textureFlare2, this.width/2, 0.0, THREE.AdditiveBlending );
+    lensFlare.add( this.textureFlare2, this.width/2, 0.0, THREE.AdditiveBlending );
+    lensFlare.add( this.textureFlare3, 60, 0.6, THREE.AdditiveBlending );
+    lensFlare.add( this.textureFlare3, 70, 0.7, THREE.AdditiveBlending );
+    lensFlare.add( this.textureFlare3, 120, 0.9, THREE.AdditiveBlending );
+    lensFlare.add( this.textureFlare3, 70, 1.0, THREE.AdditiveBlending );
+    lensFlare.customUpdateCallback = this.lensFlareUpdateCallback;
+    lensFlare.position.copy( light.position );
+    this.scene.add( lensFlare );
+  },
+
+
+  lensFlareUpdateCallback: function( object ) {
+    var f, fl = object.lensFlares.length;
+    //console.log(f);
+    var flare;
+    var vecX = -object.positionScreen.x * 2;
+    var vecY = -object.positionScreen.y * 2;
+    for( f = 0; f < fl; f++ ) {
+      flare = object.lensFlares[ f ];
+      flare.x = object.positionScreen.x + vecX * flare.distance;
+      flare.y = object.positionScreen.y + vecY * flare.distance;
+      flare.rotation = 0;
+    }
+    object.lensFlares[ 2 ].y += 0.025;
+    object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
+  },
+
+
   loadWorld: function(socket,data){
 
     this.objects = [];
@@ -73,7 +112,7 @@ var game = {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(this.width, this.height);
     container = document.getElementById('game');
     container.appendChild(this.renderer.domElement);
@@ -85,12 +124,19 @@ var game = {
     // directionalLight.position.set( 2, 1.2, 10 ).normalize();
     // this.scene.add( directionalLight );
 
-    var ambient = new THREE.AmbientLight( 0x756e4e );
+    var ambient = new THREE.AmbientLight( 0x756e4e, 0.9 );
     this.scene.add( ambient );
 
-    this.addLight(0xffffee , {x:50,y:50,z:50}, 'one');
-    //this.addLight(0xeeffff , {x:-50,y:-50,z:-50}, 'two');
+    /*
+    var textureLoader = new THREE.TextureLoader();
+    this.textureFlare0 = textureLoader.load( "img/lensflare0.png" );
+    this.textureFlare2 = textureLoader.load( "img/lensflare2.png" );
+    this.textureFlare3 = textureLoader.load( "img/lensflare3.png" );
+    this.addLightAndLensFlare( 0.55, 0.9, 0.5, 100, 0, -100 );
+    */
 
+    this.addLight(0xffffdd , {x:50,y:50,z:50}, 'one');
+    //this.addLight(0xeeffff , {x:-50,y:-50,z:-50}, 'two');
 
     this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 10000);
     this.camera.position.y = 0;
@@ -101,6 +147,7 @@ var game = {
 
     var WindowResize = require('three-window-resize');
     var windowResize = new WindowResize(this.renderer, this.camera);
+    window.addEventListener( 'resize', this.onWindowResize, false );
 
     this.registerEvents(socket);
 
@@ -108,6 +155,12 @@ var game = {
 
     this.render(socket);
 
+  },
+
+  onWindowResize: function(){
+    console.log("resize");
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
   },
 
   render: function () {
@@ -153,19 +206,15 @@ var game = {
     // mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
+    //currently crosshair is set for center of screen this need to be somewhere visible for user
     mouse.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( (window.innerHeight/3) / window.innerHeight ) * 1 + 1;
+    mouse.y = - ( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( mouse, game.camera );
 
     var intersects = raycaster.intersectObjects( game.objects, true );
 
-    console.log(intersects);
-
     if ( intersects.length > 0 ) {
-
-
-      //console.log(intersects);
 
       //var a = game.camera.getWorldDirection();
       var a = intersects[0].point;
@@ -182,7 +231,9 @@ var game = {
       var d = 0xffffff;
 
       if(intersects[0].object.playerId){
-        e = intersects[0].object.playerId;
+        var name = intersects[0].object.name;
+        e = { type:'player', name: name };
+        //e = intersects[0].object.playerId;
       }else{
         var name = intersects[0].object.name;
         e = { type:'cube', name: name };
@@ -217,12 +268,16 @@ var game = {
   },
 
   confirmHit: function(data){
-    if(data.name === thisPlayer.playerId){
-      console.log("confirm hit");
+    if(data.type == 'player'){
+      if(data.name === thisPlayer.playerId){
+        console.log("confirm hit");
 
+        this.hit(data.name);
+        console.log("report to server");
+        socket.emit('playerKill', thisPlayer.playerId);
+      }
+    }else if (data.type == 'cube'){
       this.hit(data.name);
-      console.log("report to server");
-      socket.emit('playerKill', thisPlayer.playerId);
     }
   },
 
@@ -235,6 +290,7 @@ var game = {
     }
     this.remove(id);
   },
+
 
   remove: function(name) {
     this.scene.remove(this.scene.getObjectByName(name));
@@ -249,10 +305,6 @@ var game = {
       var obj = game.getObject(thisPlayer.playerId);
       var playerpos = obj.getWorldPosition();
 
-      if(data.hit != ''){
-        this.confirmHit(data.hit);
-      }
-
 			//if(){
 			//sound.startSound(data.to, playerpos);
 			//}
@@ -263,11 +315,13 @@ var game = {
 			//maybe conver value before
 			// http://stackoverflow.com/questions/21646738/convert-hex-to-rgba
 
-      // var arrow = new THREE.ArrowHelper( data[0], data[1], data[2], '0xffffff');
-      // console.log(arrow);
-      // this.scene.add( arrow );
+      var arrow = new THREE.ArrowHelper( data.to, data.from, data.distance, '0xffffff');
+      console.log(arrow);
+      this.scene.add( arrow );
 
+      /*
 
+      //current line and material working version
       var material = new THREE.LineBasicMaterial({
         color: data.color,
         transparent: true,
@@ -282,6 +336,7 @@ var game = {
       line.name = "shot"+this.shots;
       this.scene.add( line );
 
+      //current line and material working version
       var ref = this;
       this.trackOriginalOpacities(line);
 
@@ -290,19 +345,23 @@ var game = {
         easing: this.TWEEN.Easing.Back.In,
         callback : function (){
 
+          if(data.hit != ''){
+            ref.confirmHit(data.hit);
+          }
+
           ref.fadeMesh(line, "in", {
             duration: 1000,
             easing: ref.TWEEN.Easing.Quintic.InOut,
             callback : function (){
               //console.log(line.name);
+              console.log(data);
               game.remove(line.name);
             }
           });
         }
       });
-
+      */
     }
-
 	},
 
   // part of fadeMesh tracks original opacity
@@ -407,9 +466,6 @@ var game = {
     }
 
     if( change ){
-      console.log("checkKeyStates");
-
-      //console.log("PASS: "+thisPlayer.playerId+" = "+socket.id);
 
       var pass = {
         playerId: thisPlayer.playerId,
@@ -463,10 +519,10 @@ var game = {
 
 		var material =  new THREE.MeshLambertMaterial({color: color, transparent:true, opacity:opacity, side: THREE.DoubleSide});
 
-		// var material = new THREE.MeshStandardMaterial({color: "#000", roughness: 1});
-		// var envMap = new THREE.TextureLoader().load('s.png');
-		// envMap.mapping = THREE.SphericalReflectionMapping;
-		// material.envMap = envMap;
+		//var material = new THREE.MeshStandardMaterial({color: "#000", roughness: 1});
+		//var envMap = new THREE.TextureLoader().load('s.png');
+		//envMap.mapping = THREE.SphericalReflectionMapping;
+		//material.envMap = envMap;
 
 		//var RoundedBoxGeometry = require('three-rounded-box')(THREE); //may want to bring in via uglify
 		//var cube = new RoundedBoxGeometry(data.size, data.size, data.size, data.size*0.05, data.size*0.1);
