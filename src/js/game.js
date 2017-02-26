@@ -28,32 +28,7 @@ var game = {
     return addresses;
   },
 
-  /*
-  temp: function(){
-    var dis = 3;
-    var tempObject = [
-      ["rgb(255, 0, 0)", dis, dis],
-      ["rgb(0, 0, 255)", -dis, -dis],
-      ["rgb(255, 255, 0)", -dis, dis],
-      ["rgb(0, 255, 0)", dis, -dis]
-    ];
 
-    var temp = {
-      size: 1
-    };
-
-    for (var i = 0; i < tempObject.length; i++) {
-      var color = new THREE.Color( tempObject[i][0] );
-      var obj1 = this.create_cube(temp, color, 0.8);
-      obj1.rotation.set(0,0,0);
-      obj1.position.x = tempObject[i][1];
-      obj1.position.y = 0;
-      obj1.position.z = tempObject[i][2];
-      three.scene.add( obj1 );
-      this.objects.push( obj1 );
-    }
-  },
-  */
 
   addLight: function(color, position, name){
     var light = new THREE.PointLight( color, 1.5, 2000 );
@@ -102,17 +77,23 @@ var game = {
   },
 
 
-  loadWorld: function(socket,data){
+  loadWorld: function( socket, data ){
 
     this.objects = [];
     this.players = [];
     this.keyState = {};
     this.shots = 0;
 
+    this.sound = false; // will be defined in the options
+
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+    this.renderer.gammaInput = true;
+    this.renderer.gammaOutput = true;
+
     this.renderer.setSize(this.width, this.height);
     container = document.getElementById('game');
     container.appendChild(this.renderer.domElement);
@@ -127,13 +108,11 @@ var game = {
     var ambient = new THREE.AmbientLight( 0x756e4e, 0.9 );
     this.scene.add( ambient );
 
-    /*
-    var textureLoader = new THREE.TextureLoader();
-    this.textureFlare0 = textureLoader.load( "img/lensflare0.png" );
-    this.textureFlare2 = textureLoader.load( "img/lensflare2.png" );
-    this.textureFlare3 = textureLoader.load( "img/lensflare3.png" );
-    this.addLightAndLensFlare( 0.55, 0.9, 0.5, 100, 0, -100 );
-    */
+    // var textureLoader = new THREE.TextureLoader();
+    // this.textureFlare0 = textureLoader.load( "img/lensflare0.png" );
+    // this.textureFlare2 = textureLoader.load( "img/lensflare2.png" );
+    // this.textureFlare3 = textureLoader.load( "img/lensflare3.png" );
+    // this.addLightAndLensFlare( 0.55, 0.9, 0.5, 100, 0, -100 );
 
     this.addLight(0xffffdd , {x:50,y:50,z:50}, 'one');
     //this.addLight(0xeeffff , {x:-50,y:-50,z:-50}, 'two');
@@ -143,7 +122,7 @@ var game = {
     this.camera.position.z = 0;
     this.scene.add(this.camera);
 
-		this.TWEEN = require('tween.js');
+		this.TWEEN = require('tween.js'); //may want to bundle
 
     var WindowResize = require('three-window-resize');
     var windowResize = new WindowResize(this.renderer, this.camera);
@@ -242,7 +221,7 @@ var game = {
       var f = {to:a, from:b, distance:c, color:d, hit:e};
 
       //this.addShot(arrow);
-			socket.emit('playerShoot', f);
+			socket.emit('playerShot', f);
 
     }else{
       var direction = game.camera.getWorldDirection();
@@ -261,7 +240,7 @@ var game = {
 
       var f = {to:a, from:b, distance:c, color:d, hit:e};
 
-      socket.emit('playerShoot', f);
+      socket.emit('playerShot', f);
 
     }
 
@@ -298,28 +277,21 @@ var game = {
 
 	addShot: function(data){
     if(data){
-      console.log(data);
 
       this.shots++;
 
       var obj = game.getObject(thisPlayer.playerId);
       var playerpos = obj.getWorldPosition();
 
-			//if(){
-			//sound.startSound(data.to, playerpos);
-			//}
+			if(this.sound){
+			  sound.startSound(data.to, playerpos);
+			}
 
-      //tried setting colour and it did not work
-      //var c = new THREE.MeshLambertMaterial({color: data[3] , transparent:true, opacity:0.3, side: THREE.DoubleSide});
-
-			//maybe conver value before
-			// http://stackoverflow.com/questions/21646738/convert-hex-to-rgba
-
+      /*
       var arrow = new THREE.ArrowHelper( data.to, data.from, data.distance, '0xffffff');
       console.log(arrow);
       this.scene.add( arrow );
-
-      /*
+      */
 
       //current line and material working version
       var material = new THREE.LineBasicMaterial({
@@ -354,13 +326,12 @@ var game = {
             easing: ref.TWEEN.Easing.Quintic.InOut,
             callback : function (){
               //console.log(line.name);
-              console.log(data);
               game.remove(line.name);
             }
           });
         }
       });
-      */
+
     }
 	},
 
@@ -388,26 +359,26 @@ var game = {
     easing = options.easing || this.TWEEN.Easing.Linear.None,
     duration = options.duration || 2000;
     // check to make sure originals exist
-      if( !originals ) {
-        console.error("Fade error: originalOpacities not defined, use trackOriginalOpacities");
-        return;
-      }
-      // tween opacity back to originals
-      var tweenOpacity = new this.TWEEN.Tween(current)
-          .to({ percentage: direction == "in" ? 0 : 1 }, duration)
-          .easing(easing)
-          .onUpdate(function() {
-               for (var i = 0; i < mats.length; i++) {
-                  mats[i].opacity = originals[i] * current.percentage;
-               }
-           })
-           .onComplete(function(){
-                if(options.callback){
-                     options.callback();
-                }
-           });
-      tweenOpacity.start();
-      return tweenOpacity;
+    if( !originals ) {
+      console.error("Fade error: originalOpacities not defined, use trackOriginalOpacities");
+      return;
+    }
+    // tween opacity back to originals
+    var tweenOpacity = new this.TWEEN.Tween(current)
+      .to({ percentage: direction == "in" ? 0 : 1 }, duration)
+      .easing(easing)
+      .onUpdate(function() {
+        for (var i = 0; i < mats.length; i++) {
+          mats[i].opacity = originals[i] * current.percentage;
+        }
+       })
+       .onComplete(function(){
+          if(options.callback){
+            options.callback();
+          }
+       });
+    tweenOpacity.start();
+    return tweenOpacity;
   },
 
 	fovChange: function(f){
@@ -519,13 +490,14 @@ var game = {
 
 		var material =  new THREE.MeshLambertMaterial({color: color, transparent:true, opacity:opacity, side: THREE.DoubleSide});
 
-		//var material = new THREE.MeshStandardMaterial({color: "#000", roughness: 1});
-		//var envMap = new THREE.TextureLoader().load('s.png');
-		//envMap.mapping = THREE.SphericalReflectionMapping;
-		//material.envMap = envMap;
+		// var material = new THREE.MeshStandardMaterial({color: "#111111", roughness: 0.1});
+		// var envMap = new THREE.TextureLoader().load('img/s.png');
+		// envMap.mapping = THREE.SphericalReflectionMapping;
+    // //material.envMapIntensity = 1;
+		// material.envMap = envMap;
 
-		//var RoundedBoxGeometry = require('three-rounded-box')(THREE); //may want to bring in via uglify
-		//var cube = new RoundedBoxGeometry(data.size, data.size, data.size, data.size*0.05, data.size*0.1);
+		// var RoundedBoxGeometry = require('three-rounded-box')(THREE); //may want to bring in via uglify
+		// var cube = new RoundedBoxGeometry(data.size, data.size, data.size, data.size*0.05, data.size*0.1);
 
 		var cube = new THREE.CubeGeometry(data.size, data.size, data.size);
 

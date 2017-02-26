@@ -39,6 +39,9 @@ function startup(){
   //not sure when best to initialize sound
   sound.init();
 
+  //ui.handlebars('login2');
+
+
   //focus for this page
   $( "#username" ).focus();
 
@@ -172,9 +175,9 @@ function startup(){
 			game.addShot(data);
 		});
 
-		socket.on('something', function(data){
-      //console.log(data);
-      game.hit(data);
+		socket.on('reportKill', function(data){
+      console.log(data);
+      game.hit(data.id);
 
 		});
 

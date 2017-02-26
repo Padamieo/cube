@@ -15,6 +15,7 @@ module.exports = function(grunt){
       app:{
         files:{
           'app/index.js': [
+						'node_modules/handlebars/dist/handlebars.min.js',
 						'node_modules/jquery/dist/jquery.js',
             'node_modules/three/build/three.js',
 						'node_modules/three/examples/js/SkyShader.js',
@@ -23,7 +24,8 @@ module.exports = function(grunt){
 						'src/js/game.js',
 						'src/js/index.js',
           	'temp/modernizr-custom.js',
-						'src/js/pagetransitions.js'
+						'src/js/pagetransitions.js',
+						'temp/templates.js'
           ]
         }
       }
@@ -33,7 +35,7 @@ module.exports = function(grunt){
   		build:{
   			files:[{
   				cwd: 'src/',
-  				src: ['**', '!**/js/*.js', '!**/*.{jpg,png}', '!**/*.less'],
+  				src: ['**', '!**/js/*.js', '!**/*.{jpg,png,hbs,less}'],
   				dest: 'app/',
   				nonull: false,
   				expand: true,
@@ -79,6 +81,14 @@ module.exports = function(grunt){
 			}
 		},
 
+		handlebars: {
+			all: {
+				files: {
+					"temp/templates.js": ["src/templates/*.hbs"]
+				}
+			}
+		},
+
     watch:{
       options: {
   		  livereload: 1337,
@@ -115,7 +125,7 @@ module.exports = function(grunt){
   ]);
 
 	grunt.registerTask('test', [
-		'modernizr_builder'
+		'handlebars'
 	]);
 
 };

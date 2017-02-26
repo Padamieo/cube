@@ -97,6 +97,8 @@ function createWindow () {
 				objects = all.cube;
 				players = all.user;
 
+        host.score = players.length-1;
+
         for (var i = 0; i < players.length; i++){
 					//if(players[i].type === 'user'){
 	          if(players[i].host === true){
@@ -125,15 +127,21 @@ function createWindow () {
         socket.broadcast.emit('updatePlayers', data);
       });
 
-			socket.on('playerShoot', function(data){
+			socket.on('playerShot', function(data){
 				//may need to store shots
         socket.emit('updateShots', data);
 				socket.broadcast.emit('updateShots', data);
 			});
 
-      socket.on('playerKill', function(data){
+      socket.on('playerKill', function(id){
         //may need to change server understanding of game
-        socket.broadcast.emit('something', data);
+        host.score = host.score-1;
+
+        data = { kill:id };
+        data.remain = host.score;
+        data.end = ( host.score <= 0 ? true : false);
+
+        socket.broadcast.emit('reportKill', data);
       });
 
       socket.on('disconnect', function(d){

@@ -17,6 +17,7 @@
     "three": "0.84.0",
     "three-rounded-box": "^0.1.1",
     "tween.js": "^16.6.0",
+    "handlebars": "^4.0.6",
     "nodemon": "*"
   },
   "browserify-shim": {
@@ -33,6 +34,7 @@
     "grunt-contrib-watch": "*",
     "grunt-modernizr": "^1.0.2",
     "grunt-modernizr-builder": "^0.1.9",
+    "grunt-contrib-handlebars": "^1.0.0",
     "load-grunt-tasks": "*"
   },
   "main": "main.js",
