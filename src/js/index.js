@@ -1,5 +1,5 @@
 var app = require('express')();
-var http = require('http').Server(app);
+//var http = require('http').Server(app);
 
 //this works but may need some sort of compiler
 var $ = require('jQuery');
@@ -7,7 +7,6 @@ var $ = require('jQuery');
 // no longer required?
 var player, socket, thisPlayer;
 var users = [];
-//var keyState = {};
 
 const uuid = game.genUUID();
 
@@ -25,11 +24,6 @@ app.get('/index.js', function(req, res){
 
 var ip_address = game.getAddress();
 
-// http.listen(0, ip_address, function(){
-//   console.log('listening on *:' + http.address().port );
-//   //ipcRenderer.send('outside', http.address().port );
-// });
-
 $( document ).ready(function() {
   startup();
 });
@@ -40,7 +34,6 @@ function startup(){
   sound.init();
 
   //ui.handlebars('login2');
-
 
   //focus for this page
   $( "#username" ).focus();
@@ -89,7 +82,6 @@ function startup(){
         };
 
 			});
-      //common(service);
 
     });
 

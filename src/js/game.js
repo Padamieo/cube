@@ -126,7 +126,6 @@ var game = {
 
     var WindowResize = require('three-window-resize');
     var windowResize = new WindowResize(this.renderer, this.camera);
-    window.addEventListener( 'resize', this.onWindowResize, false );
 
     this.registerEvents(socket);
 
@@ -157,14 +156,16 @@ var game = {
   },
 
   registerEvents: function(){
-    document.addEventListener('click', this.onMouseClick, false );
+    document.addEventListener('click', this.fire, false );
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
     // document.addEventListener('mouseout', onMouseOut, false);
     document.addEventListener('keydown', this.onKeyDown, false );
     document.addEventListener('keyup', this.onKeyUp, false );
-    //window.addEventListener( 'resize', onWindowResize, false );
+
+    // added for lensFlare size changes
+    window.addEventListener( 'resize', this.onWindowResize, false );
   },
 
   onKeyDown: function( event ){
@@ -177,7 +178,7 @@ var game = {
     game.keyState[event.keyCode || event.which] = false;
   },
 
-  onMouseClick: function( event ){
+  fire: function( event ){
 
     var raycaster = new THREE.Raycaster(); // create once
     var mouse = new THREE.Vector2(); // create once
@@ -186,20 +187,21 @@ var game = {
     // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
     //currently crosshair is set for center of screen this need to be somewhere visible for user
-    mouse.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
+    mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
+    mouse.y = 0.75; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
+
+    console.log(mouse);
 
     raycaster.setFromCamera( mouse, game.camera );
 
     var intersects = raycaster.intersectObjects( game.objects, true );
-
+    console.log(intersects);
     if ( intersects.length > 0 ) {
 
       //var a = game.camera.getWorldDirection();
       var a = intersects[0].point;
 
       //var b = three.camera.getWorldPosition();
-      //var obj = game.getObject(thisPlayer.playerId);
       var obj = game.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
@@ -207,7 +209,7 @@ var game = {
 			// var c = obj.distanceTo( vec2 );
 
       //var d = Math.random() * 0xffffff;
-      var d = 0xffffff;
+      var d = 0x1AFF00;
 
       if(intersects[0].object.playerId){
         var name = intersects[0].object.name;
@@ -218,31 +220,27 @@ var game = {
         e = { type:'cube', name: name };
       }
 
-      var f = {to:a, from:b, distance:c, color:d, hit:e};
-
-      //this.addShot(arrow);
-			socket.emit('playerShot', f);
+      var shot = {to:a, from:b, distance:c, color:d, hit:e};
 
     }else{
+      //var obj = game.scene.getObjectByName(thisPlayer.playerId);
       var direction = game.camera.getWorldDirection();
-
 
       var obj = game.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
       var c = 100;
-      var d = 0xff0000;
+      var d = 0xFF0072;
 
       var a = new THREE.Vector3();
       a.addVectors ( b, direction.multiplyScalar( c ) );
 
       var  e = '';
 
-      var f = {to:a, from:b, distance:c, color:d, hit:e};
-
-      socket.emit('playerShot', f);
-
+      var shot = {to:a, from:b, distance:c, color:d, hit:e};
     }
+
+    socket.emit('playerShot', shot);
 
   },
 
