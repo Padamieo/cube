@@ -137,7 +137,7 @@ function createWindow () {
         //may need to change server understanding of game
         host.score = host.score-1;
 
-        data = { kill:id };
+        var data = { kill:id };
         data.remain = host.score;
         data.end = ( host.score <= 0 ? true : false);
 

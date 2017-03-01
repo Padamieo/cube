@@ -28,8 +28,6 @@ var game = {
     return addresses;
   },
 
-
-
   addLight: function(color, position, name){
     var light = new THREE.PointLight( color, 1.5, 2000 );
     //light.color.setHSL( h, s, l );
@@ -153,6 +151,7 @@ var game = {
 		}
 
   	this.renderer.render(this.scene, this.camera);
+
   },
 
   registerEvents: function(){
@@ -188,11 +187,12 @@ var game = {
 
     //currently crosshair is set for center of screen this need to be somewhere visible for user
     mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
-    mouse.y = 0.75; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
+    mouse.y = 0.60; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
     console.log(mouse);
 
     raycaster.setFromCamera( mouse, game.camera );
+    console.log(raycaster);
 
     var intersects = raycaster.intersectObjects( game.objects, true );
     console.log(intersects);
@@ -224,12 +224,15 @@ var game = {
 
     }else{
       //var obj = game.scene.getObjectByName(thisPlayer.playerId);
-      var direction = game.camera.getWorldDirection();
+      //var direction = game.camera.getWorldDirection();
+
+
+      var direction = raycaster.ray.direction;
 
       var obj = game.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
-      var c = 100;
+      var c = 900;
       var d = 0xFF0072;
 
       var a = new THREE.Vector3();
@@ -311,7 +314,7 @@ var game = {
       this.trackOriginalOpacities(line);
 
       this.fadeMesh(line, "out", {
-        duration: 1000,
+        duration: 250,
         easing: this.TWEEN.Easing.Back.In,
         callback : function (){
 
@@ -547,8 +550,8 @@ var game = {
   },
 
   arrow: function(){
-    var from = new THREE.Vector3( 0, 0, 0 );
-    var to = new THREE.Vector3( -1, 0, 0 );
+    var from = new THREE.Vector3( 0, 0.5, 0.1 );
+    var to = new THREE.Vector3( -1, 0.7, 0.1 );
     var direction = to.clone().sub(from);
     var length = direction.length();
     var arrowHelper = new THREE.ArrowHelper(direction.normalize(), from, length, 0xff0000 );
