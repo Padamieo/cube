@@ -1,5 +1,25 @@
 var ui = {
 
+	pkg: function(){
+		try {
+		  pkg = require('../package.json');
+		  console.log(pkg);
+		} catch (e) {
+		  // if (e.code !== 'MODULE_NOT_FOUND') {
+		  //   throw e;
+		  // }
+		  // pkg = backupModule;
+		  console.log(pkg);
+		  pkg = false;
+		}
+
+		if(pkg && pkg.development){
+		  console.log("dev");
+		}
+
+		return pkg;
+	},
+
 	addButton: function(where, text, id, pend){
 		var insert = ( id ? 'id="'+id+'"' : '' );
 		var add = '<button '+insert+' class="pt-touch-button" >'+text+'</button>';
@@ -110,6 +130,7 @@ var ui = {
 		}else{
 			console.log("localstorage does not work");
 		}
+
 	},
 
 	getl: function(term){
@@ -134,7 +155,19 @@ var ui = {
 	handlebars: function(page, data, template){
 		var postTemplate = JST['src/templates/example.hbs']; // how do we know which template to use
 		var html = postTemplate({
-			title: 'test'
+			titlea: 'cube',
+			titleb: 'game',
+			input: [
+			{
+				id: 'username'
+			}
+		],
+			buttons: [
+				{
+					id: 'register',
+					title: 'enter'
+				}
+			]
 		});
 		this.swapContent(page, html);
 	},

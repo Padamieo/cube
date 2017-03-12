@@ -77,6 +77,15 @@ var game = {
 
   loadWorld: function( socket, data ){
 
+    //if(pkg.development);
+      //maybe wrap in setting for stats / development mode in
+      this.stats = new Stats();
+      //this.stats.showPanel( 1 );
+      this.stats.domElement.style.position	= 'absolute';
+      this.stats.domElement.style.bottom	= '0px';
+      document.body.appendChild( this.stats.domElement );
+    //}
+
     this.objects = [];
     this.players = [];
     this.keyState = {};
@@ -140,6 +149,7 @@ var game = {
   },
 
   render: function () {
+    this.stats.begin();
   	var ref = this;
   	requestAnimationFrame(function(){ref.render()});
     if ( thisPlayer ){
@@ -149,7 +159,7 @@ var game = {
 		if ( this.TWEEN ){
 			this.TWEEN.update();
 		}
-
+    this.stats.end();
   	this.renderer.render(this.scene, this.camera);
 
   },

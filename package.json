@@ -16,6 +16,7 @@
     "node-discover": "^0.6.2",
     "nodemon": "*",
     "socket.io": "^1.3.5",
+    "stats.js": "^0.17.0",
     "three": "0.84.0",
     "three-rounded-box": "^0.1.1",
     "three-window-resize": "^1.0.4",

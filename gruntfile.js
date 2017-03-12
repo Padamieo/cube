@@ -15,6 +15,7 @@ module.exports = function(grunt){
       app:{
         files:{
           'app/index.js': [
+						'node_modules/stats.js/build/stats.min.js',
 						'node_modules/handlebars/dist/handlebars.min.js',
 						'node_modules/jquery/dist/jquery.js',
             'node_modules/three/build/three.js',
@@ -109,6 +110,10 @@ module.exports = function(grunt){
 			img:{
 				files: ['src/*/**.png', 'src/*/**.jpg'],
 				tasks: ['copy:img']
+			},
+			handlebars:{
+				files: ['src/*/**.hbs'],
+				tasks: ['handlebars', 'uglify:app']
 			}
     }
 

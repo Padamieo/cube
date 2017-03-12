@@ -4,6 +4,8 @@ var app = require('express')();
 //this works but may need some sort of compiler
 var $ = require('jQuery');
 
+var pkg = ui.pkg();
+
 // no longer required?
 var player, socket, thisPlayer;
 var users = [];
@@ -33,7 +35,8 @@ function startup(){
   //not sure when best to initialize sound
   sound.init();
 
-  //ui.handlebars('login2');
+  //may need to build all pages
+  ui.handlebars('login2');
 
   //focus for this page
   $( "#username" ).focus();

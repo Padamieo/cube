@@ -13,7 +13,8 @@
 
 ### Todo
 
-- fix fire (projectile) acuracy and confirm with server/players
+- add crosshairs
+- fix fire (projectile) size and display
 - add in game ui score/players/end game
 - refine menus, maybe look at handlebars.js
     - refine selection / finding of server

@@ -12,12 +12,20 @@
 	font-style: normal;
 }
 
-*, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+*, *:after, *:before {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
 *:focus {
   outline: none;
 }
 
-body, html { font-size: 100%; padding: 0; margin: 0;}
+body, html {
+	font-size: 100%;
+	padding: 0;
+	margin: 0;
+}
 
 /* Clearfix hack by Nicolas Gallagher: http://nicolasgallagher.com/micro-clearfix-hack/ */
 .clearfix:before, .clearfix:after { content: " "; display: table; }
@@ -70,6 +78,22 @@ a {
 .codrops-top span.right a {
 	float: left;
 	display: block;
+}
+
+/* UI score */
+.ui-score{
+	color: @white;
+	position: fixed;
+	font-size: 6vh;
+	line-height: 4vh;
+	z-index: 50000;
+	bottom: 0;
+	right: 0;
+	p{
+		color: @white;
+		margin: 1vw;
+	}
+	display: none;
 }
 
 /* custom original */

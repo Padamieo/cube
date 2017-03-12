@@ -1,11 +1,16 @@
-  <div class="entry">
-    <h1>{{title}}</h1>
-    <h2>{{title}}</h2>
-    <h3>{{title}}</h3>
-    <h4>{{title}}</h4>
-    <h5>{{title}}</h5>
-    <p>{{title}}</p>
-    <div class="body">
-      {{body}}
-    </div>
+
+  <h1>{{titlea}}{{titleb}}</h1>
+
+  <div class="pt-triggers">
+    {{#if input}}
+      {{#input}}
+          <input id="{{id}}" type="text" name="{{id}}">
+      {{/input}}
+    {{/if}}
+
+    {{#if buttons}}
+      {{#buttons}}
+        <button id="{{id}}" class="pt-touch-button">{{title}}</button>
+      {{/buttons}}
+    {{/if}}
   </div>
