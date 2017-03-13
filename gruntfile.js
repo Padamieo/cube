@@ -122,6 +122,7 @@ module.exports = function(grunt){
 	// our default task, others will come later
 	grunt.registerTask('default', [
 		'modernizr_builder',
+		'handlebars',
     'uglify:app',
     'copy:build',
 		'copy:img',

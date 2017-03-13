@@ -154,26 +154,61 @@ var ui = {
 
 	handlebars: function(page, data, template){
 		var postTemplate = JST['src/templates/example.hbs']; // how do we know which template to use
-		var html = postTemplate({
-			titlea: 'cube',
-			titleb: 'game',
-			input: [
-			{
-				id: 'username'
-			}
-		],
-			buttons: [
-				{
-					id: 'register',
-					title: 'enter'
-				}
-			]
-		});
+		var html = postTemplate(data);
 		this.swapContent(page, html);
 	},
 
 	swapContent: function(page, html){
     $( "#"+page+" .content").replaceWith( '<div class="content">'+html+'</div>' );
+	},
+
+	defaultPageData: function(request){
+
+		//get language
+
+		if(request === 'login'){
+			var data = {
+				titlea: 'cube',
+				titleb: 'game',
+				input: [{ id: 'username'}],
+				buttons: [{
+					id: 'register',
+					title: 'enter'
+				}]
+			};
+		}
+
+		if(request === 'start'){
+			var data = {
+				titlea: 'main',
+				titleb: 'menu',
+				buttons: [{
+					id: 'host',
+					title: 'host'
+				},{
+					id: 'join',
+					title: 'join'
+				},{
+					id: 'options',
+					title: 'options'
+				},{
+					id: 'exit',
+					title: 'exit'
+				}]
+			};
+		}
+
+		return data;
+	},
+
+	defaultPagesSetup: function(){
+
+		var data = this.defaultPageData('login');
+		this.handlebars('login', data);
+
+		var data = this.defaultPageData('start');
+		this.handlebars('start', data);
+
 	}
 
 };

@@ -35,8 +35,8 @@ function startup(){
   //not sure when best to initialize sound
   sound.init();
 
-  //may need to build all pages
-  ui.handlebars('login2');
+  //buld default handlebars pages
+  ui.defaultPagesSetup();
 
   //focus for this page
   $( "#username" ).focus();
