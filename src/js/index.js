@@ -41,7 +41,8 @@ function startup(){
   //focus for this page
   $( "#username" ).focus();
 
-  document.getElementById("host").onclick = function(){
+  //document.getElementById("host").onclick = function(){
+  $(document).on("click", "#host", function(){
     console.log("host");
 
     ipcRenderer.send('setup', ip_address);
@@ -61,9 +62,10 @@ function startup(){
 			socket.emit('start');
 		});
 
-  };
+  });
 
-  document.getElementById("join").onclick = function(){
+  //document.getElementById("join").onclick = function(){
+  $(document).on("click", "#join", function(){
     console.log("joining");
 
     ipcRenderer.send('find', 'local');
@@ -93,7 +95,7 @@ function startup(){
       ui.fadeSpinner();
 		});
 
-  };
+  });
 
   ui.buttonSetup();
 
@@ -140,6 +142,7 @@ function startup(){
       if(!thisPlayer){
         if(data.playerId == uuid){
 
+          //ui.showScore(); // needs data to display
           game.loadWorld(socket, data);
 
           socket.emit('requestPlayers', uuid);

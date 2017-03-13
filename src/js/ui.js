@@ -3,18 +3,18 @@ var ui = {
 	pkg: function(){
 		try {
 		  pkg = require('../package.json');
-		  console.log(pkg);
+		  //console.log(pkg);
 		} catch (e) {
 		  // if (e.code !== 'MODULE_NOT_FOUND') {
 		  //   throw e;
 		  // }
 		  // pkg = backupModule;
-		  console.log(pkg);
+		  //console.log(pkg);
 		  pkg = false;
 		}
 
 		if(pkg && pkg.development){
-		  console.log("dev");
+		  //console.log("dev");
 		}
 
 		return pkg;
@@ -76,7 +76,7 @@ var ui = {
 	},
 
 	exitAppSetup: function(){
-		document.getElementById("exit").addEventListener("click", function (e) {
+		$(document).on("click", "#exit", function(){
 			const remote = require('electron').remote;
 			var window = remote.getCurrentWindow();
 			window.close();
@@ -86,25 +86,30 @@ var ui = {
 	buttonSetup: function(){
 		var ref = this;
 
-		document.getElementById("register").onclick = function(){
+		$(document).on("click", "#register", function(){
+
 			console.log("submit name");
 			var value = $( "#username" ).val();
 			if(value){
 				nameUser = value;
+				// var d = { name: nameUser };
+				// var b = JSON.stringify(d);
+				// ref.updateL('users', b );
 			}else{
 				nameUser = "Player"+uuid;
 			}
+
 			ref.menuchange('main');
-		};
+		});
 
-		document.getElementById("options").onclick = function(){
+		$(document).on("click", "#options", function(){
 			ref.menuchange('options');
-		};
+		});
 
-		document.getElementById("stop-search").onclick = function(){
+		$(document).on("click", "#stop-search", function(){
 			ref.resetSpinner();
 			ref.menuchange('main'); // may need to add a
-		};
+		});
 
 		$(document).on("click", "#stop-hosting", function(){
 			socket.emit('dissembly');
@@ -115,27 +120,38 @@ var ui = {
 			ref.menuchange('main');
 		});
 
-		document.getElementById("exit-options").onclick = function(){
+		$(document).on("click", "#exit-options", function(){
 			ref.menuchange('main');
-		};
+		});
 
 		this.exitAppSetup();
 	},
 
-	setl: function(term){
+	setl: function(term, data){
 		if(localStorage != undefined){
 			if(localStorage.getItem(term) === null){
-				localStorage.setItem(term, true );
+				localStorage.setItem(term, data );
 			}
 		}else{
 			console.log("localstorage does not work");
 		}
+	},
 
+	updateL: function(term, data){
+		if(localStorage != undefined){
+			localStorage.setItem(term, data );
+		}
 	},
 
 	getl: function(term){
 		if(localStorage != undefined){
-			localStorage.getItem(term);
+			return localStorage.getItem(term);
+		}
+	},
+
+	deletel: function(term){
+		if(localStorage != undefined){
+			localStorage.removeItem(term);
 		}
 	},
 
@@ -209,6 +225,13 @@ var ui = {
 		var data = this.defaultPageData('start');
 		this.handlebars('start', data);
 
+	},
+
+	//this probably should be a promise
+	showScore: function(){
+		$( ".ui-score" ).fadeIn( "slow", function() {
+	    // Animation complete
+	  });
 	}
 
 };
