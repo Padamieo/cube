@@ -97,14 +97,17 @@ function createWindow () {
 				objects = all.cube;
 				players = all.user;
 
-        host.score = players.length-1;
+        host.current = players.length-1;
+        host.total = players.length-1;
+
+        var pass = { current: host.current, total: host.total };
 
         for (var i = 0; i < players.length; i++){
 					//if(players[i].type === 'user'){
 	          if(players[i].host === true){
-	            socket.emit( 'startMatch', players[i] );
+	            socket.emit( 'startMatch', players[i], pass);
 	          }else{
-	            socket.broadcast.emit( 'startMatch', players[i] );
+	            socket.broadcast.emit( 'startMatch', players[i], pass);
 	          }
 					//}
         };
@@ -135,11 +138,10 @@ function createWindow () {
 
       socket.on('playerKill', function(id){
         //may need to change server understanding of game
-        host.score = host.score-1;
-
+        host.current = host.current-1;
         var data = { kill:id };
-        data.remain = host.score;
-        data.end = ( host.score <= 0 ? true : false);
+        data.remain = host.total;
+        data.end = ( host.current <= 0 ? true : false);
 
         socket.broadcast.emit('reportKill', data);
       });
@@ -153,10 +155,11 @@ function createWindow () {
 
       socket.on('dissembly', function(){
         app = null;
-        console.log(http);
+        console.log(app);
         http = null;
         console.log(http);
         io = null;
+        console.log(io);
       });
 
     });

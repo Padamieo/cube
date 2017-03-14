@@ -1,32 +1,4 @@
-var os = require('os');
-
 var game = {
-
-  //this is not game element
-  getAddress: function(idx) {
-    var addresses = [],
-    interfaces = os.networkInterfaces(),
-    name, ifaces, iface;
-
-    for (name in interfaces) {
-      if(interfaces.hasOwnProperty(name)){
-        ifaces = interfaces[name];
-        if(!/(loopback|vmware|internal)/gi.test(name)){
-          for (var i = 0; i < ifaces.length; i++) {
-            iface = ifaces[i];
-            if (iface.family === 'IPv4' &&  !iface.internal && iface.address !== '127.0.0.1') {
-              addresses.push(iface.address);
-            }
-          }
-        }
-      }
-    }
-    // if an index is passed only return it.
-    if(addresses.length = 1){
-      return addresses.pop();
-    }
-    return addresses;
-  },
 
   addLight: function(color, position, name){
     var light = new THREE.PointLight( color, 1.5, 2000 );

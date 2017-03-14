@@ -24,7 +24,7 @@ app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
 
-var ip_address = game.getAddress();
+var ip_address = ui.getAddress();
 
 $( document ).ready(function() {
   startup();
@@ -138,11 +138,13 @@ function startup(){
 			}
 		});
 
-    socket.on('startMatch', function(data){
+    socket.on('startMatch', function(data, setup){
       if(!thisPlayer){
         if(data.playerId == uuid){
 
-          //ui.showScore(); // needs data to display
+          ui.updateScore(setup);
+          ui.showScore(); // needs data to display
+
           game.loadWorld(socket, data);
 
           socket.emit('requestPlayers', uuid);

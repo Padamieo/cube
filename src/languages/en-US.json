@@ -1,4 +1,26 @@
 {
+  "titles":{
+    "game": {
+      "a": "cube",
+      "b": "game"
+    },
+    "join": {
+      "a": "search",
+      "b": "join"
+    },
+    "host": {
+      "a": "waiting",
+      "b": "players"
+    },
+    "start": {
+      "a": "main",
+      "b": "menu"
+    },
+    "options": {
+      "a": "options",
+      "b": "settings"
+    }
+  },
   "enter":"Enter",
   "host":"Host",
 	"join": "Join",

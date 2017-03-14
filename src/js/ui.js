@@ -1,5 +1,33 @@
 var ui = {
 
+	//this is not game element
+	getAddress: function(idx) {
+		var os = require('os');
+		
+		var addresses = [],
+		interfaces = os.networkInterfaces(),
+		name, ifaces, iface;
+
+		for (name in interfaces) {
+			if(interfaces.hasOwnProperty(name)){
+				ifaces = interfaces[name];
+				if(!/(loopback|vmware|internal)/gi.test(name)){
+					for (var i = 0; i < ifaces.length; i++) {
+						iface = ifaces[i];
+						if (iface.family === 'IPv4' &&  !iface.internal && iface.address !== '127.0.0.1') {
+							addresses.push(iface.address);
+						}
+					}
+				}
+			}
+		}
+		// if an index is passed only return it.
+		if(addresses.length = 1){
+			return addresses.pop();
+		}
+		return addresses;
+	},
+
 	pkg: function(){
 		try {
 		  pkg = require('../package.json');
@@ -181,35 +209,47 @@ var ui = {
 	defaultPageData: function(request){
 
 		//get language
+		var lang = ui.getLanguage();
 
 		if(request === 'login'){
 			var data = {
-				titlea: 'cube',
-				titleb: 'game',
+				titlea: lang.titles.game.a,
+				titleb: lang.titles.game.b,
 				input: [{ id: 'username'}],
 				buttons: [{
 					id: 'register',
-					title: 'enter'
+					title: lang.enter
 				}]
 			};
 		}
 
 		if(request === 'start'){
 			var data = {
-				titlea: 'main',
-				titleb: 'menu',
+				titlea: lang.titles.start.a,
+				titleb: lang.titles.start.b,
 				buttons: [{
 					id: 'host',
-					title: 'host'
+					title: lang.host
 				},{
 					id: 'join',
-					title: 'join'
+					title: lang.join
 				},{
 					id: 'options',
-					title: 'options'
+					title: lang.options
 				},{
 					id: 'exit',
-					title: 'exit'
+					title: lang.exit
+				}]
+			};
+		}
+
+		if(request === 'options'){
+			var data = {
+				titlea: lang.titles.options.a,
+				titleb: lang.titles.options.b,
+				buttons: [{
+					id: 'exit-options',
+					title: lang.return
 				}]
 			};
 		}
@@ -217,13 +257,29 @@ var ui = {
 		return data;
 	},
 
+	getLanguage: function(){
+		var defaultLanguage = 'en-Us';
+
+		//get user set language
+		//var language = defaultLanguage;
+
+		var languageData;
+		try {
+			languageData = require('./languages/'+language+'.json');
+		} catch (e) {
+			languageData = require('./languages/'+defaultLanguage+'.json');
+		};
+		return languageData;
+	},
+
 	defaultPagesSetup: function(){
 
-		var data = this.defaultPageData('login');
-		this.handlebars('login', data);
+		var pages = ["login","start","options"];
 
-		var data = this.defaultPageData('start');
-		this.handlebars('start', data);
+		for (var i = 0; i < pages.length; i++) {
+			var data = this.defaultPageData(pages[i]);
+			this.handlebars(pages[i], data);
+		}
 
 	},
 
@@ -232,6 +288,16 @@ var ui = {
 		$( ".ui-score" ).fadeIn( "slow", function() {
 	    // Animation complete
 	  });
+	},
+
+	updateScore: function(setup){
+		console.log(setup);
+		var current = setup.current;
+		var total = setup.total;
+		var text = current+"/"+total;
+		$( ".ui-score" ).text(function( text ) {
+		  return text;
+		});
 	}
 
 };
