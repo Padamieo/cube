@@ -41,7 +41,7 @@ function startup(){
   //focus for this page
   $( "#username" ).focus();
 
-  //document.getElementById("host").onclick = function(){
+
   $(document).on("click", "#host", function(){
     console.log("host");
 
@@ -56,15 +56,9 @@ function startup(){
       common(service);
     });
 
-		$(document).on("click", "#startMatch", function(){
-			console.log("startMatch");
-			//$( "#lobby" ).hide();updatePlayers
-			socket.emit('start');
-		});
-
   });
 
-  //document.getElementById("join").onclick = function(){
+
   $(document).on("click", "#join", function(){
     console.log("joining");
 
@@ -97,6 +91,7 @@ function startup(){
 
   });
 
+
   ui.buttonSetup();
 
   function common(service){
@@ -113,17 +108,20 @@ function startup(){
 		socket.on('createUser', function(data){
 			console.log("createUser");
 
+
+      if(data.host){
+        var d = ui.defaultPageData('lobby');
+        ui.handlebars('lobby', d);
+      }
+
+      // var d = ui.defaultPageData('lobby');
+      // ui.handlebars('lobby', d);
+
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
 			socket.emit('requestUsers', uuid);
 			ui.addUser(data);
 			ui.menuchange('host');
-			if(data.host){
-				// $("#lobby").append('<button id="startMatch" class="pt-touch-button" >Start</button>');
-				ui.addButton("#lobby", 'Start', 'startMatch');
-        ui.addButton("#lobby", 'stop hosting', 'stop-hosting');
-        // <button id="stop-hosting" class="pt-touch-button" >stop hosting</button>
-			}
 
 		});
 

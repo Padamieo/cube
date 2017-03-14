@@ -3,7 +3,7 @@ var ui = {
 	//this is not game element
 	getAddress: function(idx) {
 		var os = require('os');
-		
+
 		var addresses = [],
 		interfaces = os.networkInterfaces(),
 		name, ifaces, iface;
@@ -152,6 +152,12 @@ var ui = {
 			ref.menuchange('main');
 		});
 
+		$(document).on("click", "#startMatch", function(){
+			console.log("startMatch");
+			//$( "#lobby" ).hide();updatePlayers
+			socket.emit('start');
+		});
+
 		this.exitAppSetup();
 	},
 
@@ -254,6 +260,21 @@ var ui = {
 			};
 		}
 
+		if(request === 'lobby'){
+			var data = {
+				titlea: lang.titles.host.a,
+				titleb: lang.titles.host.b,
+				buttons: [{
+					id: 'startMatch',
+					title: lang.start
+				},{
+					id: 'stop-hosting',
+					title: lang.stop
+				}],
+				users: true
+			};
+		}
+
 		return data;
 	},
 
@@ -274,7 +295,7 @@ var ui = {
 
 	defaultPagesSetup: function(){
 
-		var pages = ["login","start","options"];
+		var pages = ["login", "start", "options"];
 
 		for (var i = 0; i < pages.length; i++) {
 			var data = this.defaultPageData(pages[i]);
@@ -286,7 +307,7 @@ var ui = {
 	//this probably should be a promise
 	showScore: function(){
 		$( ".ui-score" ).fadeIn( "slow", function() {
-	    // Animation complete
+
 	  });
 	},
 

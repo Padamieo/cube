@@ -26,5 +26,7 @@
 	"join": "Join",
   "exit":"Exit",
   "options": "Options",
-  "return": "Return"
+  "return": "Return",
+  "start": "start",
+  "stop": "stop"
 }

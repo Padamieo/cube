@@ -2,10 +2,15 @@
   <h1><strong>{{titlea}}</strong>{{titleb}}</h1>
 
   <div class="pt-triggers">
+
     {{#if input}}
       {{#input}}
           <input id="{{id}}" type="text" name="{{id}}">
       {{/input}}
+    {{/if}}
+
+    {{#if users}}
+      <ul id="users"></ul>
     {{/if}}
 
     {{#if buttons}}
@@ -13,4 +18,6 @@
         <button id="{{id}}" class="pt-touch-button">{{title}}</button>
       {{/buttons}}
     {{/if}}
+
+
   </div>
