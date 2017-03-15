@@ -171,20 +171,21 @@ var game = {
     mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
     mouse.y = 0.60; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
-    console.log(mouse);
+    //console.log(mouse);
 
     raycaster.setFromCamera( mouse, game.camera );
-    console.log(raycaster);
+    //console.log(raycaster);
 
     var intersects = raycaster.intersectObjects( game.objects, true );
-    console.log(intersects);
+    //console.log(intersects);
+
     if ( intersects.length > 0 ) {
 
       //var a = game.camera.getWorldDirection();
       var a = intersects[0].point;
 
       //var b = three.camera.getWorldPosition();
-      var obj = game.scene.getObjectByName(thisPlayer.playerId);
+      var obj = game.scene.getObjectByName( thisPlayer.playerId );
       var b = obj.getWorldPosition();
 
 			var c = intersects[0].distance;
@@ -202,12 +203,9 @@ var game = {
         e = { type:'cube', name: name };
       }
 
-      var shot = {to:a, from:b, distance:c, color:d, hit:e};
-
     }else{
       //var obj = game.scene.getObjectByName(thisPlayer.playerId);
       //var direction = game.camera.getWorldDirection();
-
 
       var direction = raycaster.ray.direction;
 
@@ -222,8 +220,9 @@ var game = {
 
       var  e = '';
 
-      var shot = {to:a, from:b, distance:c, color:d, hit:e};
     }
+
+    var shot = {to:a, from:b, distance:c, color:d, hit:e};
 
     socket.emit('playerShot', shot);
 
@@ -259,6 +258,7 @@ var game = {
   },
 
 	addShot: function(data){
+    console.log("addShot");
     if(data){
 
       this.shots++;
@@ -523,7 +523,10 @@ var game = {
     obj.add( arrowHelper );
 
     this.camera.position.set( 3, 1, 0 );
-    this.camera.lookAt( obj.position );
+    
+    //console.log(obj.position);
+    var temp = new THREE.Vector3( -1, 0, 0 );
+    this.camera.lookAt( temp );
 
     obj = this.position_rotation(obj, data);
 

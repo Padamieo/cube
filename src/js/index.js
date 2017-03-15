@@ -110,9 +110,11 @@ function startup(){
 
 
       if(data.host){
-        var d = ui.defaultPageData('lobby');
-        ui.handlebars('lobby', d);
+
       }
+
+      var d = ui.defaultPageData('lobby');
+      ui.handlebars('lobby', d);
 
       // var d = ui.defaultPageData('lobby');
       // ui.handlebars('lobby', d);
