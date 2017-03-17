@@ -24,8 +24,6 @@ app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
 
-var ip_address = ui.getAddress();
-
 $( document ).ready(function() {
   startup();
 });
@@ -42,8 +40,11 @@ function startup(){
   $( "#username" ).focus();
 
 
+
   $(document).on("click", "#host", function(){
     console.log("host");
+
+    var ip_address = ui.getAddress();
 
     ipcRenderer.send('setup', ip_address);
     console.log("setup");
@@ -57,6 +58,7 @@ function startup(){
     });
 
   });
+
 
 
   $(document).on("click", "#join", function(){
@@ -108,7 +110,6 @@ function startup(){
 		socket.on('createUser', function(data){
 			console.log("createUser");
 
-
       if(data.host){
 
       }
@@ -137,6 +138,7 @@ function startup(){
 				}
 			}
 		});
+    
 
     socket.on('startMatch', function(data, setup){
       if(!thisPlayer){

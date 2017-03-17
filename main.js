@@ -19,6 +19,7 @@ const Discover = require('node-discover');
 var players = [];
 var users = [];
 var objects = [];
+var service = '';
 var host = require('./app/host.js');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -34,7 +35,7 @@ function createWindow () {
     minWidth: 750,
     minHeight: 510,
     webPreferences:{
-      devTools: true
+      devTools: pkg.development
     }
   })
 
@@ -54,18 +55,26 @@ function createWindow () {
 
   ipcMain.on('setup', function(event, ip) {
 
+    if(service){
+      event.sender.send('hosting', service );
+      return;
+    }
+
     var app = require('express')();
     var http = require('http').Server(app);
     var io = require('socket.io')(http);
 
     http.listen(0, function(){
 
-      console.log('listening on *:' + http.address().port );
+      if(!service){
+        service = {
+          ip: ip,
+          port: http.address().port
+        }
+      };
 
-      var service = {
-        ip: ip,
-        port: http.address().port
-      }
+      console.log('service');
+      console.log(service);
 
       event.sender.send('hosting', service );
 
@@ -154,12 +163,17 @@ function createWindow () {
       });
 
       socket.on('dissembly', function(){
-        app = null;
-        console.log(app);
-        http = null;
-        console.log(http);
-        io = null;
-        console.log(io);
+        // app = null;
+        // console.log(app);
+        // http = null;
+        // console.log(http);
+        // io = null;
+        // console.log(io);
+
+        //this is specific to users disconnecting
+        console.log(users);
+        users = [];
+        //also need to inform connected users of host disapearing
       });
 
     });
