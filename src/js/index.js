@@ -40,7 +40,6 @@ function startup(){
   $( "#username" ).focus();
 
 
-
   $(document).on("click", "#host", function(){
     console.log("host");
 
@@ -64,37 +63,53 @@ function startup(){
   $(document).on("click", "#join", function(){
     console.log("joining");
 
+    var data = ui.defaultPageData("search");
+    ui.handlebars("search", data);
+
     ipcRenderer.send('find', 'local');
 		ui.menuchange('join');
 
     ipcRenderer.on('found', function(event, services){
-			ui.fadeSpinner();
+      //ui.fadeSpinner();
+      console.log(services);
+      var data = ui.defaultPageData("search");
+      var hosts = [];
 
-			$.each(services, function( index, value ) {
-        console.log(value);
+      $.each(services, function( index, value ) {
         var gameName = value.details.host_name+" Game";
-				ui.addButton("#search .pt-triggers", gameName, "A"+index, true);
-				//needs to add on click trigger to common service
-        document.getElementById("A"+index).onclick = function(){
-          var dets = value.details;
-          console.log(value.details);
-          console.log("pressed join");
-          common(dets);
-        };
+        var v = game.contains(hosts, gameName, 'title' );
+        if(v < 0){
+          var details = value.details;
+          var host_details = {name: "host", value: JSON.stringify(details)};
+          hosts.push({id: index, class: "join-host", title: gameName, data: host_details})
+        }
+      });
 
-			});
+      $.each(hosts, function( index, value ) {
+        data.buttons.unshift(hosts[index]);
+      });
 
+      data.spinner = false;
+			ui.handlebars("search", data);
     });
 
 		ipcRenderer.on('unfound', function(event, service){
 			console.log("unfound");
-      ui.fadeSpinner();
+      var data = ui.defaultPageData("search");
+      data.spinner = false;
+      //TODO: add message that nothing was found local or online?
+      ui.handlebars("search", data);
 		});
 
   });
 
-
   ui.buttonSetup();
+
+  $(document).on("click", ".join-host", function(){
+    var details = $( this ).data( "host" );
+    console.log("join host");
+    common(details);
+  });
 
   function common(service){
     console.log("common started");
@@ -110,15 +125,9 @@ function startup(){
 		socket.on('createUser', function(data){
 			console.log("createUser");
 
-      if(data.host){
-
-      }
-
-      var d = ui.defaultPageData('lobby');
-      ui.handlebars('lobby', d);
-
-      // var d = ui.defaultPageData('lobby');
-      // ui.handlebars('lobby', d);
+      var userType = ( data.host ? 'lobby-host' : 'lobby' );
+      var page = ui.defaultPageData(userType);
+      ui.handlebars('lobby', page);
 
 			users.push(data);
 			//change page visual, add this player to list with ready button if hosting
@@ -138,7 +147,7 @@ function startup(){
 				}
 			}
 		});
-    
+
 
     socket.on('startMatch', function(data, setup){
       if(!thisPlayer){

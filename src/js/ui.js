@@ -260,20 +260,39 @@ var ui = {
 			};
 		}
 
-		if(request === 'lobby'){
+		if(request.includes("lobby")){
 			var data = {
 				titlea: lang.titles.host.a,
 				titleb: lang.titles.host.b,
-				buttons: [{
+				users: true
+			};
+			if(request.includes("host")){
+				data.buttons = [{
 					id: 'startMatch',
 					title: lang.start
 				},{
 					id: 'stop-hosting',
 					title: lang.stop
+				}];
+			}else{
+				data.buttons = [{
+					id: 'stop-hosting',
+					title: lang.exit
+				}];
+			}
+		};
+
+		if(request === 'search'){
+			var data = {
+				titlea: lang.titles.join.a,
+				titleb: lang.titles.join.b,
+				buttons: [{
+					id: 'stop-search',
+					title: lang.stop
 				}],
-				users: true
+				spinner: true
 			};
-		}
+		};
 
 		return data;
 	},
@@ -295,7 +314,7 @@ var ui = {
 
 	defaultPagesSetup: function(){
 
-		var pages = ["login", "start", "options"];
+		var pages = ["login", "start", "options", "join"];
 
 		for (var i = 0; i < pages.length; i++) {
 			var data = this.defaultPageData(pages[i]);
@@ -307,6 +326,9 @@ var ui = {
 	//this probably should be a promise
 	showScore: function(){
 		$( ".ui-score" ).fadeIn( "slow", function() {
+
+	  });
+		$( "#crosshair" ).fadeIn( "slow", function() {
 
 	  });
 	},

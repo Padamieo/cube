@@ -169,7 +169,7 @@ var game = {
 
     //currently crosshair is set for center of screen this need to be somewhere visible for user
     mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
-    mouse.y = 0.60; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
+    mouse.y = 0.5; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
     //console.log(mouse);
 
@@ -519,11 +519,11 @@ var game = {
     this.players.push( obj );
     this.scene.add( obj );
 
-    var arrowHelper = this.arrow();
-    obj.add( arrowHelper );
+    // var arrowHelper = this.arrow();
+    // obj.add( arrowHelper );
 
     this.camera.position.set( 3, 1, 0 );
-    
+
     //console.log(obj.position);
     var temp = new THREE.Vector3( -1, 0, 0 );
     this.camera.lookAt( temp );
@@ -545,7 +545,7 @@ var game = {
   },
 
   addOtherPlayer: function(data){
-    var index = this.contains(this.players, data.playerId);
+    var index = this.contains(this.players, data.playerId, 'playerId');
     if(index == -1){
       if(uuid != data.playerId){
         this.addPlayer(data);
@@ -593,9 +593,9 @@ var game = {
     return '_' + Math.random().toString(36).substr(2, 9);
   },
 
-  contains: function( array, id ) {
+  contains: function( array, id, term ) {
     var index = array.findIndex(function(a){
-      return a.playerId === id;
+      return a[term] === id;
     });
     return index;
   }

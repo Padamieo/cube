@@ -12,23 +12,14 @@
 		<span class="right"><a class="" href="#"><span>username change?</span></a></span>
 	</div>
 
-  <div class="ui-score"><p>test</p></div>
-
-		<!-- <div id="start">
-	    <button id="host">Host</button>
-	    <button id="join">Join</button>
-		</div> -->
-
-		<!-- <div id="lobby">
-			<ul id="users"></ul>
-		</div> -->
+  <div class="ui-score" style="display: none;"><p>test</p></div>
+  <div id="crosshair" style="display: none;"><div id="cross"></div></div>
 
     <!-- <button id="iterateEffects" data-animation="5" class="pt-touch-button">Show next page transition</button> -->
 
 			<div id="pt-main" class="pt-perspective">
 
         <!-- startup screen -->
-
         <div id="login" class="pt-page pt-page-1">
           <div class="content"></div>
         </div>
@@ -41,24 +32,11 @@
         <!-- hosting -->
 				<div id="lobby" class="pt-page pt-page-3">
           <div class="content"></div>
-        <!--
-		      <h1><strong>waiting</strong> players</h1>
-
-          <div id="lobby" class="pt-triggers">
-            <ul id="users"></ul>
-          </div>
-        -->
 				</div>
 
         <!-- searching / joining -->
         <div id="search" class="pt-page pt-page-4">
-
-          <h1><strong>search</strong> join</h1>
-          <div class="pt-triggers">
-            <div class="spinner sk-rotating-plane"></div>
-            <button id="stop-search" class="pt-touch-button" >stop search</button>
-          </div>
-
+          <div class="content"></div>
         </div>
 
         <!-- game -->
@@ -71,6 +49,7 @@
         </div>
 
 			</div>
+
 
     <script src="index.js"></script>
     <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script> --> <!-- would like to referance out localyhosted version -->

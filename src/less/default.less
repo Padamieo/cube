@@ -126,3 +126,41 @@ input{
 .spinner{
 	background-color: #fff !important;
 }
+
+#crosshair{
+	position: absolute;
+	z-index: 100;
+	width: 100%;
+	-webkit-user-select: none;
+	height: 100%;
+
+	#cross {
+		width: 10vh;
+		height: 10vh;
+		position: relative;
+		margin: auto;
+		margin-top: 20vh;
+
+		&:before, &:after {
+		  content: "";
+		  position: absolute;
+		  background: rgba(255,255,255,0.5);
+		}
+
+		&:before {
+		  left: 50%;
+		  width: 1%;
+			min-width: 1px;
+		  margin-left: -0.5%;
+		  height: 100%;
+		}
+
+		&:after {
+		  top: 50%;
+		  height: 1%;
+			min-height: 1px;
+		  margin-top: -0.5%;
+		  width: 100%;
+		}
+	}
+}

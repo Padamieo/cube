@@ -1,5 +1,5 @@
 
-  <h1><strong>{{titlea}}</strong>{{titleb}}</h1>
+  <h1><strong>{{titlea}}</strong> {{titleb}}</h1>
 
   <div class="pt-triggers">
 
@@ -13,9 +13,19 @@
       <ul id="users"></ul>
     {{/if}}
 
+    {{#if spinner}}
+      <div class="spinner sk-rotating-plane"></div>
+    {{/if}}
+
     {{#if buttons}}
       {{#buttons}}
-        <button id="{{id}}" class="pt-touch-button">{{title}}</button>
+        <button id="{{id}}" class="pt-touch-button {{class}}"
+        {{#if data}}
+          {{#data}}
+            data-{{name}}="{{value}}"
+          {{/data}}
+        {{/if}}
+        >{{title}}</button>
       {{/buttons}}
     {{/if}}
 
