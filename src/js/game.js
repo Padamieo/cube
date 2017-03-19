@@ -212,7 +212,7 @@ var game = {
       var obj = game.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
-      var c = 900;
+      var c = 999;
       var d = 0xFF0072;
 
       var a = new THREE.Vector3();

@@ -108,14 +108,15 @@ var host = {
 		}, {});
 	},
 
-  removePlayer: function( id ){
-    var index = this.contains( players, id );
-    players.splice(index, 1);
+  removeFrom: function( id, from, term ){
+		termSet = ( term ? term : 'playerId' );
+    var index = this.contains( from, id, termSet );
+    return from.splice(index, 1);
   },
 
-  contains: function( players, id ) {
-    var index = players.findIndex(function(pd){
-      return pd.playerId === id;
+  contains: function( array, id, term ) {
+    var index = array.findIndex(function(pd){
+      return pd[term] === id;
     });
     return index;
   },
@@ -163,7 +164,21 @@ var host = {
       })
     })
     return close;
-  }
+  },
+
+	removeDuplicates: function(a){
+		a.forEach(function(obj, index) {
+			var match = obj.host_name;
+			var currentIndex = index;
+			a.forEach(function(obj, index) {
+				if(index != currentIndex){
+					if(obj.host_name === match){
+						a.splice(index, 1);
+					}
+				}
+			})
+		})
+	}
 
 };
 

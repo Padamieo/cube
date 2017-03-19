@@ -7,7 +7,7 @@ var $ = require('jQuery');
 var pkg = ui.pkg();
 
 // no longer required?
-var player, socket, thisPlayer;
+var socket, thisPlayer;
 var users = [];
 
 const uuid = game.genUUID();
@@ -50,6 +50,8 @@ function startup(){
 
     ipcRenderer.on('hosting', function(event, service){
       console.log("hosting");
+      console.log(service);
+      ui.host = true;
       service.host_name = nameUser;
       ipcRenderer.send('advertise', service);
       //console.log(service);
@@ -103,6 +105,7 @@ function startup(){
 
   });
 
+
   ui.buttonSetup();
 
   $(document).on("click", ".join-host", function(){
@@ -113,7 +116,6 @@ function startup(){
 
   function common(service){
     console.log("common started");
-		//$( "#start" ).hide(); //may need to change to animation change
 
     io = require('socket.io-client'),
     socket = io.connect('http://'+service.ip+':'+service.port);
@@ -123,32 +125,42 @@ function startup(){
     });
 
 		socket.on('createUser', function(data){
+
 			console.log("createUser");
-
-      var userType = ( data.host ? 'lobby-host' : 'lobby' );
-      var page = ui.defaultPageData(userType);
-      ui.handlebars('lobby', page);
-
-			users.push(data);
-			//change page visual, add this player to list with ready button if hosting
-			socket.emit('requestUsers', uuid);
-			ui.addUser(data);
+      ui.user = data;
+      console.log(data);
+      users.push(data);
+      ui.buildLobby(data);
+      socket.emit('requestUsers', uuid);
 			ui.menuchange('host');
 
 		});
 
 		socket.on('addUser', function(data){
 			console.log("addUser");
-			var index = game.contains(users, data.playerId);
-			if(index == -1){
-				if(uuid != data.playerId){
+      //something is making this work weird
+			// var index = game.contains(users, data.playerId, 'playerId');
+			// if(index === -1){
+			// 	if(uuid != data.playerId){
 					users.push(data);
 					ui.addUser(data);
-				}
-			}
+			// 	}
+			// }
 		});
 
+    socket.on('removeUser', function(id){
+      console.log("removeUser");
+      var users = [];
+      var data = ui.user;
+      ui.buildLobby(data);
+      socket.emit('requestUsers', uuid);
+    });
 
+    socket.on('host-closed', function(data){
+      console.log("host closed");
+    });
+
+    //game mode
     socket.on('startMatch', function(data, setup){
       if(!thisPlayer){
         if(data.playerId == uuid){

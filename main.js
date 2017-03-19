@@ -15,6 +15,7 @@ const path = require('path')
 const url = require('url')
 
 const Discover = require('node-discover');
+var d = ''; //need to give this a better name
 
 var players = [];
 var users = [];
@@ -83,7 +84,7 @@ function createWindow () {
     io.on('connection', function(socket){
 
 			socket.on('newUser', function(id, name){
-        if(host.contains( users, id ) == -1){
+        if(host.contains( users, id, 'playerId' ) == -1){
   				var user = host.addUser(users, id, name);
   				socket.emit( 'createUser', user );
   				socket.broadcast.emit( 'addUser', user );
@@ -99,6 +100,7 @@ function createWindow () {
 			});
 
 			socket.on('start', function(){
+        console.log(service);
         //confirm request is from host
 				players = host.createPlayers(users);
 
@@ -155,11 +157,17 @@ function createWindow () {
         socket.broadcast.emit('reportKill', data);
       });
 
-      socket.on('disconnect', function(d){
-        console.log("need uuid to remove now");
-        console.log(d);
+      socket.on('disconnect', function(){
+        console.log("not sure how to use this");
         // host.removePlayer( socket.id );
         // socket.broadcast.emit('removePlayer', socket.id );
+      });
+
+      socket.on('leave', function(id){
+        //console.log(service);
+        host.removeFrom( id, users );
+        socket.emit('removeUser', id);
+        socket.broadcast.emit('removeUser', id);
       });
 
       socket.on('dissembly', function(){
@@ -172,6 +180,7 @@ function createWindow () {
 
         //this is specific to users disconnecting
         console.log(users);
+        socket.broadcast.emit('host-closed', '');
         users = [];
         //also need to inform connected users of host disapearing
       });
@@ -182,15 +191,15 @@ function createWindow () {
 
 
   ipcMain.on('advertise', function(event, service) {
-    //console.log('advertise');
+    console.log('advertise');
+    // console.log(service);
+    d = Discover();
 
-    var d = Discover();
-
-    d.advertise({ something : "something" });
+    d.advertise('CubeGame');
 
     d.on('added', function(obj) {
 
-      var success = d.send("service-details", { details : service });
+      var success = d.send("service-details", { details : service, id: pkg.name+pkg.version });
 
       if (!success) {
         //could not send on that channel; probably because it is reserved
@@ -200,13 +209,21 @@ function createWindow () {
 
   });
 
+  ipcMain.on('unadvertise', function(event, service) {
+    //var d = Discover();
+    console.log(d);
+    d.stop();
+  });
+
   ipcMain.on('find', function(event, scope) {
     console.log('find '+scope);
 
     var pass = [];
-    console.log(pass);
 
-    function partB() {
+    function reply() {
+
+      host.removeDuplicates(pass);
+
       if(pass){
         if(pass.length == 0){
           console.log("none found yet");
@@ -221,17 +238,19 @@ function createWindow () {
       }
     }
 
-    var d = Discover();
+    d = Discover();
 
     var success = d.join("service-details", function (data) {
-      if (data.details) {
-        console.log("B"+data);
-        pass.push( data );
+      if(pkg.name+pkg.version === data.id){
+        if (data.details) {
+          console.log("B"+data);
+          pass.push( data );
+        }
       }
     });
 
     if(success){
-      setTimeout(partB, 3000); //this time should change depending on find type
+      setTimeout(reply, 3000); //this time should change depending on find type
     }else{
       console.log("could not find a game ): ");
     }

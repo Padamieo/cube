@@ -59,7 +59,7 @@ var ui = {
 	},
 
 	addUser: function(data){
-		$("#users").append('<li id="'+data.playerId+'" >'+data.name+'</li>');
+		$("#users").append('<li class="'+(data.host ? 'host' : '' )+'" id="'+data.playerId+'" >'+data.name+'</li>');
 	},
 
 	addText: function(text, location, classes){
@@ -140,11 +140,28 @@ var ui = {
 		});
 
 		$(document).on("click", "#stop-hosting", function(){
+			console.log("stop-hosting");
+
+			users = [];
+			socket.emit('leave', uuid);
 			socket.emit('dissembly');
+			socket.disconnect();
 			io = null;
 			socket = null;
 			//console.log("sdad");
 			//may need to disable start
+			ipcRenderer.send('unadvertise', '');
+
+			ref.menuchange('main');
+		});
+
+		$(document).on("click", "#exit-hosting", function(){
+			console.log("exit-hosting");
+			users = [];
+			socket.emit('leave', uuid);
+			socket.disconnect();
+			io = null;
+			socket = null;
 			ref.menuchange('main');
 		});
 
@@ -276,7 +293,7 @@ var ui = {
 				}];
 			}else{
 				data.buttons = [{
-					id: 'stop-hosting',
+					id: 'exit-hosting',
 					title: lang.exit
 				}];
 			}
@@ -341,6 +358,13 @@ var ui = {
 		$( ".ui-score" ).text(function( text ) {
 		  return text;
 		});
-	}
+	},
+
+	buildLobby: function(data){
+    var userType = ( data.host && ui.host ? 'lobby-host' : 'lobby' );
+    var page = ui.defaultPageData(userType);
+    ui.handlebars('lobby', page);
+    ui.addUser(data);
+  }
 
 };
