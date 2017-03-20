@@ -199,9 +199,11 @@ function startup(){
 		});
 
 		socket.on('reportKill', function(data){
+      console.log("reportKill");
       console.log(data);
+      ui.updateScore(data);
       game.hit(data.kill);
-
+      
 		});
 
     socket.on('removePlayer', function(data){

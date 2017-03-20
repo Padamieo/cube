@@ -244,7 +244,7 @@ var game = {
 
   hit: function(id){
     console.log("hit");
-    console.log(id);
+    //console.log(id);
     for (var i = 0; i < game.objects.length; i++) {
       if(game.objects[i].name == id){
         game.objects.splice(i, 1);

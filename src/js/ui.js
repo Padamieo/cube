@@ -351,13 +351,11 @@ var ui = {
 	},
 
 	updateScore: function(setup){
-		console.log(setup);
-		var current = setup.current;
+		console.log("updateScore");
+		var alive = setup.current-setup.total;
 		var total = setup.total;
-		var text = current+"/"+total;
-		$( ".ui-score" ).text(function( text ) {
-		  return text;
-		});
+		var text = alive+"/"+total;
+		$( ".ui-score" ).text( text );
 	},
 
 	buildLobby: function(data){

@@ -151,7 +151,8 @@ function createWindow () {
         //may need to change server understanding of game
         host.current = host.current-1;
         var data = { kill:id };
-        data.remain = host.total;
+        data.current = host.current;
+        data.total = host.total;
         data.end = ( host.current <= 0 ? true : false);
 
         socket.broadcast.emit('reportKill', data);
