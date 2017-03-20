@@ -61,7 +61,6 @@ function startup(){
   });
 
 
-
   $(document).on("click", "#join", function(){
     console.log("joining");
 
@@ -198,12 +197,17 @@ function startup(){
 			game.addShot(data);
 		});
 
+    socket.on('endgame', function(data){
+      console.log("endgame");
+      console.log(data);
+    });
+
 		socket.on('reportKill', function(data){
       console.log("reportKill");
       console.log(data);
       ui.updateScore(data);
       game.hit(data.kill);
-      
+
 		});
 
     socket.on('removePlayer', function(data){

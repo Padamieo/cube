@@ -352,7 +352,7 @@ var ui = {
 
 	updateScore: function(setup){
 		console.log("updateScore");
-		var alive = setup.current-setup.total;
+		var alive = setup.total-setup.alive;
 		var total = setup.total;
 		var text = alive+"/"+total;
 		$( ".ui-score" ).text( text );

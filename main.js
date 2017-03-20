@@ -108,10 +108,9 @@ function createWindow () {
 				objects = all.cube;
 				players = all.user;
 
-        host.current = players.length-1;
-        host.total = players.length-1;
-
-        var pass = { current: host.current, total: host.total };
+        host.alive = players.length;
+        host.total = players.length;
+        var pass = { alive: host.alive, total: host.total };
 
         for (var i = 0; i < players.length; i++){
 					//if(players[i].type === 'user'){
@@ -148,19 +147,22 @@ function createWindow () {
 			});
 
       socket.on('playerKill', function(id){
+
         //may need to change server understanding of game
-        host.current = host.current-1;
+        host.alive = (host.alive-1);
         var data = { kill:id };
-        data.current = host.current;
+        data.alive = host.alive;
         data.total = host.total;
-        data.end = ( host.current <= 0 ? true : false);
+        data.end = ( host.alive <= 1 ? true : false);
 
         socket.broadcast.emit('reportKill', data);
 
         if(data.end === true){
           setTimeout(function(){
-            console.log("END WINNER");
-            //socket.broadcast.emit('endgame', data);
+            //console.log("END WINNER");
+            var winner = '';
+            socket.broadcast.emit('endgame', winner);
+            socket.emit('endgame', winner);
           }, 3000);
         }
 
