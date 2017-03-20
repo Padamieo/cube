@@ -155,6 +155,14 @@ function createWindow () {
         data.end = ( host.current <= 0 ? true : false);
 
         socket.broadcast.emit('reportKill', data);
+
+        if(data.end === true){
+          setTimeout(function(){
+            console.log("END WINNER");
+            //socket.broadcast.emit('endgame', data);
+          }, 3000);
+        }
+
       });
 
       socket.on('disconnect', function(){

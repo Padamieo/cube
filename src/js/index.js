@@ -50,7 +50,7 @@ function startup(){
 
     ipcRenderer.on('hosting', function(event, service){
       console.log("hosting");
-      console.log(service);
+      //console.log(service);
       ui.host = true;
       service.host_name = nameUser;
       ipcRenderer.send('advertise', service);
@@ -200,7 +200,7 @@ function startup(){
 
 		socket.on('reportKill', function(data){
       console.log(data);
-      game.hit(data.id);
+      game.hit(data.kill);
 
 		});
 
