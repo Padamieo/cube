@@ -155,14 +155,31 @@ function createWindow () {
         data.total = host.total;
         data.end = ( host.alive <= 1 ? true : false);
 
+        players.forEach(function( p ){
+          if(p.playerId === id){
+            p.alive = false;
+          }
+        });
+        console.log(players);
+
         socket.broadcast.emit('reportKill', data);
 
         if(data.end === true){
           setTimeout(function(){
             //console.log("END WINNER");
             var winner = '';
+            players.forEach(function( p ){
+              if(p.alive == true){
+                winner = p.name;
+              }
+            });
+
             socket.broadcast.emit('endgame', winner);
             socket.emit('endgame', winner);
+            //store winner in users
+            //clean up for possibly another game, players and objects
+            players = [];
+            objects = [];
           }, 3000);
         }
 

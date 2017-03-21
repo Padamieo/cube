@@ -22,6 +22,7 @@ var host = {
 		u.type = 'user';
 		u = host.cube_defaults(u);
     u.speed = 0.1;
+		u.alive = true;
     u.turnSpeed = 0.03;
 		return u;
 	},

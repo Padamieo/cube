@@ -197,11 +197,6 @@ function startup(){
 			game.addShot(data);
 		});
 
-    socket.on('endgame', function(data){
-      console.log("endgame");
-      console.log(data);
-    });
-
 		socket.on('reportKill', function(data){
       console.log("reportKill");
       console.log(data);
@@ -212,6 +207,14 @@ function startup(){
 
     socket.on('removePlayer', function(data){
       game.removeOtherPlayer(data);
+    });
+
+    socket.on('endgame', function(data){
+      console.log("endgame");
+      console.log(data);
+      //show winner message
+      //transition back to host
+      //destory old canvas
     });
 
   }

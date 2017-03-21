@@ -74,7 +74,7 @@ var game = {
     this.renderer.gammaOutput = true;
 
     this.renderer.setSize(this.width, this.height);
-    container = document.getElementById('game');
+    var container = document.getElementById('game');
     container.appendChild(this.renderer.domElement);
 
     this.scene = new THREE.Scene;

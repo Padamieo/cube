@@ -48,15 +48,15 @@ var ui = {
 		return pkg;
 	},
 
-	addButton: function(where, text, id, pend){
-		var insert = ( id ? 'id="'+id+'"' : '' );
-		var add = '<button '+insert+' class="pt-touch-button" >'+text+'</button>';
-		if(pend){
-			$(where).prepend(add);
-		}else{
-			$(where).append(add);
-		}
-	},
+	// addButton: function(where, text, id, pend){
+	// 	var insert = ( id ? 'id="'+id+'"' : '' );
+	// 	var add = '<button '+insert+' class="pt-touch-button" >'+text+'</button>';
+	// 	if(pend){
+	// 		$(where).prepend(add);
+	// 	}else{
+	// 		$(where).append(add);
+	// 	}
+	// },
 
 	addUser: function(data){
 		$("#users").append('<li class="'+(data.host ? 'host' : '' )+'" id="'+data.playerId+'" >'+data.name+'</li>');
