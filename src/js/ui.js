@@ -322,9 +322,10 @@ var ui = {
 
 		var languageData;
 		try {
-			languageData = require('./languages/'+language+'.json');
+			//TODO:may need to find way to make this work with .asar compression
+			languageData = require(__dirname+'/languages/'+language+'.json');
 		} catch (e) {
-			languageData = require('./languages/'+defaultLanguage+'.json');
+			languageData = require(__dirname+'/languages/'+defaultLanguage+'.json');
 		};
 		return languageData;
 	},

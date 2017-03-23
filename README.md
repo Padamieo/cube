@@ -11,6 +11,11 @@
 - electron .
 - nodemon -x electron .
 
+### publishing
+
+  https://www.npmjs.com/package/electron-builder
+  example-cmd: node_modules/.bin/build --win
+
 ### Todo
 
 - sort end of game / winner elements

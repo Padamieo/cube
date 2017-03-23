@@ -2,7 +2,7 @@ var app = require('express')();
 //var http = require('http').Server(app);
 
 //this works but may need some sort of compiler
-var $ = require('jQuery');
+var $ = require('jquery');
 
 var pkg = ui.pkg();
 

@@ -2,19 +2,16 @@
   "name": "cube-hide-and-seek",
   "version": "0.0.1",
   "description": "electron game running on socket.io and electron",
+  "author": "Michaél Adam Lockwood",
   "development": true,
   "browser": {
-    "jQuery": "./node_modules/jquery/dist/jquery.js",
     "game": "src/game.js"
   },
   "dependencies": {
-    "SpinKit": "git://github.com/tobiasahlin/SpinKit.git",
-    "electron": "*",
     "express": "^4.10.2",
     "handlebars": "^4.0.6",
     "jquery": "*",
     "node-discover": "^0.6.2",
-    "nodemon": "*",
     "socket.io": "^1.3.5",
     "stats.js": "^0.17.0",
     "three": "0.84.0",
@@ -37,10 +34,21 @@
     "grunt-modernizr": "^1.0.2",
     "grunt-modernizr-builder": "^0.1.9",
     "grunt-contrib-handlebars": "^1.0.0",
+    "SpinKit": "git://github.com/tobiasahlin/SpinKit.git",
+    "electron": "*",
+    "electron-builder": "^16.2.0",
+    "nodemon": "*",
     "load-grunt-tasks": "*"
   },
   "main": "main.js",
   "scripts": {
     "start": "nodemon -x electron ."
+  },
+  "build": {
+    "asar": false,
+    "nsis":{
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
