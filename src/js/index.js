@@ -10,7 +10,7 @@ var pkg = ui.pkg();
 var socket, thisPlayer;
 var users = [];
 
-const uuid = game.genUUID();
+const uuid = ui.genUUID();
 
 var nameUser = '';
 
@@ -78,7 +78,7 @@ function startup(){
 
       $.each(services, function( index, value ) {
         var gameName = value.details.host_name+" Game";
-        var v = game.contains(hosts, gameName, 'title' );
+        var v = g.contains(hosts, gameName, 'title' );
         if(v < 0){
           var details = value.details;
           var host_details = {name: "host", value: JSON.stringify(details)};
@@ -138,7 +138,7 @@ function startup(){
 		socket.on('addUser', function(data){
 			console.log("addUser");
       //something is making this work weird
-			// var index = game.contains(users, data.playerId, 'playerId');
+			// var index = g.contains(users, data.playerId, 'playerId');
 			// if(index === -1){
 			// 	if(uuid != data.playerId){
 					users.push(data);
@@ -166,8 +166,8 @@ function startup(){
 
           ui.updateScore(setup);
           ui.showScore(); // needs data to display
-
-          game.loadWorld(socket, data);
+          g = new game;
+          g.loadWorld(socket, data);
 
           socket.emit('requestPlayers', uuid);
 					socket.emit('requestCubes');
@@ -178,43 +178,46 @@ function startup(){
     });
 
     socket.on('addPlayer', function(data){
-      game.addOtherPlayer(data);
+      g.addOtherPlayer(data);
     });
 
 		socket.on('addCubes', function(data){
 			for (var i = 0; i < data.length; i++){
-				game.addCube(data[i]);
+				g.addCube(data[i]);
 			}
 		});
 
     socket.on('updatePlayers', function(data){
       //may need to check uuid and data.playerId dont match or data is not incorrect between
-      game.updateObject(data);
+      g.updateObject(data);
     });
 
 		socket.on('updateShots', function(data){
       //console.log(data);
-			game.addShot(data);
+			g.addShot(data);
 		});
 
 		socket.on('reportKill', function(data){
       console.log("reportKill");
       console.log(data);
       ui.updateScore(data);
-      game.hit(data.kill);
+      g.hit(data.kill);
 
 		});
 
     socket.on('removePlayer', function(data){
-      game.removeOtherPlayer(data);
+      g.removeOtherPlayer(data);
     });
 
     socket.on('endgame', function(data){
       console.log("endgame");
       console.log(data);
       //show winner message
+
       //transition back to host
+
       //destory old canvas
+
     });
 
   }
