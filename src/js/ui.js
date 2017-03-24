@@ -364,6 +364,17 @@ var ui = {
     var page = ui.defaultPageData(userType);
     ui.handlebars('lobby', page);
     ui.addUser(data);
-  }
+  },
+
+	genUUID: function() {
+		return '_' + Math.random().toString(36).substr(2, 9);
+	},
+
+	contains: function( array, id, term ) {
+		var index = array.findIndex(function(a){
+			return a[term] === id;
+		});
+		return index;
+	}
 
 };

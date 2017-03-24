@@ -1,6 +1,7 @@
-var game = {
+//var game = {
+function game(){
 
-  addLight: function(color, position, name){
+  this.addLight = function(color, position, name){
     var light = new THREE.PointLight( color, 1.5, 2000 );
     //light.color.setHSL( h, s, l );
     light.position.set( position.x, position.y, position.z );
@@ -8,7 +9,7 @@ var game = {
     this.scene.add( light );
   },
 
-  addLightAndLensFlare: function( h, s, l, x, y, z ) {
+  this.addLightAndLensFlare = function( h, s, l, x, y, z ) {
     var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
     light.color.setHSL( h, s, l );
     light.position.set( x, y, z );
@@ -30,7 +31,7 @@ var game = {
   },
 
 
-  lensFlareUpdateCallback: function( object ) {
+  this.lensFlareUpdateCallback = function( object ) {
     var f, fl = object.lensFlares.length;
     //console.log(f);
     var flare;
@@ -47,7 +48,7 @@ var game = {
   },
 
 
-  loadWorld: function( socket, data ){
+  this.loadWorld = function( socket, data ){
 
     //if(pkg.development);
       //maybe wrap in setting for stats / development mode in
@@ -106,21 +107,21 @@ var game = {
     var WindowResize = require('three-window-resize');
     var windowResize = new WindowResize(this.renderer, this.camera);
 
-    this.registerEvents(socket);
-
     this.createPlayer(data);
+
+    this.registerEvents(socket);
 
     this.render(socket);
 
   },
 
-  onWindowResize: function(){
+  this.onWindowResize = function(){
     console.log("resize");
     this.width = window.innerWidth;
     this.height = window.innerHeight;
   },
 
-  render: function () {
+  this.render = function () {
     this.stats.begin();
   	var ref = this;
   	requestAnimationFrame(function(){ref.render()});
@@ -136,30 +137,32 @@ var game = {
 
   },
 
-  registerEvents: function(){
-    document.addEventListener('click', this.fire, false );
+  this.registerEvents = function(){
+    var ref = this;
+
+    document.addEventListener('click', function(e) { ref.fire( e ); }, false );
+
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
     // document.addEventListener('mouseout', onMouseOut, false);
-    document.addEventListener('keydown', this.onKeyDown, false );
-    document.addEventListener('keyup', this.onKeyUp, false );
+
+    document.addEventListener('keydown', function(e) { ref.onKeyDown( e, ref ); }, false );
+    document.addEventListener('keyup', function(e) { ref.onKeyUp( e, ref ); }, false );
 
     // added for lensFlare size changes
     window.addEventListener( 'resize', this.onWindowResize, false );
   },
 
-  onKeyDown: function( event ){
-    //event = event || window.event;
-    game.keyState[event.keyCode || event.which] = true;
+  this.onKeyDown = function( event, ref ){
+    ref.keyState[event.keyCode || event.which] = true;
   },
 
-  onKeyUp: function( event ){
-    //event = event || window.event;
-    game.keyState[event.keyCode || event.which] = false;
+  this.onKeyUp = function( event, ref ){
+    ref.keyState[event.keyCode || event.which] = false;
   },
 
-  fire: function( event ){
+  this.fire = function( event ){
 
     var raycaster = new THREE.Raycaster(); // create once
     var mouse = new THREE.Vector2(); // create once
@@ -171,21 +174,22 @@ var game = {
     mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
     mouse.y = 0.5; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
-    //console.log(mouse);
+    raycaster.setFromCamera( mouse, this.camera );
 
-    raycaster.setFromCamera( mouse, game.camera );
-    //console.log(raycaster);
+    var intersects = raycaster.intersectObjects( this.objects, true );
 
-    var intersects = raycaster.intersectObjects( game.objects, true );
-    //console.log(intersects);
+    var scene = this.scene;
 
     if ( intersects.length > 0 ) {
 
-      //var a = game.camera.getWorldDirection();
+      //var a = this.camera.getWorldDirection();
       var a = intersects[0].point;
 
       //var b = three.camera.getWorldPosition();
-      var obj = game.scene.getObjectByName( thisPlayer.playerId );
+      if(!thisPlayer.playerId){
+        return;
+      }
+      var obj = this.scene.getObjectByName( thisPlayer.playerId );
       var b = obj.getWorldPosition();
 
 			var c = intersects[0].distance;
@@ -204,12 +208,11 @@ var game = {
       }
 
     }else{
-      //var obj = game.scene.getObjectByName(thisPlayer.playerId);
-      //var direction = game.camera.getWorldDirection();
+      //var obj = this.scene.getObjectByName(thisPlayer.playerId);
+      //var direction = this.camera.getWorldDirection();
 
       var direction = raycaster.ray.direction;
-
-      var obj = game.scene.getObjectByName(thisPlayer.playerId);
+      var obj = this.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
       var c = 999;
@@ -228,7 +231,7 @@ var game = {
 
   },
 
-  confirmHit: function(data){
+  this.confirmHit = function(data){
     if(data.type == 'player'){
       if(data.name === thisPlayer.playerId){
         console.log("confirm hit");
@@ -242,29 +245,29 @@ var game = {
     }
   },
 
-  hit: function(id){
+  this.hit = function(id){
     console.log("hit");
     //console.log(id);
-    for (var i = 0; i < game.objects.length; i++) {
-      if(game.objects[i].name == id){
-        game.objects.splice(i, 1);
+    for (var i = 0; i < this.objects.length; i++) {
+      if(this.objects[i].name == id){
+        this.objects.splice(i, 1);
       }
     }
     this.remove(id);
   },
 
 
-  remove: function(name) {
+  this.remove = function(name) {
     this.scene.remove(this.scene.getObjectByName(name));
   },
 
-	addShot: function(data){
+	this.addShot = function(data){
     console.log("addShot");
     if(data){
 
       this.shots++;
 
-      var obj = game.getObject(thisPlayer.playerId);
+      var obj = this.getObject(thisPlayer.playerId);
       var playerpos = obj.getWorldPosition();
 
 			if(this.sound){
@@ -310,7 +313,7 @@ var game = {
             easing: ref.TWEEN.Easing.Quintic.InOut,
             callback : function (){
               //console.log(line.name);
-              game.remove(line.name);
+              ref.remove(line.name);
             }
           });
         }
@@ -320,7 +323,7 @@ var game = {
 	},
 
   // part of fadeMesh tracks original opacity
-  trackOriginalOpacities: function(mesh) {
+  this.trackOriginalOpacities = function(mesh) {
     var opacities = [],
     materials = mesh.material.materials ? mesh.material.materials : [mesh.material];
     for (var i = 0; i < materials.length; i++) {
@@ -332,7 +335,7 @@ var game = {
 
   //fade mes may need refining
   // https://medium.com/@lachlantweedie/animation-in-three-js-using-tween-js-with-examples-c598a19b1263#.97d702fc5
-  fadeMesh: function(mesh, direction, options) {
+  this.fadeMesh = function(mesh, direction, options) {
     options = options || {};
     // set and check
     var current = { percentage : direction == "in" ? 1 : 0 },
@@ -365,7 +368,7 @@ var game = {
     return tweenOpacity;
   },
 
-	fovChange: function(f){
+	this.fovChange = function(f){
 		console.log(this.camera.fov);
 		var current = this.camera.fov;
 		if( f ){
@@ -376,46 +379,53 @@ var game = {
 		this.camera.updateProjectionMatrix();
 	},
 
-  checkKeyStates: function(){
+  this.escape = function(){
+    console.log("escape");
+  },
+
+  this.checkKeyStates = function(){
 
     var change = false;
     var obj = this.getObject(thisPlayer.playerId);
 
+    if( this.keyState[27] ){
+      this.escape();
+    }
 
-		if( game.keyState[38] ){
+		if( this.keyState[38] ){
 			this.fovChange(true);
 		}
-		if( game.keyState[40] ){
+		if( this.keyState[40] ){
 			this.fovChange(false);
 		}
 
 
-    if ( game.keyState[87] ) {
+    if ( this.keyState[87] ) {
       obj.rotateZ (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( game.keyState[83] ) {
+    if ( this.keyState[83] ) {
       obj.rotateZ (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( game.keyState[65] ) {
+    if ( this.keyState[65] ) {
       obj.rotateY (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( game.keyState[68] ) {
+    if ( this.keyState[68] ) {
       obj.rotateY (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( game.keyState[81] ) {
+    if ( this.keyState[81] ) {
       obj.rotateX (thisPlayer.turnSpeed);
       change = true
     }
 
-    if ( game.keyState[69] ) {
+    if ( this.keyState[69] ) {
       obj.rotateX (-thisPlayer.turnSpeed);
       change = true
     }
@@ -441,7 +451,7 @@ var game = {
 
   },
 
-  updateObject: function(data){
+  this.updateObject = function(data){
     for(var i = 0; i < this.players.length; i++){
       if(this.players[i].playerId == data.playerId){
         this.players[i].position.x = data.x;
@@ -455,7 +465,7 @@ var game = {
 
   },
 
-  getObject: function(playerId){
+  this.getObject = function(playerId){
     for(var i = 0; i < this.players.length; i++){
       if(this.players[i].playerId == playerId){
         return this.players[i];
@@ -463,14 +473,14 @@ var game = {
     }
   },
 
-  updateCameraPosition: function(playerId){
+  this.updateCameraPosition = function(playerId){
     var obj = this.getObject(playerId);
     this.camera.position.x = obj.position.x + 2* Math.sin( obj.rotation.y );
     this.camera.position.y = obj.position.y + 2;
     this.camera.position.z = obj.position.z + 2.5 * Math.cos( obj.rotation.y );
   },
 
-  create_cube: function(data, color, opacity, alt){
+  this.create_cube = function(data, color, opacity, alt){
 
 		var material =  new THREE.MeshLambertMaterial({color: color, transparent:true, opacity:opacity, side: THREE.DoubleSide});
 
@@ -490,7 +500,7 @@ var game = {
 
   },
 
-  position_rotation: function(o, data){
+  this.position_rotation = function(o, data){
     o.rotation.set(
       data.r_x,
       data.r_y,
@@ -502,7 +512,7 @@ var game = {
     return o;
   },
 
-  createPlayer: function(data){
+  this.createPlayer = function(data){
 
     //initial setup of local data store
     thisPlayer = data;
@@ -535,7 +545,7 @@ var game = {
 
   },
 
-  arrow: function(){
+  this.arrow = function(){
     var from = new THREE.Vector3( 0, 0.5, 0.1 );
     var to = new THREE.Vector3( -1, 0.7, 0.1 );
     var direction = to.clone().sub(from);
@@ -545,8 +555,8 @@ var game = {
     return arrowHelper;
   },
 
-  addOtherPlayer: function(data){
-    var index = this.contains(this.players, data.playerId, 'playerId');
+  this.addOtherPlayer = function(data){
+    var index = ui.contains(this.players, data.playerId, 'playerId');
     if(index == -1){
       if(uuid != data.playerId){
         this.addPlayer(data);
@@ -554,7 +564,7 @@ var game = {
     }
   },
 
-  addPlayer: function(data){
+  this.addPlayer = function(data){
     var obj = this.create_cube(data, 0xff7777, 0.9);
     obj.playerId = data.playerId; //may want to drop playerId in future
     obj.name = data.playerId;
@@ -564,7 +574,7 @@ var game = {
     this.scene.add( obj );
   },
 
-	addCube: function(data){
+	this.addCube = function(data){
 		var obj = this.create_cube(data, 0xfff777, 0.9);
 		obj.name = data.name;
     obj = this.position_rotation(obj, data);
@@ -573,7 +583,7 @@ var game = {
 	},
 
   //not sure this works, may only remove from players array
-  removeOtherPlayer: function(socket_id){
+  this.removeOtherPlayer = function(socket_id){
 
     //remove the players
     for(var i = 0; i < this.players.length; i++){
@@ -588,19 +598,8 @@ var game = {
     })
     this.players.splice(index, 1);
 
-  },
-
-  genUUID: function() {
-    return '_' + Math.random().toString(36).substr(2, 9);
-  },
-
-  contains: function( array, id, term ) {
-    var index = array.findIndex(function(a){
-      return a[term] === id;
-    });
-    return index;
   }
 
 };
 
-module.exports = game;
+//module.exports = game;
