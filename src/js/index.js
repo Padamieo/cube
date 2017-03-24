@@ -78,7 +78,7 @@ function startup(){
 
       $.each(services, function( index, value ) {
         var gameName = value.details.host_name+" Game";
-        var v = g.contains(hosts, gameName, 'title' );
+        var v = ui.contains(hosts, gameName, 'title' );
         if(v < 0){
           var details = value.details;
           var host_details = {name: "host", value: JSON.stringify(details)};

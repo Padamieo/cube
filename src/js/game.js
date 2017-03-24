@@ -155,15 +155,11 @@ function game(){
   },
 
   this.onKeyDown = function( event, ref ){
-    //event = event || window.event;
-    console.log(ref);
-    console.log(event);
     ref.keyState[event.keyCode || event.which] = true;
   },
 
-  this.onKeyUp = function( event ){
-    //event = event || window.event;
-    g.keyState[event.keyCode || event.which] = false;
+  this.onKeyUp = function( event, ref ){
+    ref.keyState[event.keyCode || event.which] = false;
   },
 
   this.fire = function( event ){
@@ -383,11 +379,18 @@ function game(){
 		this.camera.updateProjectionMatrix();
 	},
 
+  this.escape = function(){
+    console.log("escape");
+  },
+
   this.checkKeyStates = function(){
 
     var change = false;
     var obj = this.getObject(thisPlayer.playerId);
 
+    if( this.keyState[27] ){
+      this.escape();
+    }
 
 		if( this.keyState[38] ){
 			this.fovChange(true);
@@ -553,7 +556,7 @@ function game(){
   },
 
   this.addOtherPlayer = function(data){
-    var index = this.contains(this.players, data.playerId, 'playerId');
+    var index = ui.contains(this.players, data.playerId, 'playerId');
     if(index == -1){
       if(uuid != data.playerId){
         this.addPlayer(data);
@@ -595,13 +598,6 @@ function game(){
     })
     this.players.splice(index, 1);
 
-  },
-
-  this.contains = function( array, id, term ) {
-    var index = array.findIndex(function(a){
-      return a[term] === id;
-    });
-    return index;
   }
 
 };
