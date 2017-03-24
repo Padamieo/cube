@@ -217,7 +217,7 @@ function startup(){
       //transition back to host
 
       //destory old canvas
-
+      delete g;
     });
 
   }

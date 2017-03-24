@@ -139,25 +139,26 @@ function game(){
 
   this.registerEvents = function(){
     var ref = this;
-    var myFunctionReference = function() { ref.fire(this) };
-    document.addEventListener('click', myFunctionReference, false );
+
+    document.addEventListener('click', function(e) { ref.fire( e ); }, false );
 
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
     // document.addEventListener('mouseout', onMouseOut, false);
-    document.addEventListener('keydown', this.onKeyDown, false );
-    document.addEventListener('keyup', this.onKeyUp, false );
 
+    document.addEventListener('keydown', function(e) { ref.onKeyDown( e, ref ); }, false );
+    document.addEventListener('keyup', function(e) { ref.onKeyUp( e, ref ); }, false );
 
     // added for lensFlare size changes
     window.addEventListener( 'resize', this.onWindowResize, false );
   },
 
-  this.onKeyDown = function( event ){
+  this.onKeyDown = function( event, ref ){
     //event = event || window.event;
-    console.log();
-    g.keyState[event.keyCode || event.which] = true;
+    console.log(ref);
+    console.log(event);
+    ref.keyState[event.keyCode || event.which] = true;
   },
 
   this.onKeyUp = function( event ){
@@ -165,9 +166,7 @@ function game(){
     g.keyState[event.keyCode || event.which] = false;
   },
 
-  this.fire = function( ){
-
-    console.log(event);
+  this.fire = function( event ){
 
     var raycaster = new THREE.Raycaster(); // create once
     var mouse = new THREE.Vector2(); // create once
@@ -179,17 +178,11 @@ function game(){
     mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
     mouse.y = 0.5; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
 
-    //console.log(mouse);
-
     raycaster.setFromCamera( mouse, this.camera );
-    //console.log(raycaster);
 
     var intersects = raycaster.intersectObjects( this.objects, true );
-    //console.log(intersects);
 
-    //console.log(event);
     var scene = this.scene;
-
 
     if ( intersects.length > 0 ) {
 
@@ -223,8 +216,6 @@ function game(){
       //var direction = this.camera.getWorldDirection();
 
       var direction = raycaster.ray.direction;
-      console.log(this.scene);
-      console.log(thisPlayer.playerId);
       var obj = this.scene.getObjectByName(thisPlayer.playerId);
       var b = obj.getWorldPosition();
 
@@ -326,7 +317,7 @@ function game(){
             easing: ref.TWEEN.Easing.Quintic.InOut,
             callback : function (){
               //console.log(line.name);
-              //this.remove(line.name);
+              ref.remove(line.name);
             }
           });
         }
