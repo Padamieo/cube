@@ -205,19 +205,21 @@ function startup(){
 
 		});
 
-    socket.on('removePlayer', function(data){
-      g.removeOtherPlayer(data);
-    });
+    // socket.on('removePlayer', function(data){
+    //   g.removeOtherPlayer(data);
+    // });
 
     socket.on('endgame', function(data){
       console.log("endgame");
       console.log(data);
       //show winner message
 
+
       //transition back to host
+      ui.menuchange('host');
 
       //destory old canvas
-      delete g;
+      //delete g;
     });
 
   }

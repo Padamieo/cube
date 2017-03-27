@@ -137,10 +137,22 @@ function game(){
 
   },
 
+  this.dergisterEvents = function(){
+    var ref = this;
+    //window.removeEventListener('click', function(e) { ref.fire( e ); }, false );
+    $( "#cross" ).off( "click", function() {
+      console.log( "this" );
+    });
+  },
+
   this.registerEvents = function(){
     var ref = this;
 
-    document.addEventListener('click', function(e) { ref.fire( e ); }, false );
+    //window.addEventListener('click', function(e) { ref.fire( e ); }, false );
+
+    $( "#cross" ).on( "click", function() {
+      console.log( "this" );
+    });
 
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
@@ -381,6 +393,7 @@ function game(){
 
   this.escape = function(){
     console.log("escape");
+    this.dergisterEvents();
   },
 
   this.checkKeyStates = function(){
