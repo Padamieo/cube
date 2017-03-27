@@ -141,8 +141,8 @@ function startup(){
 			// var index = g.contains(users, data.playerId, 'playerId');
 			// if(index === -1){
 			// 	if(uuid != data.playerId){
-					users.push(data);
-					ui.addUser(data);
+				users.push(data);
+				ui.addUser(data);
 			// 	}
 			// }
 		});

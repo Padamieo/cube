@@ -220,7 +220,8 @@ var ui = {
 	},
 
 	handlebars: function(page, data, template){
-		var postTemplate = JST['src/templates/example.hbs']; // how do we know which template to use
+		var set_template = (template ? template : 'default' );
+		var postTemplate = JST['src/templates/'+set_template+'.hbs']; // how do we know which template to use
 		var html = postTemplate(data);
 		this.swapContent(page, html);
 	},
@@ -336,7 +337,12 @@ var ui = {
 
 		for (var i = 0; i < pages.length; i++) {
 			var data = this.defaultPageData(pages[i]);
-			this.handlebars(pages[i], data);
+			if(pages[i] === "options"){
+				this.handlebars(pages[i], data, "options");
+			}else{
+				this.handlebars(pages[i], data);
+			}
+
 		}
 
 	},
@@ -349,6 +355,15 @@ var ui = {
 		$( "#crosshair" ).fadeIn( "slow", function() {
 
 	  });
+	},
+
+	hideScore: function(){
+		$( ".ui-score" ).fadeOut( "slow", function() {
+
+		});
+		$( "#crosshair" ).fadeOut( "slow", function() {
+
+		});
 	},
 
 	updateScore: function(setup){

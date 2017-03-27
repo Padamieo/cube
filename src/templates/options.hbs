@@ -1,0 +1,41 @@
+
+  <h1><strong>{{titlea}}</strong> {{titleb}}</h1>
+
+  <div class="pt-triggers">
+
+    <label class="switch">
+      <input type="checkbox">
+      <div class="slider round"></div>
+    </label>
+
+    <input type="range" style="width:100%">
+
+
+    {{#if input}}
+      {{#input}}
+          <label for="{{id}}">test</label>
+          <input id="{{id}}" type="text" name="{{id}}">
+      {{/input}}
+    {{/if}}
+
+    {{#if users}}
+      <ul id="users"></ul>
+    {{/if}}
+
+    {{#if spinner}}
+      <div class="spinner sk-rotating-plane"></div>
+    {{/if}}
+
+    {{#if buttons}}
+      {{#buttons}}
+        <button id="{{id}}" class="pt-touch-button {{class}}"
+        {{#if data}}
+          {{#data}}
+            data-{{name}}="{{value}}"
+          {{/data}}
+        {{/if}}
+        >{{title}}</button>
+      {{/buttons}}
+    {{/if}}
+
+  </div>

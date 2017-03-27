@@ -69,7 +69,8 @@ function game(){
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    var canvas = document.getElementById("canvasID");
+    this.renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias: true, alpha: true });
 
     this.renderer.gammaInput = true;
     this.renderer.gammaOutput = true;
@@ -140,27 +141,43 @@ function game(){
   this.dergisterEvents = function(){
     var ref = this;
     //window.removeEventListener('click', function(e) { ref.fire( e ); }, false );
-    $( "#cross" ).off( "click", function() {
-      console.log( "this" );
-    });
+    $( window ).unbind( );
+
+    ui.hideScore();
+    ui.menuchange('host');
+    thisPlayer = null;
+    console.log(this);
+    // this.scene.dispose();
+    // this.scene = null;
+
   },
 
   this.registerEvents = function(){
     var ref = this;
+    console.log( "this" );
 
     //window.addEventListener('click', function(e) { ref.fire( e ); }, false );
 
-    $( "#cross" ).on( "click", function() {
-      console.log( "this" );
+    $( window ).bind( "click", function() {
+
+      ref.fire( this );
     });
+
 
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
     // document.addEventListener('mouseout', onMouseOut, false);
 
-    document.addEventListener('keydown', function(e) { ref.onKeyDown( e, ref ); }, false );
-    document.addEventListener('keyup', function(e) { ref.onKeyUp( e, ref ); }, false );
+    $( window ).keydown( function( event ) {
+      ref.onKeyDown( event, ref );
+    });
+
+    $( window ).keyup( function( event ) {
+      ref.onKeyUp( event, ref );
+    });
+    //document.addEventListener('keydown', function(e) { ref.onKeyDown( e, ref ); }, false );
+    //document.addEventListener('keyup', function(e) { ref.onKeyUp( e, ref ); }, false );
 
     // added for lensFlare size changes
     window.addEventListener( 'resize', this.onWindowResize, false );

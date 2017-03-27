@@ -100,6 +100,7 @@ function createWindow () {
 			});
 
 			socket.on('start', function(){
+        console.log("start");
         console.log(service);
         //confirm request is from host
 				players = host.createPlayers(users);
