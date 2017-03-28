@@ -68,17 +68,18 @@ function game(){
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-
+    console.log("canvas");
     var canvas = document.getElementById("canvasID");
     this.renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias: true, alpha: true });
 
     this.renderer.gammaInput = true;
     this.renderer.gammaOutput = true;
-
+    console.log("renderer");
     this.renderer.setSize(this.width, this.height);
     var container = document.getElementById('game');
     container.appendChild(this.renderer.domElement);
 
+    console.log("Scene");
     this.scene = new THREE.Scene;
     this.scene.background = new THREE.Color("#202020");
 
@@ -108,8 +109,10 @@ function game(){
     var WindowResize = require('three-window-resize');
     var windowResize = new WindowResize(this.renderer, this.camera);
 
+    console.log("createPlayer");
     this.createPlayer(data);
 
+    console.log("registerEvents");
     this.registerEvents(socket);
 
     this.render(socket);
@@ -134,27 +137,34 @@ function game(){
 			this.TWEEN.update();
 		}
     this.stats.end();
-  	this.renderer.render(this.scene, this.camera);
-
+    if(this.renderer != null){
+      this.renderer.render(this.scene, this.camera);
+    }
   },
 
-  this.dergisterEvents = function(){
+
+  this.deregisterEvents = function(){
     var ref = this;
     //window.removeEventListener('click', function(e) { ref.fire( e ); }, false );
     $( window ).unbind( );
+    $( window ).off();
 
     ui.hideScore();
     ui.menuchange('host');
+
     thisPlayer = null;
-    console.log(this);
-    // this.scene.dispose();
-    // this.scene = null;
+
+    this.keyState = {};
+    
+    this.scene = null;
+    this.renderer = null;
+    this.camera = null;
 
   },
 
   this.registerEvents = function(){
     var ref = this;
-    console.log( "this" );
+    console.log( "registerEvents" );
 
     //window.addEventListener('click', function(e) { ref.fire( e ); }, false );
 
@@ -169,11 +179,11 @@ function game(){
     // document.addEventListener('mousemove', onMouseMove, false);
     // document.addEventListener('mouseout', onMouseOut, false);
 
-    $( window ).keydown( function( event ) {
+    $( window ).on( "keydown", function( event ) {
       ref.onKeyDown( event, ref );
     });
 
-    $( window ).keyup( function( event ) {
+    $( window ).on( "keyup", function( event ) {
       ref.onKeyUp( event, ref );
     });
     //document.addEventListener('keydown', function(e) { ref.onKeyDown( e, ref ); }, false );
@@ -284,7 +294,6 @@ function game(){
     }
     this.remove(id);
   },
-
 
   this.remove = function(name) {
     this.scene.remove(this.scene.getObjectByName(name));
@@ -410,7 +419,7 @@ function game(){
 
   this.escape = function(){
     console.log("escape");
-    this.dergisterEvents();
+    this.deregisterEvents();
   },
 
   this.checkKeyStates = function(){
@@ -428,7 +437,6 @@ function game(){
 		if( this.keyState[40] ){
 			this.fovChange(false);
 		}
-
 
     if ( this.keyState[87] ) {
       obj.rotateZ (thisPlayer.turnSpeed);
