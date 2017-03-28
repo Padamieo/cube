@@ -348,7 +348,7 @@ var ui = {
 	},
 
 	//this probably should be a promise
-	showScore: function(){
+	showGUI: function(){
 		$( ".ui-score" ).fadeIn( "slow", function() {
 
 	  });
@@ -357,7 +357,7 @@ var ui = {
 	  });
 	},
 
-	hideScore: function(){
+	hideGUI: function(){
 		$( ".ui-score" ).fadeOut( "slow", function() {
 
 		});

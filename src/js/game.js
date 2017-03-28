@@ -16,7 +16,7 @@ function game(){
     this.scene.add( light );
     var flareColor = new THREE.Color( 0xffffff );
     flareColor.setHSL( h, s, l + 0.5 );
-    console.log(this.width);
+
     var lensFlare = new THREE.LensFlare( this.textureFlare0, this.width, 0.0, THREE.AdditiveBlending, flareColor );
     lensFlare.add( this.textureFlare2, this.width/2, 0.0, THREE.AdditiveBlending );
     lensFlare.add( this.textureFlare2, this.width/2, 0.0, THREE.AdditiveBlending );
@@ -29,7 +29,6 @@ function game(){
     lensFlare.position.copy( light.position );
     this.scene.add( lensFlare );
   },
-
 
   this.lensFlareUpdateCallback = function( object ) {
     var f, fl = object.lensFlares.length;
@@ -50,14 +49,14 @@ function game(){
 
   this.loadWorld = function( socket, data ){
 
-    //if(pkg.development);
+    if(pkg.development){
       //maybe wrap in setting for stats / development mode in
       this.stats = new Stats();
       //this.stats.showPanel( 1 );
       this.stats.domElement.style.position	= 'absolute';
       this.stats.domElement.style.bottom	= '0px';
       document.body.appendChild( this.stats.domElement );
-    //}
+    }
 
     this.objects = [];
     this.players = [];
@@ -68,18 +67,17 @@ function game(){
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    console.log("canvas");
+
     var canvas = document.getElementById("canvasID");
     this.renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias: true, alpha: true });
 
     this.renderer.gammaInput = true;
     this.renderer.gammaOutput = true;
-    console.log("renderer");
+
     this.renderer.setSize(this.width, this.height);
     var container = document.getElementById('game');
     container.appendChild(this.renderer.domElement);
 
-    console.log("Scene");
     this.scene = new THREE.Scene;
     this.scene.background = new THREE.Color("#202020");
 
@@ -109,10 +107,8 @@ function game(){
     var WindowResize = require('three-window-resize');
     var windowResize = new WindowResize(this.renderer, this.camera);
 
-    console.log("createPlayer");
     this.createPlayer(data);
 
-    console.log("registerEvents");
     this.registerEvents(socket);
 
     this.render(socket);
@@ -120,7 +116,6 @@ function game(){
   },
 
   this.onWindowResize = function(){
-    console.log("resize");
     this.width = window.innerWidth;
     this.height = window.innerHeight;
   },
@@ -142,24 +137,25 @@ function game(){
     }
   },
 
+  this.deconstruct = function(){
+    //may need to add promise
+    this.deregisterEvents();
 
-  this.deregisterEvents = function(){
-    var ref = this;
-    //window.removeEventListener('click', function(e) { ref.fire( e ); }, false );
-    $( window ).unbind( );
-    $( window ).off();
-
-    ui.hideScore();
+    ui.hideGUI();
     ui.menuchange('host');
 
     thisPlayer = null;
 
     this.keyState = {};
-    
+
     this.scene = null;
     this.renderer = null;
     this.camera = null;
+  },
 
+  this.deregisterEvents = function(){
+    $( window ).unbind();
+    $( window ).off();
   },
 
   this.registerEvents = function(){
@@ -210,8 +206,8 @@ function game(){
     // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
     //currently crosshair is set for center of screen this need to be somewhere visible for user
-    mouse.x = 0; //( (window.innerWidth/2) / window.innerWidth ) * 2 - 1;
-    mouse.y = 0.5; //( (window.innerHeight/2) / window.innerHeight ) * 2 + 1;
+    mouse.x = 0;
+    mouse.y = 0.5;
 
     raycaster.setFromCamera( mouse, this.camera );
 
@@ -396,12 +392,12 @@ function game(){
         for (var i = 0; i < mats.length; i++) {
           mats[i].opacity = originals[i] * current.percentage;
         }
-       })
-       .onComplete(function(){
-          if(options.callback){
-            options.callback();
-          }
-       });
+      })
+      .onComplete(function(){
+        if(options.callback){
+          options.callback();
+        }
+      });
     tweenOpacity.start();
     return tweenOpacity;
   },
@@ -419,7 +415,10 @@ function game(){
 
   this.escape = function(){
     console.log("escape");
+    ui.hideGUI();
+    this.keyState = {};
     this.deregisterEvents();
+    ui.menuchange('options'); //maybe new escape?
   },
 
   this.checkKeyStates = function(){
@@ -639,5 +638,3 @@ function game(){
   }
 
 };
-
-//module.exports = game;

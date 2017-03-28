@@ -165,7 +165,7 @@ function startup(){
         if(data.playerId == uuid){
 
           ui.updateScore(setup);
-          ui.showScore(); // needs data to display
+          ui.showGUI(); // needs data to display
           g = new game;
           g.loadWorld(socket, data);
 
@@ -214,12 +214,9 @@ function startup(){
       console.log(data);
       //show winner message
 
-
       //transition back to host
-      ui.menuchange('host');
+      g.deconstruct();
 
-      //destory old canvas
-      //delete g;
     });
 
   }
