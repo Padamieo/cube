@@ -31,3 +31,4 @@
   - host game by external ip / ul
 - with dev mode setup quick enter game mode
 - refine random placement of cubes
+- player disconnect/leave ingame fallback

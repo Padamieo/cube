@@ -165,10 +165,8 @@ function game(){
     //window.addEventListener('click', function(e) { ref.fire( e ); }, false );
 
     $( window ).bind( "click", function() {
-
       ref.fire( this );
     });
-
 
     // document.addEventListener('mousedown', onMouseDown, false);
     // document.addEventListener('mouseup', onMouseUp, false);
@@ -292,7 +290,9 @@ function game(){
   },
 
   this.remove = function(name) {
-    this.scene.remove(this.scene.getObjectByName(name));
+    if(this.scene){
+      this.scene.remove(this.scene.getObjectByName(name));
+    }
   },
 
 	this.addShot = function(data){
@@ -350,6 +350,7 @@ function game(){
               ref.remove(line.name);
             }
           });
+
         }
       });
 
@@ -415,10 +416,11 @@ function game(){
 
   this.escape = function(){
     console.log("escape");
-    ui.hideGUI();
-    this.keyState = {};
-    this.deregisterEvents();
-    ui.menuchange('options'); //maybe new escape?
+    // ui.hideGUI();
+    // this.keyState = {};
+    // this.deregisterEvents();
+    // ui.menuchange('options'); //maybe new escape?
+    this.deconstruct();
   },
 
   this.checkKeyStates = function(){

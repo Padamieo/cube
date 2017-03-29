@@ -48,16 +48,6 @@ var ui = {
 		return pkg;
 	},
 
-	// addButton: function(where, text, id, pend){
-	// 	var insert = ( id ? 'id="'+id+'"' : '' );
-	// 	var add = '<button '+insert+' class="pt-touch-button" >'+text+'</button>';
-	// 	if(pend){
-	// 		$(where).prepend(add);
-	// 	}else{
-	// 		$(where).append(add);
-	// 	}
-	// },
-
 	addUser: function(data){
 		$("#users").append('<li class="'+(data.host ? 'host' : '' )+'" id="'+data.playerId+'" >'+data.name+'</li>');
 	},
@@ -83,7 +73,15 @@ var ui = {
 			$( "#"+result ).remove();
 		});
 
+		return promise;
 	},
+
+	// test: function(){
+	// 	var p = this.fullText("something something");
+	// 	p.then(function(){
+	// 		console.log("additional");
+	// 	});
+	// },
 
 	fadeSpinner: function(item){
 		//this.addText('unable to find any avaliable host', '#search');
@@ -148,7 +146,7 @@ var ui = {
 			ref.menuchange('main');
 		});
 
-		$(document).on("click", "#options", function(){
+		$(document).on("click", "#settings", function(){
 			ref.menuchange('options');
 		});
 
@@ -226,7 +224,7 @@ var ui = {
 
 	keypres: function(){
 		// https://github.com/wesbos/keycodes/blob/gh-pages/scripts.js
-		var body = document.querySelector('body');
+		//var body = document.querySelector('body');
 		body.onkeydown = function (e) {
 			if ( !e.metaKey ) {
 				e.preventDefault();
@@ -276,7 +274,7 @@ var ui = {
 					id: 'join',
 					title: lang.join
 				},{
-					id: 'options',
+					id: 'settings',
 					title: lang.options
 				},{
 					id: 'exit',
@@ -385,7 +383,6 @@ var ui = {
 	},
 
 	updateScore: function(setup){
-		console.log("updateScore");
 		var alive = setup.total-setup.alive;
 		var total = setup.total;
 		var text = alive+"/"+total;

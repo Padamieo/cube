@@ -2,14 +2,19 @@
   <h1><strong>{{titlea}}</strong> {{titleb}}</h1>
 
   <div class="pt-triggers">
+    
+    {{#if switch}}
+      <label fpr="test">hello</label>
+      <label class="switch">
+        <input id="test" type="checkbox">
+        <div class="slider round"></div>
+      </label>
+    {{/if}}
 
-    <label class="switch">
-      <input type="checkbox">
-      <div class="slider round"></div>
-    </label>
-
-    <input type="range" style="width:100%">
-
+    {{#if slider}}
+      <label fpr="test2">hello</label>
+      <input id="test2" type="range" style="width:100%">
+    {{/if}}
 
     {{#if input}}
       {{#input}}
