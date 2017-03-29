@@ -67,6 +67,24 @@ var ui = {
 		$( location+" .pt-triggers" ).prepend( '<p '+c+'>'+text+'</p>' );
 	},
 
+	fullText: function(text, time){
+
+		var promise = new Promise(function( resolve ) {
+			ui.elements = ( ui.elements != undefined ? ui.elements+1 : 0 );
+			var id = 'ue'+ui.elements;
+			$( "body" ).prepend( '<p id="'+id+'" class="full-text">'+text+'</p>' );
+			var t = ( time ? time : 3000 );
+			setTimeout(function(){
+				resolve(id);
+			}, t);
+		});
+
+		promise.then(function(result) {
+			$( "#"+result ).remove();
+		});
+
+	},
+
 	fadeSpinner: function(item){
 		//this.addText('unable to find any avaliable host', '#search');
 		$( '.spinner' ).fadeOut( "fast");

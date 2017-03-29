@@ -213,7 +213,7 @@ function startup(){
       console.log("endgame");
       console.log(data);
       //show winner message
-
+      ui.fullText("Winner: "+data);
       //transition back to host
       g.deconstruct();
 
