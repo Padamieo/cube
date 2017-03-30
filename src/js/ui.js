@@ -76,13 +76,6 @@ var ui = {
 		return promise;
 	},
 
-	// test: function(){
-	// 	var p = this.fullText("something something");
-	// 	p.then(function(){
-	// 		console.log("additional");
-	// 	});
-	// },
-
 	fadeSpinner: function(item){
 		//this.addText('unable to find any avaliable host', '#search');
 		$( '.spinner' ).fadeOut( "fast");
@@ -233,42 +226,23 @@ var ui = {
 
 	keypres: function(){
 		// https://github.com/wesbos/keycodes/blob/gh-pages/scripts.js
-		//var body = document.querySelector('body');
 
 		var set = new Promise(function(resolve, reject) {
-			/*
-			window.onkeydown = function (e) {
-				if ( !e.metaKey ) {
-					e.preventDefault();
-				}
-				//document.querySelector('.keycode-display').innerHTML = e.keyCode;
-				//document.querySelector('.text-display').innerHTML =
-				var b = e.keyCode;
-				//var b = keyCodes[e.keyCode] || "huh? Let me know what browser and key this was. <a href=\"https://github.com/wesbos/keycodes/issues/new?title=Missing keycode ${e.keyCode}&body=Tell me what key it was or even better, submit a Pull request!\">Submit to Github</a>";
-				console.log(b);
-				resolve(b);
-			};
-			*/
+			//need to find way to identify gamepad and other devices input
+			// $(window).keydown(function(e) {
+			// 	console.log(e);
+			// });
 
 			$(document).on("keydown", function(e){
 				if ( !e.metaKey ) {
 					e.preventDefault();
 				}
-				//console.log(e.keyCode);
 				resolve(e.keyCode);
 			})
-
-			// if (/* everything turned out fine */) {
-			// 	resolve("Stuff worked!");
-			// } else {
-			// 	reject(Error("It broke"));
-			// }
-
 		});
 
 		set.then(function(reply){
 			$(document).off("keydown");
-			console.log("keydown");
 			console.log(reply);
 		});
 
@@ -281,8 +255,10 @@ var ui = {
 		var b = this.keypres();
 		b.then(function(r){
 			ref[setting] = r;
+			console.log(ui[setting]);
 		});
 	},
+
 
 	handlebars: function(page, data, template){
 		var set_template = (template ? template : 'default' );
