@@ -439,32 +439,32 @@ function game(){
 			this.fovChange(false);
 		}
 
-    if ( this.keyState[87] ) {
+    if ( this.keyState[ui.pitchZForward] ) {
       obj.rotateZ (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( this.keyState[83] ) {
+    if ( this.keyState[ui.pitchZBackward] ) {
       obj.rotateZ (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( this.keyState[65] ) {
+    if ( this.keyState[ui.pitchYLeft] ) {
       obj.rotateY (thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( this.keyState[68] ) {
+    if ( this.keyState[ui.pitchYRight] ) {
       obj.rotateY (-thisPlayer.turnSpeed);
       change = true;
     }
 
-    if ( this.keyState[81] ) {
+    if ( this.keyState[ui.pitchXLeft ] ) {
       obj.rotateX (thisPlayer.turnSpeed);
       change = true
     }
 
-    if ( this.keyState[69] ) {
+    if ( this.keyState[ui.pitchXRight] ) {
       obj.rotateX (-thisPlayer.turnSpeed);
       change = true
     }

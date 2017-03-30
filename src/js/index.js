@@ -36,9 +36,11 @@ function startup(){
   //buld default handlebars pages
   ui.defaultPagesSetup();
 
+  //untill we are loading user settings
+  ui.setDefaultKeys();
+
   //focus for this page
   $( "#username" ).focus();
-
 
   $(document).on("click", "#host", function(){
     console.log("host");

@@ -167,7 +167,6 @@ function createWindow () {
 
         if(data.end === true){
           setTimeout(function(){
-            //console.log("END WINNER");
             var winner = '';
             players.forEach(function( p ){
               if(p.alive == true){
