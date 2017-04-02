@@ -249,16 +249,36 @@ var ui = {
 		return set;
 	},
 
-	test: function(setting){
-		//setKeys
+	test: function(){
+		// nav = navigator.getGamepads();
+		// console.log(nav);
+		//
+		// var event = new CustomEvent('build', { 'detail': ui.pitchXRight });
+		// window.addEventListener('build', function (e) {
+		// 	console.log("build event");
+		// 	console.log(e);
+		// }, false);
+
+
+		// $(document).on("contextmenu", function(e){
+		// 	console.log(e);
+		// });
+
+
+		// $(document).on("keypress", function(e){
+		// 	console.log(e);
+		// });
+
+	},
+
+	setKey: function(setting){
 		var ref = this;
 		var b = this.keypres();
-		b.then(function(r){
-			ref[setting] = r;
+		b.then(function(newKey){
+			ref[setting] = newKey;
 			console.log(ui[setting]);
 		});
 	},
-
 
 	handlebars: function(page, data, template){
 		var set_template = (template ? template : 'default' );
