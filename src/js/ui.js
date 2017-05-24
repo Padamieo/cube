@@ -52,10 +52,12 @@ var ui = {
 		$("#users").append('<li class="'+(data.host ? 'host' : '' )+'" id="'+data.playerId+'" >'+data.name+'</li>');
 	},
 
+	/*
 	addText: function(text, location, classes){
 		var c = ( classes ? 'class="'+classes+'"' : '' );
 		$( location+" .pt-triggers" ).prepend( '<p '+c+'>'+text+'</p>' );
 	},
+	*/
 
 	fullText: function(text, time){
 
