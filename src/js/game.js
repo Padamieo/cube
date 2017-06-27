@@ -286,6 +286,14 @@ function game(){
         this.objects.splice(i, 1);
       }
     }
+    var obj = this.scene.getObjectByName( id );
+    console.log( obj );
+    var d = {
+      x: obj.position.x,
+      y: obj.position.y,
+      z: obj.position.z
+    }
+    this.addSmallCubes(d);
     this.remove(id);
   },
 
@@ -604,7 +612,8 @@ function game(){
   },
 
   this.addPlayer = function(data){
-    var obj = this.create_cube(data, 0xff7777, 0.9);
+    var color = ( data.color ? data.color : 0xff7777 );
+    var obj = this.create_cube(data, color, 0.9);
     obj.playerId = data.playerId; //may want to drop playerId in future
     obj.name = data.playerId;
     obj = this.position_rotation(obj, data);
@@ -614,12 +623,40 @@ function game(){
   },
 
 	this.addCube = function(data){
-		var obj = this.create_cube(data, 0xfff777, 0.9);
+    var color = ( data.color ? data.color : 0xfff777 );
+		var obj = this.create_cube(data, color, 0.9);
 		obj.name = data.name;
     obj = this.position_rotation(obj, data);
 		this.objects.push( obj );
 		this.scene.add( obj );
 	},
+
+  this.addSmallCubes = function (data){
+    var special = {
+      name: 'test',
+      r_x: 0,
+      r_y: 0,
+      r_z: 0,
+      x: data.x+0.25,
+      y: data.y+0.25,
+      z: data.z+0.25,
+      size: 0.5,
+      color: 0xff77ff
+    };
+    g.addCube(special, '');
+    var special = {
+      name: 'test',
+      r_x: 0,
+      r_y: 0,
+      r_z: 0,
+      x: data.x-0.25,
+      y: data.y-0.25,
+      z: data.z-0.25,
+      size: 0.5,
+      color: 0xff77ff
+    };
+    g.addCube(special, '');
+  },
 
   //not sure this works, may only remove from players array
   this.removeOtherPlayer = function(socket_id){

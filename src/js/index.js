@@ -187,7 +187,9 @@ function startup(){
 			for (var i = 0; i < data.length; i++){
 				g.addCube(data[i]);
 			}
+
 		});
+
 
     socket.on('updatePlayers', function(data){
       //may need to check uuid and data.playerId dont match or data is not incorrect between
