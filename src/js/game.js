@@ -632,30 +632,35 @@ function game(){
 	},
 
   this.addSmallCubes = function (data){
-    var special = {
-      name: 'test',
-      r_x: 0,
-      r_y: 0,
-      r_z: 0,
-      x: data.x+0.25,
-      y: data.y+0.25,
-      z: data.z+0.25,
-      size: 0.5,
-      color: 0xff77ff
-    };
-    g.addCube(special, '');
-    var special = {
-      name: 'test',
-      r_x: 0,
-      r_y: 0,
-      r_z: 0,
-      x: data.x-0.25,
-      y: data.y-0.25,
-      z: data.z-0.25,
-      size: 0.5,
-      color: 0xff77ff
-    };
-    g.addCube(special, '');
+    var size = 1;
+    var half_size = size/2;
+    var quart_size = half_size/2;
+    var positions = [
+      {x: -quart_size, y: -quart_size, z: -quart_size },
+      {x: quart_size, y: quart_size, z: quart_size },
+      {x: -quart_size, y: -quart_size, z: quart_size },
+      {x: quart_size, y: -quart_size, z: -quart_size },
+      {x: -quart_size, y: quart_size, z: quart_size },
+      {x: quart_size, y: quart_size, z: -quart_size },
+      {x: quart_size, y: -quart_size, z: -quart_size },
+      {x: quart_size, y: -quart_size, z: quart_size },
+
+    ];
+    for (i = 0; i < 7; i++) {
+      var special = {
+        name: 'test',
+        r_x: 0,
+        r_y: 0,
+        r_z: 0,
+        x: data.x+positions[i].x,
+        y: data.y+positions[i].y,
+        z: data.z+positions[i].z,
+        size: half_size,
+        color: 0xff77ff
+      };
+      g.addCube(special, '');
+    }
+
   },
 
   //not sure this works, may only remove from players array
