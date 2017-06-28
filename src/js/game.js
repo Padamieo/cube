@@ -269,16 +269,17 @@ function game(){
       if(data.name === thisPlayer.playerId){
         console.log("confirm hit");
 
-        this.hit(data.name);
+        this.hit(data);
         console.log("report to server");
         socket.emit('playerKill', thisPlayer.playerId);
       }
     }else if (data.type == 'cube'){
-      this.hit(data.name);
+      this.hit(data);
     }
   },
 
-  this.hit = function(id){
+  this.hit = function(data){
+    var id = data.name;
     console.log("hit");
     //console.log(id);
     for (var i = 0; i < this.objects.length; i++) {
@@ -287,13 +288,13 @@ function game(){
       }
     }
     var obj = this.scene.getObjectByName( id );
-    console.log( obj );
+    //console.log( obj );
     var d = {
       x: obj.position.x,
       y: obj.position.y,
       z: obj.position.z
     }
-    this.addSmallCubes(d);
+    this.addSmallCubes(d, data);
     this.remove(id);
   },
 
@@ -631,7 +632,7 @@ function game(){
 		this.scene.add( obj );
 	},
 
-  this.addSmallCubes = function (data){
+  this.addSmallCubes = function (data, d){
 
     var g = this;
 
@@ -647,6 +648,16 @@ function game(){
       mesh.scale.y = 0.5;
       mesh.scale.z = 0.5;
       g.scene.add( mesh );
+      console.log( d );
+      console.log(mesh.position);
+      var wee = new this.TWEEN.Tween(mesh.position).to({ x: 0, y: 0, z: 0 }, 5000);
+      wee.easing(this.TWEEN.Easing.Elastic.InOut);
+      wee.repeat(Infinity);
+      //wee.yoyo(true);
+      wee.start();
+      wee.onStart(function() { console.log("start") });
+      wee.onComplete(function() { console.log("complete") });
+
     });
 
     /*

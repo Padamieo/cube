@@ -187,8 +187,8 @@ function startup(){
 			for (var i = 0; i < data.length; i++){
 				g.addCube(data[i]);
 			}
-      var d = { x:0, y:0, z:0 };
-      g.addSmallCubes( d ); // testing
+      // var d = { x:0, y:0, z:0 };
+      // g.addSmallCubes( d ); // testing
 		});
 
     socket.on('updatePlayers', function(data){
