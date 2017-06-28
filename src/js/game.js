@@ -632,34 +632,38 @@ function game(){
 	},
 
   this.addSmallCubes = function (data){
-    var size = 1;
-    var half_size = size/2;
-    var quart_size = half_size/2;
-    var positions = [
-      {x: -quart_size, y: -quart_size, z: -quart_size },
-      {x: quart_size, y: quart_size, z: quart_size },
-      {x: -quart_size, y: -quart_size, z: quart_size },
-      {x: quart_size, y: -quart_size, z: -quart_size },
-      {x: -quart_size, y: quart_size, z: quart_size },
-      {x: quart_size, y: quart_size, z: -quart_size },
-      {x: quart_size, y: -quart_size, z: -quart_size },
-      {x: quart_size, y: -quart_size, z: quart_size },
 
-    ];
-    for (i = 0; i < 7; i++) {
-      var special = {
-        name: 'test',
-        r_x: 0,
-        r_y: 0,
-        r_z: 0,
-        x: data.x+positions[i].x,
-        y: data.y+positions[i].y,
-        z: data.z+positions[i].z,
-        size: half_size,
-        color: 0xff77ff
-      };
-      g.addCube(special, '');
-    }
+    var g = this;
+
+    var loader = new THREE.JSONLoader();
+
+    loader.load( 'js/untitled.json', function ( geometry ) {
+      var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
+      var mesh = new THREE.Mesh( geometry, material );
+      mesh.position.x = data.x;
+      mesh.position.y = data.y;
+      mesh.position.z = data.z;
+      mesh.scale.x = 0.5;
+      mesh.scale.y = 0.5;
+      mesh.scale.z = 0.5;
+      g.scene.add( mesh );
+    });
+
+    /*
+    var d = {
+      name: 'test',
+      r_x: 0,
+      r_y: 0,
+      r_z: 0,
+      x: 0,
+      y: 0,
+      z: 0,
+      size: 1,
+      color: 0xff77ff
+    };
+
+    this.addCube( d );
+    */
 
   },
 
