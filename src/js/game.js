@@ -111,6 +111,15 @@ function game(){
 
     this.registerEvents(socket);
 
+
+    this.world = new CANNON.World();
+    this.world.gravity.set(0,0,0);
+    this.world.broadphase = new CANNON.NaiveBroadphase();
+    this.world.solver.iterations = 10;
+
+    this.mesh = [];
+    this.body = [];
+
     this.render(socket);
 
   },
@@ -135,6 +144,8 @@ function game(){
     if(this.renderer != null){
       this.renderer.render(this.scene, this.camera);
     }
+
+    this.updatePhysics();
   },
 
   this.deconstruct = function(){
@@ -265,21 +276,21 @@ function game(){
   },
 
   this.confirmHit = function(data){
-    if(data.type == 'player'){
-      if(data.name === thisPlayer.playerId){
+    if(data.hit.type == 'player'){
+      if(data.hit.name === thisPlayer.playerId){
         console.log("confirm hit");
 
         this.hit(data);
         console.log("report to server");
         socket.emit('playerKill', thisPlayer.playerId);
       }
-    }else if (data.type == 'cube'){
+    }else if (data.hit.type == 'cube'){
       this.hit(data);
     }
   },
 
   this.hit = function(data){
-    var id = data.name;
+    var id = data.hit.name;
     console.log("hit");
     //console.log(id);
     for (var i = 0; i < this.objects.length; i++) {
@@ -348,7 +359,7 @@ function game(){
         callback : function (){
 
           if(data.hit != ''){
-            ref.confirmHit(data.hit);
+            ref.confirmHit(data);
           }
 
           ref.fadeMesh(line, "in", {
@@ -632,31 +643,74 @@ function game(){
 		this.scene.add( obj );
 	},
 
-  this.addSmallCubes = function (data, d){
+  this.updatePhysics = function (){
+    // Step the physics world
+    this.world.step( 1/60 );
+    // Copy coordinates from Cannon.js to Three.js
+    if( this.mesh ){
+      if( this.mesh.length >= 1 ){
+        for (i = 0; i < this.mesh.length; i++) {
+          this.mesh[i].position.copy(this.body[i].position);
+          //this.mesh[i].quaternion.copy(this.body[i].quaternion);
+        }
+      }
+    }
+
+  },
+
+  this.addSmallCubes = function (position, d){
 
     var g = this;
+
+    console.log( d );
+
+    // var v1 = (0, -100, 0);
+    //var v2 = (0, 100, 0);
+    // var dir = new THREE.Vector3();
+    // dir.subVectors( v2, v1 ).normalize();
+
+
+    var dir = new THREE.Vector3( 0, 0, 0 );
+    var axis = new THREE.Vector3( d.to.x, d.to.y, d.to.z );
+
+    var angle = Math.PI / 2;
+    dir.applyAxisAngle( axis, angle );
+
+    console.log( dir );
 
     var loader = new THREE.JSONLoader();
 
     loader.load( 'js/untitled.json', function ( geometry ) {
+      var i = g.mesh.length;
+
       var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
-      var mesh = new THREE.Mesh( geometry, material );
-      mesh.position.x = data.x;
-      mesh.position.y = data.y;
-      mesh.position.z = data.z;
-      mesh.scale.x = 0.5;
-      mesh.scale.y = 0.5;
-      mesh.scale.z = 0.5;
-      g.scene.add( mesh );
-      console.log( d );
-      console.log(mesh.position);
-      var wee = new this.TWEEN.Tween(mesh.position).to({ x: 0, y: 0, z: 0 }, 5000);
-      wee.easing(this.TWEEN.Easing.Elastic.InOut);
-      wee.repeat(Infinity);
-      //wee.yoyo(true);
-      wee.start();
-      wee.onStart(function() { console.log("start") });
-      wee.onComplete(function() { console.log("complete") });
+      var temp = new THREE.Mesh( geometry, material );
+      temp.position.x = position.x;
+      temp.position.y = position.y;
+      temp.position.z = position.z;
+      temp.scale.x = 0.5;
+      temp.scale.y = 0.5;
+      temp.scale.z = 0.5;
+      temp.name = 'debris'+i;
+      console.log( g.mesh.length );
+      console.log( g.mesh );
+      g.mesh.push( temp );
+      g.scene.add( temp );
+
+      shape = new CANNON.Box(new CANNON.Vec3(0.5,0.5,0.5));
+      mass = 1;
+      var body = new CANNON.Body({
+        mass: 1
+      });
+      body.position.set( position.x, position.y, position.z );
+      g.body.push( body );
+      //g.body[i]
+      g.body[i].addShape( shape );
+      g.body[i].position = g.mesh[i].position;
+      g.body[i].angularVelocity.set( 0, 0, 0 );
+      g.body[i].velocity.set(dir.x, dir.y, dir.z);
+      g.body[i].angularDamping = 0.5;
+      g.world.addBody( g.body[i] );
 
     });
 

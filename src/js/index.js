@@ -10,6 +10,8 @@ var pkg = ui.pkg();
 var socket, thisPlayer;
 var users = [];
 
+var g = 'a';
+
 const uuid = ui.genUUID();
 
 var nameUser = '';
