@@ -115,7 +115,7 @@ function game(){
     this.world = new CANNON.World();
     this.world.gravity.set(0,0,0);
     this.world.broadphase = new CANNON.NaiveBroadphase();
-    this.world.solver.iterations = 10;
+    //this.world.solver.iterations = 10;
 
     this.mesh = [];
     this.body = [];
@@ -651,7 +651,7 @@ function game(){
       if( this.mesh.length >= 1 ){
         for (i = 0; i < this.mesh.length; i++) {
           this.mesh[i].position.copy(this.body[i].position);
-          //this.mesh[i].quaternion.copy(this.body[i].quaternion);
+          this.mesh[i].quaternion.copy(this.body[i].quaternion);
         }
       }
     }
@@ -669,14 +669,16 @@ function game(){
     // var dir = new THREE.Vector3();
     // dir.subVectors( v2, v1 ).normalize();
 
+    // var dir = new THREE.Vector3( 0, 0, 0 );
+    // var axis = new THREE.Vector3( d.to.x, d.to.y, d.to.z );
+    //
+    // var angle = Math.PI / 2;
+    // dir.applyAxisAngle( axis, angle );
 
-    var dir = new THREE.Vector3( 0, 0, 0 );
-    var axis = new THREE.Vector3( d.to.x, d.to.y, d.to.z );
-
-    var angle = Math.PI / 2;
-    dir.applyAxisAngle( axis, angle );
+    var dir = new THREE.Vector3( (d.to.x-d.from.x), (d.to.y-d.from.y), (d.to.z-d.from.z) );
 
     console.log( dir );
+
 
     var loader = new THREE.JSONLoader();
 
@@ -692,43 +694,31 @@ function game(){
       temp.scale.y = 0.5;
       temp.scale.z = 0.5;
       temp.name = 'debris'+i;
-      console.log( g.mesh.length );
-      console.log( g.mesh );
+      // console.log( g.mesh.length );
+      // console.log( g.mesh );
       g.mesh.push( temp );
       g.scene.add( temp );
 
-      shape = new CANNON.Box(new CANNON.Vec3(0.5,0.5,0.5));
-      mass = 1;
-      var body = new CANNON.Body({
-        mass: 1
+      var damping = 0.01;
+      var mass = 10;
+      var mat = new CANNON.Material();
+      var cubeShape = new CANNON.Box(new CANNON.Vec3(1,1,1));
+
+      g.body[i] = new CANNON.Body({
+        mass: mass,
+        material: mat,
+        position: new CANNON.Vec3( position.x, position.y, position.z )
       });
-      body.position.set( position.x, position.y, position.z );
-      g.body.push( body );
-      //g.body[i]
-      g.body[i].addShape( shape );
-      g.body[i].position = g.mesh[i].position;
-      g.body[i].angularVelocity.set( 0, 0, 0 );
-      g.body[i].velocity.set(dir.x, dir.y, dir.z);
-      g.body[i].angularDamping = 0.5;
-      g.world.addBody( g.body[i] );
+
+      g.body[i].addShape( cubeShape );
+      g.body[i].velocity.set( dir.x, dir.y, dir.z );
+      //g.body[i].angularVelocity.set( dir.x, dir.y, dir.z );
+      g.body[i].linearDamping = damping;
+      g.body[i].angularDamping = damping;
+      g.world.addBody (g.body[i] );
+      //demo.addVisual(obj[i]);
 
     });
-
-    /*
-    var d = {
-      name: 'test',
-      r_x: 0,
-      r_y: 0,
-      r_z: 0,
-      x: 0,
-      y: 0,
-      z: 0,
-      size: 1,
-      color: 0xff77ff
-    };
-
-    this.addCube( d );
-    */
 
   },
 
