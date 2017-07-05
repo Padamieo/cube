@@ -1,4 +1,4 @@
-//var game = {
+
 function game(){
 
   this.addLight = function(color, position, name){
@@ -116,6 +116,9 @@ function game(){
     this.world.gravity.set(0,0,0);
     this.world.broadphase = new CANNON.NaiveBroadphase();
     //this.world.solver.iterations = 10;
+    if(pkg.development){
+      this.cannonDebugRenderer = new THREE.CannonDebugRenderer( this.scene, this.world );
+    }
 
     this.mesh = [];
     this.body = [];
@@ -146,6 +149,9 @@ function game(){
     }
 
     this.updatePhysics();
+    if(pkg.development){
+      this.cannonDebugRenderer.update();
+    }
   },
 
   this.deconstruct = function(){
@@ -247,8 +253,10 @@ function game(){
         e = { type:'player', name: name };
         //e = intersects[0].object.playerId;
       }else{
+        //console.log("notice me");
+        var point = intersects[0].point;
         var name = intersects[0].object.name;
-        e = { type:'cube', name: name };
+        e = { type:'cube', name: name, point: point };
       }
 
     }else{
@@ -452,12 +460,26 @@ function game(){
       this.escape();
     }
 
-		if( this.keyState[38] ){
-			this.fovChange(true);
-		}
-		if( this.keyState[40] ){
-			this.fovChange(false);
-		}
+  	if(pkg.development){
+  		if( this.keyState[38] ){
+  			this.fovChange(true);
+  		}
+  		if( this.keyState[40] ){
+  			this.fovChange(false);
+  		}
+      if ( this.keyState[104] ) {
+        obj.translateX( -0.01 );
+      }
+      if ( this.keyState[101] ) {
+        obj.translateX( 0.01 );
+      }
+      if ( this.keyState[102] ) {
+        obj.translateZ( -0.01 );
+      }
+      if ( this.keyState[100] ) {
+        obj.translateZ( 0.01 );
+      }
+    }
 
     if ( this.keyState[ui.pitchZForward] ) {
       obj.rotateZ (thisPlayer.turnSpeed);
@@ -650,6 +672,7 @@ function game(){
     if( this.mesh ){
       if( this.mesh.length >= 1 ){
         for (i = 0; i < this.mesh.length; i++) {
+          //console.log(this.body[i].velocity.x); //may want to know velocity down to 0
           this.mesh[i].position.copy(this.body[i].position);
           this.mesh[i].quaternion.copy(this.body[i].quaternion);
         }
@@ -662,27 +685,15 @@ function game(){
 
     var g = this;
 
-    console.log( d );
-
-    // var v1 = (0, -100, 0);
-    //var v2 = (0, 100, 0);
-    // var dir = new THREE.Vector3();
-    // dir.subVectors( v2, v1 ).normalize();
-
-    // var dir = new THREE.Vector3( 0, 0, 0 );
-    // var axis = new THREE.Vector3( d.to.x, d.to.y, d.to.z );
-    //
-    // var angle = Math.PI / 2;
-    // dir.applyAxisAngle( axis, angle );
+    //console.log( d );
 
     var dir = new THREE.Vector3( (d.to.x-d.from.x), (d.to.y-d.from.y), (d.to.z-d.from.z) );
-
-    console.log( dir );
-
+    //console.log( dir );
 
     var loader = new THREE.JSONLoader();
 
-    loader.load( 'js/untitled.json', function ( geometry ) {
+    /*
+    loader.load( 'geometry/untitled.json', function ( geometry ) {
       var i = g.mesh.length;
 
       var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
@@ -694,12 +705,11 @@ function game(){
       temp.scale.y = 0.5;
       temp.scale.z = 0.5;
       temp.name = 'debris'+i;
-      // console.log( g.mesh.length );
-      // console.log( g.mesh );
+
       g.mesh.push( temp );
       g.scene.add( temp );
 
-      var damping = 0.01;
+      var damping = 0.1;
       var mass = 10;
       var mat = new CANNON.Material();
       var cubeShape = new CANNON.Box(new CANNON.Vec3(1,1,1));
@@ -715,10 +725,95 @@ function game(){
       //g.body[i].angularVelocity.set( dir.x, dir.y, dir.z );
       g.body[i].linearDamping = damping;
       g.body[i].angularDamping = damping;
+
+      if(d.hit.point){
+        var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
+        var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
+        g.body[i].applyImpulse ( impulse,  worldPoint );
+      }
+
       g.world.addBody (g.body[i] );
-      //demo.addVisual(obj[i]);
 
     });
+    */
+    for (i = 1; i < 5; i++) {
+
+      loader.load( 'geometry/debris'+i+'.json', function ( geometry ) {
+        var e = g.mesh.length;
+
+        var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
+        var temp = new THREE.Mesh( geometry, material );
+        temp.position.x = position.x;
+        temp.position.y = position.y;
+        temp.position.z = position.z;
+        temp.scale.x = 0.5;
+        temp.scale.y = 0.5;
+        temp.scale.z = 0.5;
+        temp.name = 'debris'+e;
+
+        // var center = THREE.GeometryUtils.center( temp );
+        // console.log( center );
+        // console.log( position.x+','+position.y+','+position.z );
+
+        var box = new THREE.BoxHelper( temp, 0xffff00 );
+        g.scene.add( box );
+        //temp.add( box );
+
+        g.mesh.push( temp );
+        g.scene.add( temp );
+
+
+        var damping = 0.5;//0.1 probably
+        var mass = 10;
+        var mat = new CANNON.Material();
+
+        //console.log(temp.geometry.vertices);
+
+        cannonPoints = temp.geometry.vertices.map(function(v) {
+          return new CANNON.Vec3( v.x, v.y, v.z )
+        });
+
+        cannonFaces = temp.geometry.faces.map(function(f) {
+          return [f.a, f.b, f.c]
+        });
+
+        var cubeShape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
+        //var cubeShape = new CANNON.Box(new CANNON.Vec3(0.15,0.15,0.15));
+
+        if(e == 2){
+          console.log("one");
+          g.body[e] = new CANNON.Body({
+            mass: mass,
+            material: mat,
+            position: new CANNON.Vec3( position.x-5, position.y-5, position.z-5 )
+          });
+        }else{
+          g.body[e] = new CANNON.Body({
+            mass: mass,
+            material: mat,
+            position: new CANNON.Vec3( position.x, position.y, position.z )
+          });
+        }
+
+
+        g.body[e].addShape( cubeShape );
+        //g.body[e].velocity.set( dir.x, dir.y, dir.z );
+        //g.body[i].angularVelocity.set( dir.x, dir.y, dir.z );
+        g.body[e].linearDamping = damping;
+        g.body[e].angularDamping = damping;
+
+        if(d.hit.point){
+          // var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
+          // var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
+          // g.body[e].applyImpulse ( impulse,  worldPoint );
+        }
+
+        g.world.addBody (g.body[e] );
+
+
+      });
+    }
+
 
   },
 
