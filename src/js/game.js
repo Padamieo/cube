@@ -46,7 +46,6 @@ function game(){
     object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
   },
 
-
   this.loadWorld = function( socket, data ){
 
     if(pkg.development){
@@ -111,7 +110,7 @@ function game(){
 
     this.registerEvents(socket);
 
-
+    //physics cannon stuff for debris
     this.world = new CANNON.World();
     this.world.gravity.set(0,0,0);
     this.world.broadphase = new CANNON.NaiveBroadphase();
@@ -119,12 +118,11 @@ function game(){
     if(pkg.development){
       this.cannonDebugRenderer = new THREE.CannonDebugRenderer( this.scene, this.world );
     }
-
-    this.mesh = [];
-    this.body = [];
+    this.debrisMesh = [];
+    this.debrisShape = [];
 
     this.render(socket);
-
+    
   },
 
   this.onWindowResize = function(){
@@ -336,18 +334,12 @@ function game(){
 			  sound.startSound(data.to, playerpos);
 			}
 
-      /*
-      var arrow = new THREE.ArrowHelper( data.to, data.from, data.distance, '0xffffff');
-      console.log(arrow);
-      this.scene.add( arrow );
-      */
-
       //current line and material working version
       var material = new THREE.LineBasicMaterial({
         color: data.color,
         transparent: true,
         opacity: 1
-       });
+      });
 
       var geometry = new THREE.Geometry();
       geometry.vertices.push(data.to);
@@ -669,12 +661,12 @@ function game(){
     // Step the physics world
     this.world.step( 1/60 );
     // Copy coordinates from Cannon.js to Three.js
-    if( this.mesh ){
-      if( this.mesh.length >= 1 ){
-        for (i = 0; i < this.mesh.length; i++) {
-          //console.log(this.body[i].velocity.x); //may want to know velocity down to 0
-          this.mesh[i].position.copy(this.body[i].position);
-          this.mesh[i].quaternion.copy(this.body[i].quaternion);
+    if( this.debrisMesh ){
+      if( this.debrisMesh.length >= 1 ){
+        for (i = 0; i < this.debrisMesh.length; i++) {
+          //console.log(this.debrisShape[i].velocity.x); //may want to know velocity down to 0
+          this.debrisMesh[i].position.copy(this.debrisShape[i].position);
+          this.debrisMesh[i].quaternion.copy(this.debrisShape[i].quaternion);
         }
       }
     }
@@ -694,7 +686,7 @@ function game(){
 
     /*
     loader.load( 'geometry/untitled.json', function ( geometry ) {
-      var i = g.mesh.length;
+      var i = g.debrisMesh.length;
 
       var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
       var temp = new THREE.Mesh( geometry, material );
@@ -706,7 +698,7 @@ function game(){
       temp.scale.z = 0.5;
       temp.name = 'debris'+i;
 
-      g.mesh.push( temp );
+      g.debrisMesh.push( temp );
       g.scene.add( temp );
 
       var damping = 0.1;
@@ -714,41 +706,39 @@ function game(){
       var mat = new CANNON.Material();
       var cubeShape = new CANNON.Box(new CANNON.Vec3(1,1,1));
 
-      g.body[i] = new CANNON.Body({
+      g.debrisShape[i] = new CANNON.Body({
         mass: mass,
         material: mat,
         position: new CANNON.Vec3( position.x, position.y, position.z )
       });
 
-      g.body[i].addShape( cubeShape );
-      g.body[i].velocity.set( dir.x, dir.y, dir.z );
-      //g.body[i].angularVelocity.set( dir.x, dir.y, dir.z );
-      g.body[i].linearDamping = damping;
-      g.body[i].angularDamping = damping;
+      g.debrisShape[i].addShape( cubeShape );
+      g.debrisShape[i].velocity.set( dir.x, dir.y, dir.z );
+      //g.debrisShape[i].angularVelocity.set( dir.x, dir.y, dir.z );
+      g.debrisShape[i].linearDamping = damping;
+      g.debrisShape[i].angularDamping = damping;
 
       if(d.hit.point){
         var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
         var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
-        g.body[i].applyImpulse ( impulse,  worldPoint );
+        g.debrisShape[i].applyImpulse ( impulse,  worldPoint );
       }
 
-      g.world.addBody (g.body[i] );
+      g.world.addBody (g.debrisShape[i] );
 
     });
     */
+
     for (i = 1; i < 5; i++) {
 
       loader.load( 'geometry/debris'+i+'.json', function ( geometry ) {
-        var e = g.mesh.length;
+        var e = g.debrisMesh.length;
 
         var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
         var temp = new THREE.Mesh( geometry, material );
         temp.position.x = position.x;
         temp.position.y = position.y;
         temp.position.z = position.z;
-        // temp.scale.x = 0.5;
-        // temp.scale.y = 0.5;
-        // temp.scale.z = 0.5;
         temp.name = 'debris'+e;
 
         // var center = THREE.GeometryUtils.center( temp );
@@ -759,7 +749,7 @@ function game(){
         g.scene.add( box );
         //temp.add( box );
 
-        g.mesh.push( temp );
+        g.debrisMesh.push( temp );
         g.scene.add( temp );
 
 
@@ -782,33 +772,25 @@ function game(){
         var cubeShape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
         //var cubeShape = new CANNON.Box(new CANNON.Vec3(0.15,0.15,0.15));
 
-        g.body[e] = new CANNON.Body({
+        g.debrisShape[e] = new CANNON.Body({
           mass: mass,
           material: mat,
           position: new CANNON.Vec3( position.x, position.y, position.z )
         });
 
-        // console.log( g.body[e] );
-        // g.body[e].boundingRadius = 1;
-        // console.log( g.body[e] );
-        // g.body[e].shape.halfExtents.x = 0.5;
-        // g.body[e].shape.halfExtents.y = 0.5;
-        // g.body[e].shape.halfExtents.z = 0.5;
-        // g.body[e].updateConvexPolyhedronRepresentation();
-
-        g.body[e].addShape( cubeShape );
-        g.body[e].velocity.set( dir.x, dir.y, dir.z );
-        //g.body[i].angularVelocity.set( dir.x, dir.y, dir.z );
-        g.body[e].linearDamping = damping;
-        g.body[e].angularDamping = damping;
+        g.debrisShape[e].addShape( cubeShape );
+        g.debrisShape[e].velocity.set( dir.x, dir.y, dir.z );
+        //g.debrisShape[i].angularVelocity.set( dir.x, dir.y, dir.z );
+        g.debrisShape[e].linearDamping = damping;
+        g.debrisShape[e].angularDamping = damping;
 
         if(d.hit.point){
           var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
           var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
-          g.body[e].applyImpulse ( impulse,  worldPoint );
+          g.debrisShape[e].applyImpulse ( impulse,  worldPoint );
         }
 
-        g.world.addBody (g.body[e] );
+        g.world.addBody ( g.debrisShape[e] );
 
 
       });

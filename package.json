@@ -43,7 +43,8 @@
   },
   "main": "main.js",
   "scripts": {
-    "start": "nodemon -x electron ."
+    "start": "nodemon -x electron .",
+    "postinstall": "node_modules/.bin/bower install"
   },
   "build": {
     "asar": false,
