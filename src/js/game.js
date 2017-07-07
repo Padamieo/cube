@@ -314,7 +314,7 @@ function game(){
       r_y: obj.rotation.y,
       r_z: obj.rotation.z
     }
-    this.addSmallCubes(d, data);
+    this.addSmallCubes2(d, data, obj.geometry.vertices );
     this.remove(id);
   },
 
@@ -681,6 +681,74 @@ function game(){
 
   },
 
+  this.addSmallCubes2 = function ( position, someData, verts ){
+      console.log(verts);
+
+      var mm = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        wireframe: true
+      });
+      var cc = new THREE.CubeGeometry(1, 1, 1);
+      var oo = new THREE.Mesh( cc, mm );
+      oo = this.position_rotation( oo, position );
+      this.scene.add( oo );
+
+
+      var geom = new THREE.Geometry();
+
+      // geom.vertices.push(
+      // 	new THREE.Vector3( -10,  10, 0 ),
+      // 	new THREE.Vector3( -10, -10, 0 ),
+      // 	new THREE.Vector3(  10, -10, 0 )
+      // );
+
+      geom.vertices.push(
+        verts[0],
+        verts[1],
+        verts[2]
+      );
+      geom.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+      geom.vertices.push(
+        verts[0],
+        verts[1],
+        verts[5]
+      );
+      geom.faces.push( new THREE.Face3( 0, 1, 5 ) );
+
+      geom.vertices.push(
+        verts[0],
+        verts[2],
+        verts[5]
+      );
+      geom.faces.push( new THREE.Face3( 0, 2, 5 ) );
+
+      geom.vertices.push(
+        verts[1],
+        verts[2],
+        verts[5]
+      );
+      geom.faces.push( new THREE.Face3( 1, 2, 5 ) );
+
+
+      geom.computeBoundingSphere();
+      geom.computeFaceNormals();
+
+
+      var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
+      var object = new THREE.Mesh( geom, material );
+      console.log(object);
+      // object.position.x = position.x;
+      // object.position.y = position.y;
+      // object.position.z = position.z;
+      object = this.position_rotation( object, position );
+
+      var box = new THREE.BoxHelper( object, 0xffff00 );
+      this.scene.add( box );
+      //this.debrisMesh.push( object );
+      this.scene.add(object);
+  },
+
   this.addSmallCubes = function (position, d){
 
     var g = this;
@@ -690,7 +758,7 @@ function game(){
     var dir = new THREE.Vector3( (d.to.x-d.from.x), (d.to.y-d.from.y), (d.to.z-d.from.z) );
     //console.log( dir );
 
-    var loader = new THREE.ObjectLoader();
+    var loader = new THREE.JSONLoader();
 
     for (i = 2; i < 3; i++) { // 1 - 5
 
