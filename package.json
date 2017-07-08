@@ -4,6 +4,7 @@
   "description": "electron game running on socket.io and electron",
   "author": "Michaél Adam Lockwood",
   "development": true,
+  "debug": true,
   "browser": {
     "game": "src/game.js"
   },

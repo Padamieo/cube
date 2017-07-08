@@ -96,7 +96,7 @@ function createWindow () {
 					if (users[i].playerId != id){
 						socket.emit('addUser', users[i]);
 					}
-				}
+				}        
 			});
 
 			socket.on('start', function(){
