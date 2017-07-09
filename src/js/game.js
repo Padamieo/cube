@@ -115,11 +115,12 @@ function game(){
     this.world.gravity.set(0,0,0);
     this.world.broadphase = new CANNON.NaiveBroadphase();
     //this.world.solver.iterations = 10;
-    if(pkg.development){
+    if(pkg.debugCannon){
       this.cannonDebugRenderer = new THREE.CannonDebugRenderer( this.scene, this.world );
     }
     this.debrisMesh = [];
     this.debrisShape = [];
+    this.cubeBodies = [];
 
     this.render(socket);
 
@@ -147,7 +148,7 @@ function game(){
     }
 
     this.updatePhysics();
-    if(pkg.development){
+    if(pkg.debugCannon){
       this.cannonDebugRenderer.update();
     }
   },
@@ -296,26 +297,24 @@ function game(){
   },
 
   this.hit = function(data){
-    var id = data.hit.name;
+    var name = data.hit.name;
     console.log("hit");
-    //console.log(id);
     for (var i = 0; i < this.objects.length; i++) {
-      if(this.objects[i].name == id){
+      if(this.objects[i].name == name){
         this.objects.splice(i, 1);
       }
     }
-    var obj = this.scene.getObjectByName( id );
-    //console.log( obj );
-    var d = {
+    var obj = this.scene.getObjectByName( name );
+    var positionRotation = {
       x: obj.position.x,
       y: obj.position.y,
       z: obj.position.z,
       r_x: obj.rotation.x,
       r_y: obj.rotation.y,
       r_z: obj.rotation.z
-    }
-    this.addSmallCubes2(d, data, obj.geometry.vertices );
-    this.remove(id);
+    };
+    this.addTriangleDebrisFromCube( positionRotation, data, obj.geometry.vertices, obj.size );
+    this.remove(name);
   },
 
   this.remove = function(name) {
@@ -530,12 +529,6 @@ function game(){
   this.updateObject = function(data){
     for(var i = 0; i < this.players.length; i++){
       if(this.players[i].playerId == data.playerId){
-        // this.players[i].position.x = data.x;
-        // this.players[i].position.y = data.y;
-        // this.players[i].position.z = data.z;
-        // this.players[i].rotation.x = data.r_x;
-        // this.players[i].rotation.y = data.r_y;
-        // this.players[i].rotation.z = data.r_z;
         this.players[i] = this.position_rotation( this.players[i], data );
       }
     }
@@ -577,20 +570,14 @@ function game(){
 
   },
 
-  this.position_rotation = function(o, data){
-    // o.rotation.set(
-    //   data.r_x,
-    //   data.r_y,
-    //   data.r_z
-    // );
-    o.rotation.x = data.r_x;
-    o.rotation.y = data.r_y;
-    o.rotation.z = data.r_z;
-
-    o.position.x = data.x;
-    o.position.y = data.y;
-    o.position.z = data.z;
-    return o;
+  this.position_rotation = function(obj, data){
+    obj.rotation.x = data.r_x;
+    obj.rotation.y = data.r_y;
+    obj.rotation.z = data.r_z;
+    obj.position.x = data.x;
+    obj.position.y = data.y;
+    obj.position.z = data.z;
+    return obj;
   },
 
   this.createPlayer = function(data){
@@ -608,15 +595,13 @@ function game(){
     obj.position.y = 0;
     obj.position.z = 0;
 
+    obj.size = data.size;
+
     this.players.push( obj );
     this.scene.add( obj );
 
-    // var arrowHelper = this.arrow();
-    // obj.add( arrowHelper );
-
     this.camera.position.set( 3, 1, 0 );
 
-    //console.log(obj.position);
     var temp = new THREE.Vector3( -1, 0, 0 );
     this.camera.lookAt( temp );
 
@@ -660,9 +645,19 @@ function game(){
     var color = ( data.color ? data.color : 0xfff777 );
 		var obj = this.create_cube(data, color, 0.9);
 		obj.name = data.name;
+    obj.size = data.size;
     obj = this.position_rotation(obj, data);
 		this.objects.push( obj );
 		this.scene.add( obj );
+
+    /*
+    //physics for cubes?
+    var e = this.cubeBodies.length;
+    var debrisShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+    this.cubeBodies[e] = new CANNON.Body({mass: 100, shape: debrisShape});
+    this.cubeBodies[e].position.set(data.x, data.y, data.z);
+    this.world.add(this.cubeBodies[e]);
+    */
 	},
 
   this.updatePhysics = function (){
@@ -673,208 +668,135 @@ function game(){
       if( this.debrisMesh.length >= 1 ){
         for (i = 0; i < this.debrisMesh.length; i++) {
           //console.log(this.debrisShape[i].velocity.x); //may want to know velocity down to 0
-          //this.debrisMesh[i].position.copy(this.debrisShape[i].position);
-          //this.debrisMesh[i].quaternion.copy(this.debrisShape[i].quaternion);
+          this.debrisMesh[i].position.copy(this.debrisShape[i].position);
+          this.debrisMesh[i].quaternion.copy(this.debrisShape[i].quaternion);
         }
       }
     }
-
+    /*
+    if( this.cubeBodies ){
+      if( this.cubeBodies.length >= 1 ){
+        for (i = 0; i < this.cubeBodies.length; i++) {
+          // this.cubeBodies[i].position.copy(this.object?[i].position);
+          // this.cubeBodies[i].quaternion.copy(this.object?[i].quaternion);
+        }
+      }
+    }
+    */
   },
 
-  this.addSmallCubes2 = function ( position, someData, verts ){
-    console.log(position);
+  this.addTriangleDebrisFromCube = function ( position, shotData, vertices, size ){
 
-    var mm = new THREE.MeshBasicMaterial({
-      color: 0xff0000,
-      wireframe: true
-    });
-    var cc = new THREE.CubeGeometry(1, 1, 1);
-    var oo = new THREE.Mesh( cc, mm );
-    oo = this.position_rotation( oo, position );
-    this.scene.add( oo );
+    size = ( size ? size : 1 );
 
-    var damping = 0.5;//0.1 probably
+    if(pkg.debugCannon){
+      var mat = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        wireframe: true
+      });
+      var cube = new THREE.CubeGeometry(1, 1, 1);
+      var obj = new THREE.Mesh( cube, mat );
+      obj = this.position_rotation( obj, position );
+      this.scene.add( obj );
+    }
+
+    var damping = 0.3;//0.1 probably
     var mass = 10;
     var mat = new CANNON.Material();
+    var dir = new THREE.Vector3(
+      (shotData.to.x-shotData.from.x),
+      (shotData.to.y-shotData.from.y),
+      (shotData.to.z-shotData.from.z)
+    );
 
-    triangles = [
+    var triangles = [
       [0,1,2,5],
       [1,2,3,6],
       [2,5,6,7],
       [1,4,5,6]
     ];
 
-    colors = [
-      0xff77ff,
-      0x55ff55,
-      0x55ffff,
-      0xff9900
-    ]
+    var material = new THREE.MeshLambertMaterial({ color: 0xfff777 });
+    var quater = size/4;
 
-    /*
+    var offset = [
+      [quater,quater,quater],
+      [quater,-quater,-quater],
+      [-quater,-quater,quater],
+      [-quater,quater,-quater]
+    ];
+
     for (i = 0; i < 4; i++) {
 
       var e = this.debrisMesh.length;
 
       arr = triangles[i];
-      objecte = this.buildDebris( verts, arr, colors[i] );
-      objecte = this.position_rotation( objecte, position );
-      //g.debrisMesh.push( objecte );
-      this.scene.add( objecte );
+      debris_temp = this.buildTriangleDebris( vertices, arr, material );
+      debris_temp = this.position_rotation( debris_temp, position );
+      debris_temp.name = 'debris'+e;
 
-      cannonPoints = objecte.geometry.vertices.map(function(v) {
-        return new CANNON.Vec3( v.x, v.y, v.z )
-      });
-      cannonPoints.reverse();
+      this.debrisMesh.push( debris_temp );
+      this.scene.add( g.debrisMesh[e] );
 
-      cannonFaces = objecte.geometry.faces.map(function(f) {
-        return [f.a, f.b, f.c]
-      });
+      var object = this.scene.getObjectByName( debris_temp.name );
 
-      var cubeShape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
-      //var cubeShape = new CANNON.Box(new CANNON.Vec3(0.15,0.15,0.15));
+      var debrisShape = new CANNON.Box(new CANNON.Vec3(quater, quater, quater));
+      this.debrisShape[e] = new CANNON.Body({mass: mass, shape: debrisShape});
+      this.debrisShape[e].position.set(object.position.x, object.position.y, object.position.z);
+      this.debrisShape[e].quaternion.w = object.quaternion._w;
+      this.debrisShape[e].quaternion.x = object.quaternion._x;
+      this.debrisShape[e].quaternion.y = object.quaternion._y;
+      this.debrisShape[e].quaternion.z = object.quaternion._z;
+      this.debrisShape[e].shapeOffsets[0].x = offset[i][0];
+      this.debrisShape[e].shapeOffsets[0].y = offset[i][1];
+      this.debrisShape[e].shapeOffsets[0].z = offset[i][2];
 
-      this.debrisShape[e] = new CANNON.Body({
-        mass: mass,
-        material: mat,
-        position: new CANNON.Vec3( position.x, position.y, position.z )
-      });
-
-      //console.log(g.debrisShape[e]);
-      this.debrisShape[e].addShape( cubeShape );
+      this.debrisShape[e].velocity.set( Math.random()*dir.x, Math.random()*dir.y, Math.random()*dir.z );
+      this.debrisShape[e].angularVelocity.set( Math.random()*5, Math.random()*5, Math.random()*5 );
 
       this.debrisShape[e].linearDamping = damping;
-      this.debrisShape[e].angularDamping = damping;
+      this.debrisShape[e].angularDamping = damping/2;
 
-      // if(d.hit.point){
-      //   var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
-      //   var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
-      //   g.debrisShape[e].applyImpulse ( impulse,  worldPoint );
-      // }
+      if(shotData.hit.point){
+        var worldPoint = new CANNON.Vec3( shotData.hit.point.x, shotData.hit.point.y, shotData.hit.point.z );
+        var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
+        this.debrisShape[e].applyImpulse ( impulse,  worldPoint );
+      }
 
-      this.world.addBody ( this.debrisShape[e] );
+      this.world.add(this.debrisShape[e]);
 
     }
-    */
-
-    var e = this.debrisMesh.length;
-
-    arr = [1,2,3,6];
-    objecte = this.buildDebris( verts, arr, 0x55ff55 );
-    objecte = this.position_rotation( objecte, position );
-
-    // var box = new THREE.BoxHelper( objecte, 0xffff00 );
-    // this.scene.add( box );
-
-    // console.log( object.position );
-    // //geometry.applyMatrix( new THREE.Matrix4().makeTranslation(x, y, z) );
-    // var vector = object.geometry.boundingBox.getCenter();
-    // console.log( vector );
-    //
-    // this.scene.updateMatrixWorld();
-    //
-    // console.log( object.position );
-    // //geometry.applyMatrix( new THREE.Matrix4().makeTranslation(x, y, z) );
-    // var vector = object.geometry.boundingBox.getCenter();
-    // console.log( vector );
-
-    objecte.name = 'banana';
-    this.scene.add( objecte );
-    var object = this.scene.getObjectByName( objecte.name );
-    var v = this.getCenterPoint( object );
-    console.log(v);
-
-    //object.DefaultMatrixAutoUpdate();
-    //var vector = object.center();
-    //console.log( vector );
-
-    //var bb = this.scene.getObjectByName( objecte.name );
-    //console.log( bb );
-
-    var sphereShape = new CANNON.Sphere(0.25);
-    var sphereBody = new CANNON.Body({mass: mass, shape: sphereShape}); // Step 2
-    sphereBody.position.set(object.position.x, object.position.y-1, object.position.z);
-    this.world.add(sphereBody); // Step 3
-
-
-    // cannonPoints = object.geometry.vertices.map(function(v) {
-    //   return new CANNON.Vec3( v.x, v.y, v.z )
-    // });
-    // cannonPoints.reverse();
-    //
-    // cannonFaces = object.geometry.faces.map(function(f) {
-    //   return [f.a, f.b, f.c]
-    // });
-    //
-    // var cubeShape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
-    //
-    // this.debrisShape[e] = new CANNON.Body({
-    //   mass: mass,
-    //   material: mat,
-    //   position: new CANNON.Vec3( object.position.x, object.position.y, object.position.z )
-    // });
-
-
-    // this.debrisShape[e].addShape( cubeShape );
-    //
-    // this.debrisShape[e].linearDamping = damping;
-    // this.debrisShape[e].angularDamping = damping;
-
-
-    // if(d.hit.point){
-    //   var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
-    //   var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
-    //   g.debrisShape[e].applyImpulse ( impulse,  worldPoint );
-    // }
-
-    //this.world.addBody ( this.debrisShape[e] );
-
 
   },
 
-
-  this.getCenterPoint = function(mesh) {
-    var middle = new THREE.Vector3();
-    var geometry = mesh.geometry;
-
-    geometry.computeBoundingBox();
-
-    middle.x = (geometry.boundingBox.max.x + geometry.boundingBox.min.x) / 2;
-    middle.y = (geometry.boundingBox.max.y + geometry.boundingBox.min.y) / 2;
-    middle.z = (geometry.boundingBox.max.z + geometry.boundingBox.min.z) / 2;
-
-    mesh.localToWorld( middle );
-    return middle;
-  },
-
-  this.buildDebris = function ( verts, arr, color ){
+  this.buildTriangleDebris = function ( vertices, arr, material ){
 
     var geometry = new THREE.Geometry();
     geometry.vertices.push(
-      verts[arr[0]],
-      verts[arr[1]],
-      verts[arr[2]]
+      vertices[arr[0]],
+      vertices[arr[1]],
+      vertices[arr[2]]
     );
     geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
 
     geometry.vertices.push(
-      verts[arr[0]],
-      verts[arr[2]],
-      verts[arr[3]]
+      vertices[arr[0]],
+      vertices[arr[2]],
+      vertices[arr[3]]
     );
     geometry.faces.push( new THREE.Face3( 3, 4, 5 ) );
 
     geometry.vertices.push(
-      verts[arr[3]],
-      verts[arr[2]],
-      verts[arr[1]]
+      vertices[arr[3]],
+      vertices[arr[2]],
+      vertices[arr[1]]
     );
     geometry.faces.push( new THREE.Face3( 6, 7, 8 ) );
 
     geometry.vertices.push(
-      verts[arr[3]],
-      verts[arr[1]],
-      verts[arr[0]]
+      vertices[arr[3]],
+      vertices[arr[1]],
+      vertices[arr[0]]
     );
     geometry.faces.push(  new THREE.Face3( 9, 10, 11 ) )
 
@@ -882,131 +804,11 @@ function game(){
     geometry.computeVertexNormals();
     geometry.computeBoundingBox();
 
-    var material =  new THREE.MeshLambertMaterial({ color: color, transparent:true, opacity:0.8 });
-    var object = new THREE.Mesh( geometry, material );
-    // console.log( object.position );
-    // //geometry.applyMatrix( new THREE.Matrix4().makeTranslation(x, y, z) );
-    // var vector = object.geometry.boundingBox.getCenter();
-    // console.log( vector );
-    //
-    // this.scene.updateMatrixWorld();
-    //
-    // console.log( object.position );
-    // //geometry.applyMatrix( new THREE.Matrix4().makeTranslation(x, y, z) );
-    // var vector = object.geometry.boundingBox.getCenter();
-    // console.log( vector );
-
-    return object;
-  },
-
-  this.addSmallCubes = function (position, d){
-
-    var g = this;
-
-    console.log( position );
-
-    var dir = new THREE.Vector3( (d.to.x-d.from.x), (d.to.y-d.from.y), (d.to.z-d.from.z) );
-    //console.log( dir );
-
-    var loader = new THREE.JSONLoader();
-
-    for (i = 2; i < 3; i++) { // 1 - 5
-
-      loader.load( 'geometry/debris'+i+'.json', function ( geometry ) {
-        var e = g.debrisMesh.length;
-
-        var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
-        var temp = new THREE.Mesh( geometry, material );
-        temp.position.x = position.x;
-        temp.position.y = position.y;
-        temp.position.z = position.z;
-        //temp = g.position_rotation( temp, position );
-        temp.rotateZ( position.r_z );
-        // temp.rotateY( position.r_y );
-        // temp.rotateX( position.r_x );
-        temp.name = 'debris'+e;
-        console.log(temp);
-
-        var mm = new THREE.MeshBasicMaterial({
-          color: 0xff0000,
-          wireframe: true
-        });
-        var cc = new THREE.CubeGeometry(1, 1, 1);
-        var obj = new THREE.Mesh( cc, mm );
-        obj = g.position_rotation( obj, position );
-        // obj.position.x = position.x;
-        // obj.position.y = position.y;
-        // obj.position.z = position.z;
-        g.scene.add( obj );
-        //console.log(obj);
-
-        //temp.quaternion = obj.quaternion;
-
-        var box = new THREE.BoxHelper( temp, 0xffff00 );
-        g.scene.add( box );
-        //temp.add( box );
-
-        g.debrisMesh.push( temp );
-        g.scene.add( temp );
-        // g.debrisMesh[e].rotation.set(
-        //   position.r_x,
-        //   position.r_y,
-        //   position.r_z
-        // );
-
-
-        var damping = 0.5;//0.1 probably
-        var mass = 10;
-        var mat = new CANNON.Material();
-
-        //console.log(temp.geometry.vertices);
-
-        cannonPoints = temp.geometry.vertices.map(function(v) {
-          return new CANNON.Vec3( v.x, v.y, v.z )
-        });
-        cannonPoints.reverse();
-
-        cannonFaces = temp.geometry.faces.map(function(f) {
-          return [f.a, f.b, f.c]
-        });
-        // cannonFaces.reverse();
-
-        var cubeShape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
-        //var cubeShape = new CANNON.Box(new CANNON.Vec3(0.15,0.15,0.15));
-
-        g.debrisShape[e] = new CANNON.Body({
-          mass: mass,
-          material: mat,
-          position: new CANNON.Vec3( position.x, position.y, position.z )
-        });
-
-        //console.log(g.debrisShape[e]);
-        g.debrisShape[e].addShape( cubeShape );
-
-        //g.debrisShape[e] = g.position_rotation( g.debrisShape[e], position );
-        g.debrisShape[e].position.x = position.x;
-        g.debrisShape[e].position.y = position.y;
-        g.debrisShape[e].position.z = position.z;
-
-        //g.debrisShape[e].velocity.set( dir.x, dir.y, dir.z );
-        //g.debrisShape[i].angularVelocity.set( dir.x, dir.y, dir.z );
-        g.debrisShape[e].linearDamping = damping;
-        g.debrisShape[e].angularDamping = damping;
-
-        // if(d.hit.point){
-        //   var worldPoint = new CANNON.Vec3( d.hit.point.x, d.hit.point.y, d.hit.point.z );
-        //   var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
-        //   g.debrisShape[e].applyImpulse ( impulse,  worldPoint );
-        // }
-
-        g.world.addBody ( g.debrisShape[e] );
-        console.log(g.debrisShape[e]);
-
-
-      });
+    if(!material){
+      material =  new THREE.MeshLambertMaterial({ color: 0xfff777, transparent:true, opacity:1 });
     }
-
-
+    var object = new THREE.Mesh( geometry, material );
+    return object;
   },
 
   //not sure this works, may only remove from players array

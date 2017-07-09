@@ -5,6 +5,7 @@
   "author": "Michaél Adam Lockwood",
   "development": true,
   "debug": true,
+  "debugCannon": true,
   "browser": {
     "game": "src/game.js"
   },
