@@ -64,11 +64,11 @@ function game(){
 
     this.sound = false; // will be defined in the options
 
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = window.innerWidth; // ( window.innerWidth < 100 ? 100 : window.innerWidth );
+    this.height = window.innerHeight; // ( window.innerHeight < 100 ? 100 : window.innerHeight );
 
     var canvas = document.getElementById("canvasID");
-    this.renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias: true, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias: true, alpha: true, precision: "lowp" });
 
     this.renderer.gammaInput = true;
     this.renderer.gammaOutput = true;
@@ -125,21 +125,21 @@ function game(){
     //effects
     this.EffectComposer = require('three-effectcomposer')(THREE);
     var RGBShiftShader = THREE.RGBShiftShader;
-    this.composer = '';
     this.composer = new this.EffectComposer(this.renderer);
     this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
     this.effect = new this.EffectComposer.ShaderPass(RGBShiftShader);
     this.effect.renderToScreen = true;
-    this.effect.uniforms.amount.value = 0.005;
-    this.composer.addPass(this.effect)
+    this.effect.uniforms.amount.value = 0.000;
+    this.composer.addPass(this.effect);
+
 
     this.render(socket);
 
   },
 
   this.onWindowResize = function(){
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = window.innerWidth; // ( window.innerWidth < 100 ? 100 : window.innerWidth );
+    this.height = window.innerHeight; // ( window.innerHeight < 100 ? 100 : window.innerHeight );
   },
 
   this.render = function () {
@@ -156,8 +156,8 @@ function game(){
 		}
     this.stats.end();
     if(this.renderer != null){
-      //this.composer.render(this.scene, this.camera);
-      this.renderer.render(this.scene, this.camera);
+      this.composer.render(this.scene, this.camera);
+      //this.renderer.render(this.scene, this.camera);
     }
 
     this.updatePhysics();
@@ -193,14 +193,10 @@ function game(){
     var ref = this;
     console.log( "registerEvents" );
 
-    //window.addEventListener('click', function(e) { ref.fire( e ); }, false );
-
     $( window ).bind( "click", function() {
       ref.fire( this );
     });
 
-    // document.addEventListener('mousedown', onMouseDown, false);
-    // document.addEventListener('mouseup', onMouseUp, false);
     // document.addEventListener('mousemove', onMouseMove, false);
     // document.addEventListener('mouseout', onMouseOut, false);
 
@@ -211,8 +207,6 @@ function game(){
     $( window ).on( "keyup", function( event ) {
       ref.onKeyUp( event, ref );
     });
-    //document.addEventListener('keydown', function(e) { ref.onKeyDown( e, ref ); }, false );
-    //document.addEventListener('keyup', function(e) { ref.onKeyUp( e, ref ); }, false );
 
     // added for lensFlare size changes
     window.addEventListener( 'resize', this.onWindowResize, false );
@@ -294,13 +288,6 @@ function game(){
     var shot = {to:a, from:b, distance:c, color:d, hit:e};
 
     socket.emit('playerShot', shot);
-
-    this.composer = new this.EffectComposer(this.renderer);
-    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
-    current = this.effect.uniforms.amount.value;
-    this.effect.uniforms.amount.value = current/2;
-    this.composer.addPass( this.effect );
-
   },
 
   this.confirmHit = function(data){
@@ -397,8 +384,63 @@ function game(){
         }
       });
 
+
+
+      var g = this;
+      var position = { x : 0.05 };
+      var target = { x : 0.05 };
+      this.ween = new this.TWEEN.Tween({
+        propertyA: 0.005
+      }).to({ propertyA: 0.00 }, 500);
+
+      this.ween.onUpdate(function( ){
+
+        g.setB( this.propertyA );
+        //this.propertyA();
+      });
+
+      this.ween.easing(this.tenStepEasing);
+      this.ween.start();
+
+
+      this.setB( 0.005 );
+
     }
 	},
+
+  this.tenStepEasing = function(k) {
+    return Math.floor(k * 5) / 5;
+  },
+
+  // this.setA = function( value ){
+  //   var g = this;
+  //
+  //   setTimeout(function () {
+  //     // console.log("timeout");
+  //     // if( value > 0.0000 ){
+  //     //   g.setB( value/2 );
+  //     // }
+  //
+  //     this.setB( 0.000 );
+  //
+  //   }, 100);
+  // },
+
+  this.setB = function( value ){
+    this.composer = new this.EffectComposer(this.renderer);
+    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
+    //console.log(value);
+
+    // if( value === undefined ){
+    //   this.effect.uniforms.amount.value = 0;
+    // }else{
+    //   this.effect.uniforms.amount.value = value;
+    // }
+    // var current = this.effect.uniforms.amount.value;
+    this.effect.uniforms.amount.value = value;
+    this.composer.addPass( this.effect );
+    //this.setA( value );
+  },
 
   // part of fadeMesh tracks original opacity
   this.trackOriginalOpacities = function(mesh) {
