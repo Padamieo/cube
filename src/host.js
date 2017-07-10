@@ -7,9 +7,9 @@ var host = {
 		obj.x = Math.random()*r;
 		obj.y = Math.random()*r;
 		obj.z = Math.random()*r;
-		obj.r_x = 0;
-		obj.r_y = 0;
-		obj.r_z = 0;
+		obj.r_x = Math.random()*r;
+		obj.r_y = Math.random()*r;
+		obj.r_z = Math.random()*r;
 		obj.size = s;
 		return obj;
 	},

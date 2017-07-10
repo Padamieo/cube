@@ -1,4 +1,4 @@
-//var game = {
+
 function game(){
 
   this.addLight = function(color, position, name){
@@ -45,7 +45,6 @@ function game(){
     object.lensFlares[ 2 ].y += 0.025;
     object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + THREE.Math.degToRad( 45 );
   },
-
 
   this.loadWorld = function( socket, data ){
 
@@ -97,7 +96,7 @@ function game(){
     this.addLight(0xffffdd , {x:50,y:50,z:50}, 'one');
     //this.addLight(0xeeffff , {x:-50,y:-50,z:-50}, 'two');
 
-    this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 10000);
+    this.camera = new THREE.PerspectiveCamera(70, this.width / this.height, 0.1, 10000); //FOV 45
     this.camera.position.y = 0;
     this.camera.position.z = 0;
     this.scene.add(this.camera);
@@ -110,6 +109,29 @@ function game(){
     this.createPlayer(data);
 
     this.registerEvents(socket);
+
+    //physics cannon stuff for debris
+    this.world = new CANNON.World();
+    this.world.gravity.set(0,0,0);
+    this.world.broadphase = new CANNON.NaiveBroadphase();
+    //this.world.solver.iterations = 10;
+    if(pkg.debugCannon){
+      this.cannonDebugRenderer = new THREE.CannonDebugRenderer( this.scene, this.world );
+    }
+    this.debrisMesh = [];
+    this.debrisShape = [];
+    this.cubeBodies = [];
+
+    //effects
+    this.EffectComposer = require('three-effectcomposer')(THREE);
+    var RGBShiftShader = THREE.RGBShiftShader;
+    this.composer = '';
+    this.composer = new this.EffectComposer(this.renderer);
+    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
+    this.effect = new this.EffectComposer.ShaderPass(RGBShiftShader);
+    this.effect.renderToScreen = true;
+    this.effect.uniforms.amount.value = 0.005;
+    this.composer.addPass(this.effect)
 
     this.render(socket);
 
@@ -124,6 +146,7 @@ function game(){
     this.stats.begin();
   	var ref = this;
   	requestAnimationFrame(function(){ref.render()});
+
     if ( thisPlayer ){
       this.checkKeyStates();
     }
@@ -133,8 +156,16 @@ function game(){
 		}
     this.stats.end();
     if(this.renderer != null){
+      //this.composer.render(this.scene, this.camera);
       this.renderer.render(this.scene, this.camera);
     }
+
+    this.updatePhysics();
+    if(pkg.debugCannon){
+      this.cannonDebugRenderer.update();
+    }
+
+
   },
 
   this.deconstruct = function(){
@@ -236,8 +267,10 @@ function game(){
         e = { type:'player', name: name };
         //e = intersects[0].object.playerId;
       }else{
+        //console.log("notice me");
+        var point = intersects[0].point;
         var name = intersects[0].object.name;
-        e = { type:'cube', name: name };
+        e = { type:'cube', name: name, point: point };
       }
 
     }else{
@@ -262,40 +295,47 @@ function game(){
 
     socket.emit('playerShot', shot);
 
+    this.composer = new this.EffectComposer(this.renderer);
+    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
+    current = this.effect.uniforms.amount.value;
+    this.effect.uniforms.amount.value = current/2;
+    this.composer.addPass( this.effect );
+
   },
 
   this.confirmHit = function(data){
-    if(data.type == 'player'){
-      if(data.name === thisPlayer.playerId){
+    if(data.hit.type == 'player'){
+      if(data.hit.name === thisPlayer.playerId){
         console.log("confirm hit");
 
         this.hit(data);
         console.log("report to server");
         socket.emit('playerKill', thisPlayer.playerId);
       }
-    }else if (data.type == 'cube'){
+    }else if (data.hit.type == 'cube'){
       this.hit(data);
     }
   },
 
   this.hit = function(data){
-    var id = data.name;
+    var name = data.hit.name;
     console.log("hit");
-    //console.log(id);
     for (var i = 0; i < this.objects.length; i++) {
-      if(this.objects[i].name == id){
+      if(this.objects[i].name == name){
         this.objects.splice(i, 1);
       }
     }
-    var obj = this.scene.getObjectByName( id );
-    //console.log( obj );
-    var d = {
+    var obj = this.scene.getObjectByName( name );
+    var positionRotation = {
       x: obj.position.x,
       y: obj.position.y,
-      z: obj.position.z
-    }
-    this.addSmallCubes(d, data);
-    this.remove(id);
+      z: obj.position.z,
+      r_x: obj.rotation.x,
+      r_y: obj.rotation.y,
+      r_z: obj.rotation.z
+    };
+    this.addTriangleDebrisFromCube( positionRotation, data, obj.geometry.vertices, obj.size );
+    this.remove(name);
   },
 
   this.remove = function(name) {
@@ -317,18 +357,12 @@ function game(){
 			  sound.startSound(data.to, playerpos);
 			}
 
-      /*
-      var arrow = new THREE.ArrowHelper( data.to, data.from, data.distance, '0xffffff');
-      console.log(arrow);
-      this.scene.add( arrow );
-      */
-
       //current line and material working version
       var material = new THREE.LineBasicMaterial({
         color: data.color,
         transparent: true,
         opacity: 1
-       });
+      });
 
       var geometry = new THREE.Geometry();
       geometry.vertices.push(data.to);
@@ -348,7 +382,7 @@ function game(){
         callback : function (){
 
           if(data.hit != ''){
-            ref.confirmHit(data.hit);
+            ref.confirmHit(data);
           }
 
           ref.fadeMesh(line, "in", {
@@ -441,12 +475,26 @@ function game(){
       this.escape();
     }
 
-		if( this.keyState[38] ){
-			this.fovChange(true);
-		}
-		if( this.keyState[40] ){
-			this.fovChange(false);
-		}
+  	if(pkg.development){
+  		if( this.keyState[38] ){
+  			this.fovChange(true);
+  		}
+  		if( this.keyState[40] ){
+  			this.fovChange(false);
+  		}
+      if ( this.keyState[104] ) {
+        obj.translateX( -0.01 );
+      }
+      if ( this.keyState[101] ) {
+        obj.translateX( 0.01 );
+      }
+      if ( this.keyState[102] ) {
+        obj.translateZ( -0.01 );
+      }
+      if ( this.keyState[100] ) {
+        obj.translateZ( 0.01 );
+      }
+    }
 
     if ( this.keyState[ui.pitchZForward] ) {
       obj.rotateZ (thisPlayer.turnSpeed);
@@ -502,12 +550,7 @@ function game(){
   this.updateObject = function(data){
     for(var i = 0; i < this.players.length; i++){
       if(this.players[i].playerId == data.playerId){
-        this.players[i].position.x = data.x;
-        this.players[i].position.y = data.y;
-        this.players[i].position.z = data.z;
-        this.players[i].rotation.x = data.r_x;
-        this.players[i].rotation.y = data.r_y;
-        this.players[i].rotation.z = data.r_z;
+        this.players[i] = this.position_rotation( this.players[i], data );
       }
     }
 
@@ -548,16 +591,14 @@ function game(){
 
   },
 
-  this.position_rotation = function(o, data){
-    o.rotation.set(
-      data.r_x,
-      data.r_y,
-      data.r_z
-    );
-    o.position.x = data.x;
-    o.position.y = data.y;
-    o.position.z = data.z;
-    return o;
+  this.position_rotation = function(obj, data){
+    obj.rotation.x = data.r_x;
+    obj.rotation.y = data.r_y;
+    obj.rotation.z = data.r_z;
+    obj.position.x = data.x;
+    obj.position.y = data.y;
+    obj.position.z = data.z;
+    return obj;
   },
 
   this.createPlayer = function(data){
@@ -575,15 +616,13 @@ function game(){
     obj.position.y = 0;
     obj.position.z = 0;
 
+    obj.size = data.size;
+
     this.players.push( obj );
     this.scene.add( obj );
 
-    // var arrowHelper = this.arrow();
-    // obj.add( arrowHelper );
-
     this.camera.position.set( 3, 1, 0 );
 
-    //console.log(obj.position);
     var temp = new THREE.Vector3( -1, 0, 0 );
     this.camera.lookAt( temp );
 
@@ -627,55 +666,170 @@ function game(){
     var color = ( data.color ? data.color : 0xfff777 );
 		var obj = this.create_cube(data, color, 0.9);
 		obj.name = data.name;
+    obj.size = data.size;
     obj = this.position_rotation(obj, data);
 		this.objects.push( obj );
 		this.scene.add( obj );
-	},
-
-  this.addSmallCubes = function (data, d){
-
-    var g = this;
-
-    var loader = new THREE.JSONLoader();
-
-    loader.load( 'js/untitled.json', function ( geometry ) {
-      var material =  new THREE.MeshLambertMaterial({color: 0xff77ff, transparent:true, opacity:0.8, side: THREE.DoubleSide});
-      var mesh = new THREE.Mesh( geometry, material );
-      mesh.position.x = data.x;
-      mesh.position.y = data.y;
-      mesh.position.z = data.z;
-      mesh.scale.x = 0.5;
-      mesh.scale.y = 0.5;
-      mesh.scale.z = 0.5;
-      g.scene.add( mesh );
-      console.log( d );
-      console.log(mesh.position);
-      var wee = new this.TWEEN.Tween(mesh.position).to({ x: 0, y: 0, z: 0 }, 5000);
-      wee.easing(this.TWEEN.Easing.Elastic.InOut);
-      wee.repeat(Infinity);
-      //wee.yoyo(true);
-      wee.start();
-      wee.onStart(function() { console.log("start") });
-      wee.onComplete(function() { console.log("complete") });
-
-    });
 
     /*
-    var d = {
-      name: 'test',
-      r_x: 0,
-      r_y: 0,
-      r_z: 0,
-      x: 0,
-      y: 0,
-      z: 0,
-      size: 1,
-      color: 0xff77ff
-    };
-
-    this.addCube( d );
+    //physics for cubes?
+    var e = this.cubeBodies.length;
+    var debrisShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+    this.cubeBodies[e] = new CANNON.Body({mass: 100, shape: debrisShape});
+    this.cubeBodies[e].position.set(data.x, data.y, data.z);
+    this.world.add(this.cubeBodies[e]);
     */
+	},
 
+  this.updatePhysics = function (){
+    // Step the physics world
+    this.world.step( 1/60 );
+    // Copy coordinates from Cannon.js to Three.js
+    if( this.debrisMesh ){
+      if( this.debrisMesh.length >= 1 ){
+        for (i = 0; i < this.debrisMesh.length; i++) {
+          //console.log(this.debrisShape[i].velocity.x); //may want to know velocity down to 0
+          this.debrisMesh[i].position.copy(this.debrisShape[i].position);
+          this.debrisMesh[i].quaternion.copy(this.debrisShape[i].quaternion);
+        }
+      }
+    }
+    /*
+    if( this.cubeBodies ){
+      if( this.cubeBodies.length >= 1 ){
+        for (i = 0; i < this.cubeBodies.length; i++) {
+          // this.cubeBodies[i].position.copy(this.object?[i].position);
+          // this.cubeBodies[i].quaternion.copy(this.object?[i].quaternion);
+        }
+      }
+    }
+    */
+  },
+
+  this.addTriangleDebrisFromCube = function ( position, shotData, vertices, size ){
+
+    size = ( size ? size : 1 );
+
+    if(pkg.debugCannon){
+      var mat = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        wireframe: true
+      });
+      var cube = new THREE.CubeGeometry(1, 1, 1);
+      var obj = new THREE.Mesh( cube, mat );
+      obj = this.position_rotation( obj, position );
+      this.scene.add( obj );
+    }
+
+    var damping = 0.3;//0.1 probably
+    var mass = 10;
+    var mat = new CANNON.Material();
+    var dir = new THREE.Vector3(
+      (shotData.to.x-shotData.from.x),
+      (shotData.to.y-shotData.from.y),
+      (shotData.to.z-shotData.from.z)
+    );
+
+    var triangles = [
+      [0,1,2,5],
+      [1,2,3,6],
+      [2,5,6,7],
+      [1,4,5,6]
+    ];
+
+    var material = new THREE.MeshLambertMaterial({ color: 0xfff777 });
+    var quater = size/4;
+
+    var offset = [
+      [quater,quater,quater],
+      [quater,-quater,-quater],
+      [-quater,-quater,quater],
+      [-quater,quater,-quater]
+    ];
+
+    for (i = 0; i < 4; i++) {
+
+      var e = this.debrisMesh.length;
+
+      arr = triangles[i];
+      debris_temp = this.buildTriangleDebris( vertices, arr, material );
+      debris_temp = this.position_rotation( debris_temp, position );
+      debris_temp.name = 'debris'+e;
+
+      this.debrisMesh.push( debris_temp );
+      this.scene.add( g.debrisMesh[e] );
+
+      var object = this.scene.getObjectByName( debris_temp.name );
+
+      var debrisShape = new CANNON.Box(new CANNON.Vec3(quater, quater, quater));
+      this.debrisShape[e] = new CANNON.Body({mass: mass, shape: debrisShape});
+      this.debrisShape[e].position.set(object.position.x, object.position.y, object.position.z);
+      this.debrisShape[e].quaternion.w = object.quaternion._w;
+      this.debrisShape[e].quaternion.x = object.quaternion._x;
+      this.debrisShape[e].quaternion.y = object.quaternion._y;
+      this.debrisShape[e].quaternion.z = object.quaternion._z;
+      this.debrisShape[e].shapeOffsets[0].x = offset[i][0];
+      this.debrisShape[e].shapeOffsets[0].y = offset[i][1];
+      this.debrisShape[e].shapeOffsets[0].z = offset[i][2];
+
+      this.debrisShape[e].velocity.set( Math.random()*dir.x, Math.random()*dir.y, Math.random()*dir.z );
+      this.debrisShape[e].angularVelocity.set( Math.random()*5, Math.random()*5, Math.random()*5 );
+
+      this.debrisShape[e].linearDamping = damping;
+      this.debrisShape[e].angularDamping = damping/2;
+
+      if(shotData.hit.point){
+        var worldPoint = new CANNON.Vec3( shotData.hit.point.x, shotData.hit.point.y, shotData.hit.point.z );
+        var impulse = new CANNON.Vec3( dir.x, dir.y, dir.z );
+        this.debrisShape[e].applyImpulse ( impulse,  worldPoint );
+      }
+
+      this.world.add(this.debrisShape[e]);
+
+    }
+
+  },
+
+  this.buildTriangleDebris = function ( vertices, arr, material ){
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(
+      vertices[arr[0]],
+      vertices[arr[1]],
+      vertices[arr[2]]
+    );
+    geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+    geometry.vertices.push(
+      vertices[arr[0]],
+      vertices[arr[2]],
+      vertices[arr[3]]
+    );
+    geometry.faces.push( new THREE.Face3( 3, 4, 5 ) );
+
+    geometry.vertices.push(
+      vertices[arr[3]],
+      vertices[arr[2]],
+      vertices[arr[1]]
+    );
+    geometry.faces.push( new THREE.Face3( 6, 7, 8 ) );
+
+    geometry.vertices.push(
+      vertices[arr[3]],
+      vertices[arr[1]],
+      vertices[arr[0]]
+    );
+    geometry.faces.push(  new THREE.Face3( 9, 10, 11 ) )
+
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+    geometry.computeBoundingBox();
+
+    if(!material){
+      material =  new THREE.MeshLambertMaterial({ color: 0xfff777, transparent:true, opacity:1 });
+    }
+    var object = new THREE.Mesh( geometry, material );
+    return object;
   },
 
   //not sure this works, may only remove from players array
