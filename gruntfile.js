@@ -22,6 +22,8 @@ module.exports = function(grunt){
 						'node_modules/three/examples/js/SkyShader.js',
 						'node_modules/cannon/build/cannon.js',
 						'node_modules/cannon/tools/threejs/CannonDebugRenderer.js',
+						'node_modules/three-effectcomposer/index.js',
+						'node_modules/three/examples/js/shaders/RGBShiftShader.js',
 						'src/js/ui.js',
 						'src/js/sound.js',
 						'src/js/game.js',

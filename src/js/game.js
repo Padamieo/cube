@@ -122,6 +122,17 @@ function game(){
     this.debrisShape = [];
     this.cubeBodies = [];
 
+    //effects
+    this.EffectComposer = require('three-effectcomposer')(THREE);
+    var RGBShiftShader = THREE.RGBShiftShader;
+    this.composer = '';
+    this.composer = new this.EffectComposer(this.renderer);
+    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
+    this.effect = new this.EffectComposer.ShaderPass(RGBShiftShader);
+    this.effect.renderToScreen = true;
+    this.effect.uniforms.amount.value = 0.005;
+    this.composer.addPass(this.effect)
+
     this.render(socket);
 
   },
@@ -135,6 +146,7 @@ function game(){
     this.stats.begin();
   	var ref = this;
   	requestAnimationFrame(function(){ref.render()});
+
     if ( thisPlayer ){
       this.checkKeyStates();
     }
@@ -144,6 +156,7 @@ function game(){
 		}
     this.stats.end();
     if(this.renderer != null){
+      //this.composer.render(this.scene, this.camera);
       this.renderer.render(this.scene, this.camera);
     }
 
@@ -151,6 +164,8 @@ function game(){
     if(pkg.debugCannon){
       this.cannonDebugRenderer.update();
     }
+
+
   },
 
   this.deconstruct = function(){
@@ -279,6 +294,12 @@ function game(){
     var shot = {to:a, from:b, distance:c, color:d, hit:e};
 
     socket.emit('playerShot', shot);
+
+    this.composer = new this.EffectComposer(this.renderer);
+    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
+    current = this.effect.uniforms.amount.value;
+    this.effect.uniforms.amount.value = current/2;
+    this.composer.addPass( this.effect );
 
   },
 
