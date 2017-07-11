@@ -123,20 +123,25 @@ function game(){
     this.cubeBodies = [];
 
     //effects
+    this.setupEffects();
+
+    //default render call
+    this.render();
+
+  },
+
+  this.setupEffects = function(){
     this.composer = new THREE.EffectComposer( this.renderer );
     this.composer.addPass( new THREE.RenderPass( this.scene, this.camera ) );
 
     this.effect = new THREE.ShaderPass( THREE.RGBShiftShader );
     this.effect.uniforms[ 'amount' ].value = 0.000;
     this.effect.renderToScreen = true;
+    this.effect.name = 'RGBShift';
 
     //this.effect = new THREE.GlitchPass();
     //this.effect.renderToScreen = true;
     this.composer.addPass( this.effect );
-
-    //default render call
-    this.render();
-
   },
 
   this.onWindowResize = function(){
@@ -160,14 +165,13 @@ function game(){
     if(this.renderer != null){
       //this.composer.render(this.scene, this.camera);
       //this.renderer.render(this.scene, this.camera);
+      this.composer.render();
     }
 
     this.updatePhysics();
     if(pkg.debugCannon){
       this.cannonDebugRenderer.update();
     }
-
-    this.composer.render();
 
 
   },
@@ -352,7 +356,8 @@ function game(){
       var material = new THREE.LineBasicMaterial({
         color: data.color,
         transparent: true,
-        opacity: 1
+        opacity: 1,
+        linewidth: 8
       });
 
       var geometry = new THREE.Geometry();
@@ -384,7 +389,7 @@ function game(){
               ref.remove(line.name);
             }
           });
-          
+
         }
       });
 
@@ -395,28 +400,42 @@ function game(){
 
   this.triggerShift = function(){
     var g = this;
+    //var result = $.grep(this.composer.passes, function(e){ return ( e.name == 'RGBShift'; });
+    var index = this.getShaderIndex(this.composer.passes, 'RGBShift');
+    //console.log(result);
     this.ween = new this.TWEEN.Tween({
       shift: 0.005
     }).to({ shift: 0.00 }, 500);
     this.ween.onUpdate(function( ){
-      g.setRGBShift( this.shift );
+      g.setRGBShift( this.shift, index );
     });
     this.ween.easing(this.TWEEN.Easing.Bounce.InOut);
     this.ween.delay(300);
     this.ween.start();
+    //console.log(this.composer.passes);
   },
 
   this.cheaperEasing = function(k) {
     return Math.floor(k * 5) / 5;
   },
 
-  this.setRGBShift = function( value ){
+  this.setRGBShift = function( value, index ){
     //need way to identify passes 1
-    this.composer.passes[1].uniforms[ 'amount' ].value = value;
+    this.composer.passes[index].uniforms[ 'amount' ].value = value;
   },
 
   this.setGlitch = function( value ){
 
+  },
+
+  this.getShaderIndex = function( array, name ){
+    var index = '';
+    for (var i = 0; i < array.length; i++) {
+      if(array[i].name == name){
+        index = i;
+      }
+    }
+    return index;
   },
 
   // part of fadeMesh tracks original opacity
