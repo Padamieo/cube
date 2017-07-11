@@ -123,15 +123,6 @@ function game(){
     this.cubeBodies = [];
 
     //effects
-    // this.EffectComposer = require('three-effectcomposer')(THREE);
-    // var RGBShiftShader = THREE.RGBShiftShader;
-    // this.composer = new this.EffectComposer(this.renderer);
-    // this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
-    // this.effect = new this.EffectComposer.ShaderPass(RGBShiftShader);
-    // this.effect.renderToScreen = true;
-    // this.effect.uniforms.amount.value = 0.000;
-    // this.composer.addPass(this.effect);
-
     this.composer = new THREE.EffectComposer( this.renderer );
     this.composer.addPass( new THREE.RenderPass( this.scene, this.camera ) );
 
@@ -143,7 +134,8 @@ function game(){
     //this.effect.renderToScreen = true;
     this.composer.addPass( this.effect );
 
-    this.render(socket);
+    //default render call
+    this.render();
 
   },
 
@@ -392,48 +384,39 @@ function game(){
               ref.remove(line.name);
             }
           });
-
+          
         }
       });
 
-
-      var g = this;
-      // var position = { x : 0.05 };
-      // var target = { x : 0.05 };
-      this.ween = new this.TWEEN.Tween({
-        propertyA: 0.005
-      }).to({ propertyA: 0.00 }, 500);
-
-      this.ween.onUpdate(function( ){
-
-        g.setA( this.propertyA );
-        //this.propertyA();
-      });
-
-      this.ween.easing(this.TWEEN.Easing.Bounce.InOut);
-      this.ween.start();
-
-
-      //this.setA( 0.005 );
+      this.triggerShift();
 
     }
 	},
 
-  this.tenStepEasing = function(k) {
+  this.triggerShift = function(){
+    var g = this;
+    this.ween = new this.TWEEN.Tween({
+      shift: 0.005
+    }).to({ shift: 0.00 }, 500);
+    this.ween.onUpdate(function( ){
+      g.setRGBShift( this.shift );
+    });
+    this.ween.easing(this.TWEEN.Easing.Bounce.InOut);
+    this.ween.delay(300);
+    this.ween.start();
+  },
+
+  this.cheaperEasing = function(k) {
     return Math.floor(k * 5) / 5;
   },
 
-  this.setA = function( value ){
+  this.setRGBShift = function( value ){
     //need way to identify passes 1
     this.composer.passes[1].uniforms[ 'amount' ].value = value;
   },
 
-  this.setB = function( value ){
-    this.composer = new this.EffectComposer(this.renderer);
-    this.composer.addPass(new this.EffectComposer.RenderPass(this.scene, this.camera));
+  this.setGlitch = function( value ){
 
-    this.effect.uniforms.amount.value = value;
-    this.composer.addPass( this.effect );
   },
 
   // part of fadeMesh tracks original opacity
