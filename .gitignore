@@ -4,3 +4,4 @@ npm-debug.log*
 temp
 bower_components
 dist
+package-lock.json
