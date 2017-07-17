@@ -12,11 +12,11 @@ var users = [];
 
 var g = 'a';
 
-const uuid = ui.genUUID();
+var uuid = ui.genUUID();
 
 var nameUser = '';
 
-const ipcRenderer = require('electron').ipcRenderer;
+var ipcRenderer = require('electron').ipcRenderer;
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');

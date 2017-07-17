@@ -294,7 +294,7 @@ var ui = {
 
 	exitAppSetup: function(){
 		$(document).on("click", "#exit", function(){
-			const remote = require('electron').remote;
+			var remote = require('electron').remote;
 			var window = remote.getCurrentWindow();
 			window.close();
 		});
@@ -562,10 +562,11 @@ var ui = {
 	},
 
 	getLanguage: function(){
-		var defaultLanguage = 'en-Us';
+		var defaultLanguage = 'en-us';
 
 		//get user set language
 		//var language = defaultLanguage;
+		//ensure its in lowercase and is xx-xx format
 
 		var languageData;
 		try {

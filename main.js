@@ -1,20 +1,20 @@
 'use strict';
 
-const pkg = require('./package.json');
+var pkg = require('./package.json');
 
-const electron = require('electron')
+var electron = require('electron')
 // Module to control application life.
-const app = electron.app
+var app = electron.app
 // Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
+var BrowserWindow = electron.BrowserWindow
 
-const ipcMain = electron.ipcMain;
+var ipcMain = electron.ipcMain;
 
-const path = require('path')
+var path = require('path')
 
-const url = require('url')
+var url = require('url')
 
-const Discover = require('node-discover');
+var Discover = require('node-discover');
 var d = ''; //need to give this a better name
 
 var players = [];
@@ -96,7 +96,7 @@ function createWindow () {
 					if (users[i].playerId != id){
 						socket.emit('addUser', users[i]);
 					}
-				}        
+				}
 			});
 
 			socket.on('start', function(){
